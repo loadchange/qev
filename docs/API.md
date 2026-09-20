@@ -16,10 +16,14 @@ uv run qev serve --model models/qev-0.8b --backend torch --port 8008
 
 | 接口 | 用途 |
 |---|---|
+| `GET /`、`GET /snake` | 内置自主贪吃蛇页面 |
+| `GET /playground` | 接口测试页面 |
 | `GET /health` | 服务与当前 backend |
 | `GET /v1/models` | TypeSafe 风格模型列表 |
 | `POST /v1/systemone` | Noul、Choice、Score 决策 |
 | `POST /v1/chat/completions` | 非流式原生 Qwen 生成 |
+
+页面与模型接口同源，无需单独构建前端。贪吃蛇的创建、单步、导出等接口位于 `/api/snake/games`，状态与决策均由服务端维护，具体协议见 [实验室说明](DEMO.md)。这些演示接口不改变原有 Jev / TypeSafe 协议。
 
 可用别名包括 `qev-latest`、`qev:0.8b`、`qev:0.8b-mlx`、`qev-0.8b`、`qev-0.8b-mlx` 和旧客户端的 `jev-latest`。生成入口默认 `qev-native`。这些名称指向**当前已加载的 checkpoint**，不会在请求内切换权重或 Torch/MLX 后端。
 

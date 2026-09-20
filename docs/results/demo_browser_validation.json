@@ -1,0 +1,881 @@
+{
+  "format": "qev-demo-browser-validation-v1",
+  "recorded_at": "2026-09-20T23:39:35.596106+00:00",
+  "version": "0.2.0",
+  "base_url": "http://127.0.0.1:8008",
+  "browser": "Chrome 148 via agent-browser 0.37.1",
+  "model_backend": "mlx",
+  "method": "Real browser interaction with the existing local model server; no mocked model responses.",
+  "checks": {
+    "snake_controls": {
+      "passed": true,
+      "details": "Single-step, start, pause, seeded reset and resize exercised. Mobile reset seed=11,size=8 followed by one model step ate food; switching page paused at step 4.",
+      "navigation_pause": {
+        "snakeHidden": true,
+        "gameStatus": "已暂停 · 等待下一步",
+        "step": "4",
+        "playText": "▶ 开始自主运行"
+      }
+    },
+    "history_export": {
+      "passed": true,
+      "details": "Downloaded through the export button, parsed JSON, compared exactly with GET ?history=true, checked executed==proposed without intervention.",
+      "export": {
+        "format": "qev-snake-v1",
+        "exported_at": "2026-09-20T23:36:30.922Z",
+        "game": {
+          "id": "20ad6b574ed34b8b9798ea2706051963",
+          "seed": 7,
+          "size": 12,
+          "width": 12,
+          "height": 12,
+          "body": [
+            [
+              6,
+              7
+            ],
+            [
+              6,
+              6
+            ],
+            [
+              5,
+              6
+            ]
+          ],
+          "food": [
+            1,
+            7
+          ],
+          "direction": "DOWN",
+          "step": 1,
+          "score": 0,
+          "length": 3,
+          "status": "running",
+          "terminal_reason": null,
+          "alive": true,
+          "won": false,
+          "done": false,
+          "max_steps": 500,
+          "starvation_limit": 288,
+          "steps_since_food": 1,
+          "available_directions": [
+            "DOWN",
+            "LEFT",
+            "RIGHT"
+          ],
+          "candidates": [
+            {
+              "direction": "DOWN",
+              "next_cell": [
+                6,
+                8
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 6,
+              "manhattan_change": 1
+            },
+            {
+              "direction": "LEFT",
+              "next_cell": [
+                5,
+                7
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 4,
+              "manhattan_change": -1
+            },
+            {
+              "direction": "RIGHT",
+              "next_cell": [
+                7,
+                7
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 6,
+              "manhattan_change": 1
+            }
+          ],
+          "policy": {
+            "mode": "model_direct",
+            "feature_assisted": true,
+            "planner": false,
+            "guardrail": false
+          },
+          "last_decision": {
+            "step": 1,
+            "step_before": 0,
+            "step_after": 1,
+            "request": {
+              "model": "qev-0.8b",
+              "state": "Snake on a 12 by 12 board. x increases right, y increases down. Head=(6,6), food=(1,7), heading=RIGHT. Length=3. Steps without food=0. The candidates contain immediate next-cell facts, not a route plan.",
+              "questions": {
+                "move": {
+                  "type": "choice",
+                  "instructions": "Choose one Snake move. Avoid wall and body collisions first, then eat food or move toward it. A negative manhattan_change reduces distance. Immediate reverse is excluded; collision moves are still selectable.",
+                  "criteria": {
+                    "UP": {
+                      "next_cell": [
+                        6,
+                        5
+                      ],
+                      "collision": "none",
+                      "eats_food": false,
+                      "manhattan_distance": 7,
+                      "manhattan_change": 1
+                    },
+                    "DOWN": {
+                      "next_cell": [
+                        6,
+                        7
+                      ],
+                      "collision": "none",
+                      "eats_food": false,
+                      "manhattan_distance": 5,
+                      "manhattan_change": -1
+                    },
+                    "RIGHT": {
+                      "next_cell": [
+                        7,
+                        6
+                      ],
+                      "collision": "none",
+                      "eats_food": false,
+                      "manhattan_distance": 7,
+                      "manhattan_change": 1
+                    }
+                  }
+                }
+              }
+            },
+            "response": {
+              "model": "qev-0.8b",
+              "answers": {
+                "move": {
+                  "type": "choice",
+                  "choice": "DOWN",
+                  "confidence": 0.3236270613081487,
+                  "probabilities": {
+                    "UP": 0.11453532652622679,
+                    "DOWN": 0.5490847075387658,
+                    "RIGHT": 0.33637996593500746
+                  }
+                }
+              },
+              "usage": {
+                "input_tokens": 224,
+                "output_tokens": 0
+              },
+              "latency_ms": 479.02,
+              "qev": {
+                "backend": "mlx",
+                "temperature": 1.4640856959456252,
+                "training_modalities": [
+                  "text"
+                ],
+                "multimodal_decision_accuracy_validated": false,
+                "input_modalities": [
+                  "text"
+                ],
+                "truncated_questions": []
+              }
+            },
+            "candidate_facts": [
+              {
+                "direction": "UP",
+                "next_cell": [
+                  6,
+                  5
+                ],
+                "collision": null,
+                "eats_food": false,
+                "manhattan_distance": 7,
+                "manhattan_change": 1
+              },
+              {
+                "direction": "DOWN",
+                "next_cell": [
+                  6,
+                  7
+                ],
+                "collision": null,
+                "eats_food": false,
+                "manhattan_distance": 5,
+                "manhattan_change": -1
+              },
+              {
+                "direction": "RIGHT",
+                "next_cell": [
+                  7,
+                  6
+                ],
+                "collision": null,
+                "eats_food": false,
+                "manhattan_distance": 7,
+                "manhattan_change": 1
+              }
+            ],
+            "probabilities": {
+              "UP": 0.11453532652622679,
+              "DOWN": 0.5490847075387658,
+              "RIGHT": 0.33637996593500746
+            },
+            "proposed": "DOWN",
+            "executed": "DOWN",
+            "intervened": false,
+            "inference_ms": 479.08,
+            "ate": false,
+            "decision_ms": 479.138,
+            "terminal_reason": null
+          },
+          "history_count": 1,
+          "expires_in_seconds": 1800,
+          "history": [
+            {
+              "step": 1,
+              "step_before": 0,
+              "step_after": 1,
+              "request": {
+                "model": "qev-0.8b",
+                "state": "Snake on a 12 by 12 board. x increases right, y increases down. Head=(6,6), food=(1,7), heading=RIGHT. Length=3. Steps without food=0. The candidates contain immediate next-cell facts, not a route plan.",
+                "questions": {
+                  "move": {
+                    "type": "choice",
+                    "instructions": "Choose one Snake move. Avoid wall and body collisions first, then eat food or move toward it. A negative manhattan_change reduces distance. Immediate reverse is excluded; collision moves are still selectable.",
+                    "criteria": {
+                      "UP": {
+                        "next_cell": [
+                          6,
+                          5
+                        ],
+                        "collision": "none",
+                        "eats_food": false,
+                        "manhattan_distance": 7,
+                        "manhattan_change": 1
+                      },
+                      "DOWN": {
+                        "next_cell": [
+                          6,
+                          7
+                        ],
+                        "collision": "none",
+                        "eats_food": false,
+                        "manhattan_distance": 5,
+                        "manhattan_change": -1
+                      },
+                      "RIGHT": {
+                        "next_cell": [
+                          7,
+                          6
+                        ],
+                        "collision": "none",
+                        "eats_food": false,
+                        "manhattan_distance": 7,
+                        "manhattan_change": 1
+                      }
+                    }
+                  }
+                }
+              },
+              "response": {
+                "model": "qev-0.8b",
+                "answers": {
+                  "move": {
+                    "type": "choice",
+                    "choice": "DOWN",
+                    "confidence": 0.3236270613081487,
+                    "probabilities": {
+                      "UP": 0.11453532652622679,
+                      "DOWN": 0.5490847075387658,
+                      "RIGHT": 0.33637996593500746
+                    }
+                  }
+                },
+                "usage": {
+                  "input_tokens": 224,
+                  "output_tokens": 0
+                },
+                "latency_ms": 479.02,
+                "qev": {
+                  "backend": "mlx",
+                  "temperature": 1.4640856959456252,
+                  "training_modalities": [
+                    "text"
+                  ],
+                  "multimodal_decision_accuracy_validated": false,
+                  "input_modalities": [
+                    "text"
+                  ],
+                  "truncated_questions": []
+                }
+              },
+              "candidate_facts": [
+                {
+                  "direction": "UP",
+                  "next_cell": [
+                    6,
+                    5
+                  ],
+                  "collision": null,
+                  "eats_food": false,
+                  "manhattan_distance": 7,
+                  "manhattan_change": 1
+                },
+                {
+                  "direction": "DOWN",
+                  "next_cell": [
+                    6,
+                    7
+                  ],
+                  "collision": null,
+                  "eats_food": false,
+                  "manhattan_distance": 5,
+                  "manhattan_change": -1
+                },
+                {
+                  "direction": "RIGHT",
+                  "next_cell": [
+                    7,
+                    6
+                  ],
+                  "collision": null,
+                  "eats_food": false,
+                  "manhattan_distance": 7,
+                  "manhattan_change": 1
+                }
+              ],
+              "probabilities": {
+                "UP": 0.11453532652622679,
+                "DOWN": 0.5490847075387658,
+                "RIGHT": 0.33637996593500746
+              },
+              "proposed": "DOWN",
+              "executed": "DOWN",
+              "intervened": false,
+              "inference_ms": 479.08,
+              "ate": false,
+              "decision_ms": 479.138,
+              "terminal_reason": null
+            }
+          ]
+        }
+      }
+    },
+    "native_and_typed_api": {
+      "passed": true,
+      "responses": {
+        "decision": {
+          "model": "qev-latest",
+          "answers": {
+            "team": {
+              "type": "choice",
+              "choice": "billing",
+              "confidence": 0.9860776208236598,
+              "probabilities": {
+                "billing": 0.9907184138824399,
+                "technical": 0.006435261559331237,
+                "sales": 0.002846324558228873
+              }
+            },
+            "refund": {
+              "type": "noul",
+              "noul": 0.9632658760135381
+            },
+            "urgency": {
+              "type": "score",
+              "score": 0.8230944746098285,
+              "confidence": 0.742883281856591,
+              "legend": {
+                "0": "低",
+                "1": "中",
+                "2": "高"
+              },
+              "probabilities": {
+                "0": 0.34556948083849476,
+                "1": 0.48576656371318205,
+                "2": 0.16866395544832322
+              }
+            }
+          },
+          "usage": {
+            "input_tokens": 122,
+            "output_tokens": 0
+          },
+          "latency_ms": 568.15,
+          "qev": {
+            "backend": "mlx",
+            "temperature": 1.4640856959456252,
+            "training_modalities": [
+              "text"
+            ],
+            "multimodal_decision_accuracy_validated": false,
+            "input_modalities": [
+              "text"
+            ],
+            "truncated_questions": []
+          }
+        },
+        "text": {
+          "id": "chatcmpl-8479c9be99f04f149a88b348e9e1014d",
+          "object": "chat.completion",
+          "created": 1789947481,
+          "model": "qev-native",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "机器学习是一种通过计算机自动从数据中学习规律并预测未来结果的技术，它利用算法和统计方法，无需人工手动编写规则，即可从海量数据中识别出数据中的模式，从而实现对新数据的预测或决策。\n"
+              },
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 19,
+            "completion_tokens": 50,
+            "total_tokens": 69
+          },
+          "qev": {
+            "backend": "mlx",
+            "decision_adapter_enabled": false,
+            "media_frames": 0,
+            "latency_ms": 2375.15
+          }
+        },
+        "image": {
+          "id": "chatcmpl-488dcec49c1e4fc9a120cedf63b9d762",
+          "object": "chat.completion",
+          "created": 1789946661,
+          "model": "qev-native",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "图片中是一个红色的正方形。\n"
+              },
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 86,
+            "completion_tokens": 9,
+            "total_tokens": 95
+          },
+          "qev": {
+            "backend": "mlx",
+            "decision_adapter_enabled": false,
+            "media_frames": 1,
+            "latency_ms": 835.14
+          }
+        },
+        "video": {
+          "id": "chatcmpl-cac97fecac564141bbd5f97c9fb65ef5",
+          "object": "chat.completion",
+          "created": 1789946717,
+          "model": "qev-native",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "在<0.2 seconds>到<1.2 seconds>之间，一个蓝色的圆形物体从左侧向右侧移动，同时一个白色的圆形物体从右侧向左侧移动。蓝色圆形物体在移动过程中逐渐与白色圆形物体重叠，最终完全覆盖在白色圆形物体上。\n"
+              },
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 138,
+            "completion_tokens": 62,
+            "total_tokens": 200
+          },
+          "qev": {
+            "backend": "mlx",
+            "decision_adapter_enabled": false,
+            "media_frames": 4,
+            "latency_ms": 2922.4
+          }
+        },
+        "health": {
+          "status": "ok",
+          "backend": "mlx"
+        },
+        "http-error": {
+          "detail": "Unknown model alias"
+        }
+      }
+    },
+    "request_controls": {
+      "passed": true,
+      "history_restore": "Restored prior request after invalid JSON; badge became 尚未发送 and no inference was initiated.",
+      "copy": "请求 JSON已复制。",
+      "json_error": "无法格式化：Expected property name or '}' in JSON at position 1 (line 1 column 2)",
+      "cancellation": "已停止等待。服务可能仍在推理；这不代表服务端任务已取消。"
+    },
+    "responsive_layout": {
+      "passed": true,
+      "measurements": {
+        "mobile_snake": {
+          "width": 390,
+          "height": 844,
+          "documentWidth": 390,
+          "horizontalOverflow": false,
+          "seed": "SEED 11",
+          "size": "8 × 8",
+          "steps": "1",
+          "decision": {
+            "request": {
+              "model": "qev-0.8b",
+              "state": "Snake on a 8 by 8 board. x increases right, y increases down. Head=(4,4), food=(4,3), heading=RIGHT. Length=3. Steps without food=0. The candidates contain immediate next-cell facts, not a route plan.",
+              "questions": {
+                "move": {
+                  "type": "choice",
+                  "instructions": "Choose one Snake move. Avoid wall and body collisions first, then eat food or move toward it. A negative manhattan_change reduces distance. Immediate reverse is excluded; collision moves are still selectable.",
+                  "criteria": {
+                    "UP": {
+                      "next_cell": [
+                        4,
+                        3
+                      ],
+                      "collision": "none",
+                      "eats_food": true,
+                      "manhattan_distance": 0,
+                      "manhattan_change": -1
+                    },
+                    "DOWN": {
+                      "next_cell": [
+                        4,
+                        5
+                      ],
+                      "collision": "none",
+                      "eats_food": false,
+                      "manhattan_distance": 2,
+                      "manhattan_change": 1
+                    },
+                    "RIGHT": {
+                      "next_cell": [
+                        5,
+                        4
+                      ],
+                      "collision": "none",
+                      "eats_food": false,
+                      "manhattan_distance": 2,
+                      "manhattan_change": 1
+                    }
+                  }
+                }
+              }
+            },
+            "response": {
+              "model": "qev-0.8b",
+              "answers": {
+                "move": {
+                  "type": "choice",
+                  "choice": "UP",
+                  "confidence": 0.24042713131187396,
+                  "probabilities": {
+                    "UP": 0.4936180875412493,
+                    "DOWN": 0.22518551363179212,
+                    "RIGHT": 0.2811963988269585
+                  }
+                }
+              },
+              "usage": {
+                "input_tokens": 222,
+                "output_tokens": 0
+              },
+              "latency_ms": 496.18,
+              "qev": {
+                "backend": "mlx",
+                "temperature": 1.4640856959456252,
+                "training_modalities": [
+                  "text"
+                ],
+                "multimodal_decision_accuracy_validated": false,
+                "input_modalities": [
+                  "text"
+                ],
+                "truncated_questions": []
+              }
+            },
+            "proposed": "UP",
+            "executed": "UP"
+          }
+        },
+        "mobile_playground": {
+          "width": 390,
+          "height": 844,
+          "documentWidth": 390,
+          "bodyWidth": 390,
+          "horizontalOverflow": false
+        },
+        "desktop_snake": {
+          "width": 1440,
+          "height": 1000,
+          "documentWidth": 1440,
+          "horizontalOverflow": false
+        },
+        "desktop_playground": {
+          "width": 1440,
+          "height": 1000,
+          "documentWidth": 1440,
+          "horizontalOverflow": false
+        }
+      },
+      "visual_review": "Desktop Snake and Playground, and mobile Snake and Playground screenshots reviewed; controls and content readable."
+    },
+    "accessibility": {
+      "passed": true,
+      "scope": "Automated WCAG 2 A/AA rules; zero detected violations, not a complete accessibility certification.",
+      "audits": {
+        "desktop_snake": {
+          "axeVersion": "4.12.1",
+          "counts": {
+            "inapplicable": 35,
+            "incomplete": 1,
+            "passes": 25,
+            "violations": 0
+          },
+          "incomplete": [
+            {
+              "help": "Elements must meet minimum color contrast ratio thresholds",
+              "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=axeAPI",
+              "id": "color-contrast",
+              "impact": "serious",
+              "nodeCount": 5,
+              "nodes": [
+                {
+                  "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
+                  "html": "<span aria-hidden=\"true\">↳</span>",
+                  "target": [
+                    "a[data-tab=\"snake\"] > span[aria-hidden=\"true\"]"
+                  ]
+                },
+                {
+                  "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
+                  "html": "<span aria-hidden=\"true\">⌘</span>",
+                  "target": [
+                    "a[href$=\"#playground\"] > span[aria-hidden=\"true\"]"
+                  ]
+                },
+                {
+                  "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient",
+                  "html": "<span class=\"status-label\" id=\"game-status\" role=\"status\">已暂停 · 等待下一步</span>",
+                  "target": [
+                    "#game-status"
+                  ]
+                },
+                {
+                  "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient",
+                  "html": "<span id=\"game-limit\">每局最多 500 步</span>",
+                  "target": [
+                    "#game-limit"
+                  ]
+                },
+                {
+                  "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
+                  "html": "<span class=\"direction-icon\" id=\"direction-icon\">↓</span>",
+                  "target": [
+                    "#direction-icon"
+                  ]
+                }
+              ],
+              "tags": [
+                "cat.color",
+                "wcag2aa",
+                "wcag143",
+                "TTv5",
+                "TT13.c",
+                "EN-301-549",
+                "EN-9.1.4.3",
+                "ACT",
+                "RGAAv4",
+                "RGAA-3.2.1"
+              ]
+            }
+          ],
+          "url": "http://127.0.0.1:8008/snake",
+          "violations": []
+        },
+        "mobile_snake": {
+          "axeVersion": "4.12.1",
+          "counts": {
+            "inapplicable": 35,
+            "incomplete": 1,
+            "passes": 25,
+            "violations": 0
+          },
+          "incomplete": [
+            {
+              "help": "Elements must meet minimum color contrast ratio thresholds",
+              "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=axeAPI",
+              "id": "color-contrast",
+              "impact": "serious",
+              "nodeCount": 5,
+              "nodes": [
+                {
+                  "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
+                  "html": "<span aria-hidden=\"true\">↳</span>",
+                  "target": [
+                    "a[data-tab=\"snake\"] > span[aria-hidden=\"true\"]"
+                  ]
+                },
+                {
+                  "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
+                  "html": "<span aria-hidden=\"true\">⌘</span>",
+                  "target": [
+                    "a[href$=\"#playground\"] > span[aria-hidden=\"true\"]"
+                  ]
+                },
+                {
+                  "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient",
+                  "html": "<span class=\"status-label\" id=\"game-status\" role=\"status\">已暂停 · 等待下一步</span>",
+                  "target": [
+                    "#game-status"
+                  ]
+                },
+                {
+                  "failureSummary": "Fix any of the following:\n  Element's background color could not be determined due to a background gradient",
+                  "html": "<span id=\"game-limit\">每局最多 500 步</span>",
+                  "target": [
+                    "#game-limit"
+                  ]
+                },
+                {
+                  "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
+                  "html": "<span class=\"direction-icon\" id=\"direction-icon\">↓</span>",
+                  "target": [
+                    "#direction-icon"
+                  ]
+                }
+              ],
+              "tags": [
+                "cat.color",
+                "wcag2aa",
+                "wcag143",
+                "TTv5",
+                "TT13.c",
+                "EN-301-549",
+                "EN-9.1.4.3",
+                "ACT",
+                "RGAAv4",
+                "RGAA-3.2.1"
+              ]
+            }
+          ],
+          "url": "http://127.0.0.1:8008/snake",
+          "violations": []
+        },
+        "mobile_playground": {
+          "axeVersion": "4.12.1",
+          "counts": {
+            "inapplicable": 31,
+            "incomplete": 1,
+            "passes": 29,
+            "violations": 0
+          },
+          "incomplete": [
+            {
+              "help": "Elements must meet minimum color contrast ratio thresholds",
+              "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=axeAPI",
+              "id": "color-contrast",
+              "impact": "serious",
+              "nodeCount": 2,
+              "nodes": [
+                {
+                  "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
+                  "html": "<span aria-hidden=\"true\">↳</span>",
+                  "target": [
+                    "a[data-tab=\"snake\"] > span[aria-hidden=\"true\"]"
+                  ]
+                },
+                {
+                  "failureSummary": "Fix any of the following:\n  Element content contains only non-text characters",
+                  "html": "<span aria-hidden=\"true\">⌘</span>",
+                  "target": [
+                    "a[href$=\"#playground\"] > span[aria-hidden=\"true\"]"
+                  ]
+                }
+              ],
+              "tags": [
+                "cat.color",
+                "wcag2aa",
+                "wcag143",
+                "TTv5",
+                "TT13.c",
+                "EN-301-549",
+                "EN-9.1.4.3",
+                "ACT",
+                "RGAAv4",
+                "RGAA-3.2.1"
+              ]
+            }
+          ],
+          "url": "http://127.0.0.1:8008/snake#playground",
+          "violations": []
+        }
+      },
+      "remaining_incomplete": "Contrast checks on decorative arrow/command glyphs and gradient backgrounds require visual review; the actual disabled-direction text contrast and probability group role were fixed."
+    },
+    "page_errors": {
+      "passed": true,
+      "errors": []
+    },
+    "final_pages_and_assets": {
+      "passed": true,
+      "assets": {
+        "/assets/app.js": {
+          "bytes": 2760,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "a27c22e28efbcd3333e05051c39d52837e37337f9fd3a1d0d4b0072c4f51e5b0"
+        },
+        "/assets/playground.js": {
+          "bytes": 37523,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "9172c7e2bb81a09070d12011738f9992d038c28c64bcab0b0d02ac0dcfb3b310"
+        },
+        "/assets/style.css": {
+          "bytes": 13558,
+          "content_type": "text/css; charset=utf-8",
+          "sha256": "092dff563f46764767c1acf2920db1c8d7d0a61c629c9674062333aa9a5bfec6"
+        },
+        "/assets/icon.svg": {
+          "bytes": 247,
+          "content_type": "image/svg+xml",
+          "sha256": "4c9d4ef6fd481765ceb6cde0f1cb69e85292c0a567d28fe5318c64c822d53962"
+        },
+        "/assets/snake.js": {
+          "bytes": 17625,
+          "content_type": "text/javascript; charset=utf-8",
+          "sha256": "d39e0b66e130fe4f6ae7379118cb264bc737e962f4871972e35201c57ea37065"
+        }
+      },
+      "all_six_web_files_match_disk": true
+    },
+    "wheel": {
+      "passed": true,
+      "path": "dist/qev-0.2.0-py3-none-any.whl",
+      "sha256": "4b6185cae7cbb6bf0d65ad6e778698ee04b0a608f7020fa880770a79ccf47b42",
+      "web_assets": 6,
+      "all_web_assets_byte_identical": true
+    }
+  },
+  "screenshots": {
+    "../assets/demo-snake.png": {
+      "sha256": "3fa96ffd29186bb19a5e57993e7ebbab68057e83b3f95852ee0cbbb940f7649e"
+    },
+    "../assets/demo-playground.png": {
+      "sha256": "23c35330b1a268e8a37b5cf74ffb753706a01e1b8c21f3d7dcff34577cabc06c"
+    }
+  },
+  "limitations": [
+    "Snake receives text and local collision/distance features, not the canvas image; there is no planner or safety action override.",
+    "The model had no Snake-specific training; successful API operation does not establish strong game strategy.",
+    "Video test successfully sent four ordered frames through native generation, but the response hallucinated a second white moving circle. This tests the media pathway, not video understanding accuracy.",
+    "The earlier demo_validation.json records the three-game HTTP run; its static hashes precede final UI polish. This report contains the final served-asset hashes.",
+    "Browser cancellation only stops waiting; model inference may continue on the server."
+  ]
+}

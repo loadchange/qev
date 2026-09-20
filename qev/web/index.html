@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Qev 本地模型实验室：自主贪吃蛇、结构化决策与多模态接口测试。">
+  <title>Qev · 模型实验室</title>
+  <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/assets/style.css">
+  <script type="module" src="/assets/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">跳到内容</a>
+  <header class="site-header">
+    <a class="brand" href="#snake" aria-label="Qev 首页"><span class="brand-mark">Q</span><span>Qev<span class="brand-sub">实验室</span></span></a>
+    <nav class="tabs" aria-label="实验页面">
+      <a href="#snake" data-tab="snake"><span aria-hidden="true">↳</span> 自主贪吃蛇</a>
+      <a href="#playground" data-tab="playground"><span aria-hidden="true">⌘</span> 接口测试</a>
+    </nav>
+    <div class="header-right"><span id="connection" class="connection" role="status"><i></i>连接中</span><a class="doc-link" href="/docs" target="_blank" rel="noopener">API 文档 ↗</a></div>
+  </header>
+  <main id="main" tabindex="-1">
+    <section id="snake-view" aria-label="自主贪吃蛇"></section>
+    <section id="playground-view" aria-label="接口测试" hidden></section>
+  </main>
+  <footer class="site-footer"><span>Qev / Qwen3.5 · 0.8B</span><span>本地真实推理 <span class="footer-dot">·</span> 原生图文与视频能力保留</span><span id="backend-label">检查后端中</span></footer>
+  <div id="toast" role="status" aria-live="polite" hidden></div>
+  <noscript>请启用 JavaScript 使用实验页面。接口文档仍可从 /docs 访问。</noscript>
+</body>
+</html>

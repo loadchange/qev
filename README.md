@@ -18,6 +18,13 @@ GPU / PyTorch 版本使用 `models/qev-0.8b`。Mac 优先使用 MLX；MLX 通过
 
 服务默认只监听 `127.0.0.1:8008`。结构化接口为 `POST /v1/systemone`，原生生成接口为 `POST /v1/chat/completions`。多模态 HTTP 请求使用内嵌图片和采样视频帧，格式见 [接口示例](docs/API.md)。
 
+启动后打开 **http://127.0.0.1:8008** 即可使用内置实验室，无需额外前端服务：
+
+- **自主贪吃蛇**：开始、暂停、单步、固定种子重开，查看每步真实候选概率、耗时及请求，导出本局记录。引擎仅提供碰撞与食物距离特征，由模型直接选动作，没有寻路规划或安全接管。
+- **接口测试**：编辑并发送真实 JSON 请求，测试 Choice / Noul / Score、原生文字、图片与采样视频帧；查看响应、耗时和 token 使用，并复制调用示例。
+
+详见 [实验室说明](docs/DEMO.md)。本轮模型没有接受贪吃蛇专项训练，游戏表现单独记录；棋盘页面使用文字环境特征，不是视觉决策评估。
+
 ```bash
 curl http://127.0.0.1:8008/v1/systemone \
   -H 'Content-Type: application/json' --data-binary @examples/request.json

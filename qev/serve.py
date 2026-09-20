@@ -3,9 +3,13 @@
 Images are inline data URLs, and videos are explicitly sampled inline frames.
 This service never opens client-provided paths or fetches client-provided URLs.
 """
-from fastapi import FastAPI, HTTPException
-from starlette.responses import JSONResponse
+from pathlib import Path
 
+from fastapi import FastAPI, HTTPException
+from starlette.responses import FileResponse, JSONResponse
+from starlette.staticfiles import StaticFiles
+
+from . import __version__
 from .api import ChatCompletionRequest, SystemOneRequest
 
 
@@ -48,8 +52,19 @@ class RequestBodyLimit:
 
 
 def create_app(agent):
-    app = FastAPI(title="Qev", version="0.1.0")
+    app = FastAPI(title="Qev", version=__version__)
     app.add_middleware(RequestBodyLimit)
+    from .demo import create_demo_router
+
+    app.include_router(create_demo_router(agent))
+    web = Path(__file__).with_name("web")
+    app.mount("/assets", StaticFiles(directory=web), name="assets")
+
+    @app.get("/", include_in_schema=False)
+    @app.get("/snake", include_in_schema=False)
+    @app.get("/playground", include_in_schema=False)
+    def playground():
+        return FileResponse(web / "index.html", headers={"Cache-Control": "no-cache"})
 
     def known_model(name):
         return name in {"qev-latest", "jev-latest", "qev-0.8b", "qev-0.8b-mlx", "qev:0.8b", "qev:0.8b-mlx", "qev-native",

@@ -44,6 +44,23 @@ def test_server_native_endpoint_and_error_contract():
     assert client.post("/v1/systemone", json={"state": [{"type": "image_url", "image_url": {"url": "/private/image.png"}}], "questions": {"q": {"type": "noul"}}}).status_code == 422
 
 
+def test_embedded_pages_and_assets_do_not_shadow_existing_api():
+    client = TestClient(create_app(StubAgent()))
+    for route in ("/", "/snake", "/playground"):
+        response = client.get(route)
+        assert response.status_code == 200
+        assert response.headers["content-type"].startswith("text/html")
+        assert '/assets/app.js' in response.text
+    for name in ("app.js", "snake.js", "playground.js", "style.css", "icon.svg"):
+        response = client.get(f"/assets/{name}")
+        assert response.status_code == 200, name
+        assert response.content
+    assert client.get("/assets/does-not-exist.js").status_code == 404
+    assert client.get("/health").json()["backend"] == "stub"
+    assert client.get("/docs").status_code == 200
+    assert "/v1/systemone" in client.get("/openapi.json").json()["paths"]
+
+
 def test_chunked_request_body_is_bounded_before_app_execution():
     called, sent = [], []
     async def app(*args):
