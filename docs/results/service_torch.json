@@ -1,0 +1,601 @@
+{
+  "checkpoint": "/content/qev/models/qev-0.8b",
+  "backend": "torch",
+  "base_model": "Qwen/Qwen3.5-0.8B",
+  "base_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+  "config_sha256": "121ce48d84da856df67a469033a85825d3ab5a039fec986476aa5853fbb5f814",
+  "checks": {
+    "health": {
+      "passed": true,
+      "seconds": 0.0021379059999162564,
+      "result": {
+        "status": "ok",
+        "backend": "torch"
+      }
+    },
+    "models_http": {
+      "passed": true,
+      "seconds": 0.001577926999743795,
+      "result": {
+        "models": [
+          {
+            "name": "qev-0.8b",
+            "description": "Qwen3.5 typed decisions; multimodal decision accuracy is not yet validated",
+            "release_date": "2026-09-20"
+          },
+          {
+            "name": "qev-latest",
+            "description": "Alias of qev-0.8b",
+            "release_date": "2026-09-20"
+          },
+          {
+            "name": "qev:0.8b",
+            "description": "Alias of loaded checkpoint qev-0.8b",
+            "release_date": "2026-09-20"
+          },
+          {
+            "name": "qev:0.8b-mlx",
+            "description": "Alias of loaded checkpoint qev-0.8b; aliases do not switch the runtime",
+            "release_date": "2026-09-20"
+          },
+          {
+            "name": "qev-native",
+            "description": "Native Qwen text/image/video generation with the decision adapter disabled",
+            "release_date": "2026-09-20"
+          }
+        ]
+      }
+    },
+    "text_decision": {
+      "passed": true,
+      "seconds": 2.0989090240000223,
+      "result": {
+        "model": "jev-latest",
+        "answers": {
+          "department": {
+            "type": "choice",
+            "choice": "billing",
+            "confidence": 0.9968539788766985,
+            "probabilities": {
+              "billing": 0.9979026525844658,
+              "technical": 0.000566959839823557,
+              "sales": 0.001530387575710596
+            }
+          },
+          "refund": {
+            "type": "noul",
+            "noul": 0.9777999197553088
+          },
+          "urgency": {
+            "type": "score",
+            "score": 1.3433148794781604,
+            "confidence": 0.6716574397390803,
+            "legend": {
+              "0": "No time pressure",
+              "1": "Soon",
+              "2": "Today or a blocking issue"
+            },
+            "probabilities": {
+              "0": 0.183019062898303,
+              "1": 0.29064699472523337,
+              "2": 0.5263339423764636
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 172,
+          "output_tokens": 0
+        },
+        "latency_ms": 2096.14,
+        "qev": {
+          "backend": "torch",
+          "temperature": 1.4640856959456252,
+          "training_modalities": [
+            "text"
+          ],
+          "multimodal_decision_accuracy_validated": false,
+          "input_modalities": [
+            "text"
+          ],
+          "truncated_questions": []
+        }
+      }
+    },
+    "official_sdk_over_http": {
+      "passed": true,
+      "seconds": 0.31400718900022184,
+      "result": {
+        "response": {
+          "model": "jev-latest",
+          "usage": {
+            "input_tokens": 172,
+            "output_tokens": 0
+          },
+          "answers": {
+            "department": {
+              "type": "choice",
+              "choice": "billing",
+              "confidence": 0.9968539788766985,
+              "probabilities": {
+                "billing": 0.9979026525844658,
+                "technical": 0.000566959839823557,
+                "sales": 0.001530387575710596
+              }
+            },
+            "refund": {
+              "type": "noul",
+              "noul": 0.9777999197553088
+            },
+            "urgency": {
+              "type": "score",
+              "score": 1.3433148794781604,
+              "confidence": 0.6716574397390803,
+              "legend": {
+                "0": "No time pressure",
+                "1": "Soon",
+                "2": "Today or a blocking issue"
+              },
+              "probabilities": {
+                "0": 0.183019062898303,
+                "1": 0.29064699472523337,
+                "2": 0.5263339423764636
+              }
+            }
+          }
+        },
+        "comparison": {
+          "max_probability_error": 0.0,
+          "atol": 1e-05
+        },
+        "typed_accessors": true
+      }
+    },
+    "typed_model_aliases": {
+      "passed": true,
+      "seconds": 1.4978123450000567,
+      "result": {
+        "qev-latest": {
+          "max_probability_error": 0.0,
+          "atol": 1e-05
+        },
+        "qev:0.8b": {
+          "max_probability_error": 0.0,
+          "atol": 1e-05
+        },
+        "qev:0.8b-mlx": {
+          "max_probability_error": 0.0,
+          "atol": 1e-05
+        },
+        "qev-0.8b": {
+          "max_probability_error": 0.0,
+          "atol": 1e-05
+        },
+        "qev-0.8b-mlx": {
+          "max_probability_error": 0.0,
+          "atol": 1e-05
+        }
+      }
+    },
+    "independent_question_rows": {
+      "passed": true,
+      "seconds": 0.6005843199991432,
+      "result": {
+        "department": {
+          "max_probability_error": 0.0,
+          "atol": 0.005
+        },
+        "refund": {
+          "max_probability_error": 0.0,
+          "atol": 0.005
+        },
+        "urgency": {
+          "max_probability_error": 0.0,
+          "atol": 0.005
+        },
+        "reversed": {
+          "max_probability_error": 0.0,
+          "atol": 0.005
+        }
+      }
+    },
+    "native_text_before_media": {
+      "passed": true,
+      "seconds": 2.1459831599995596,
+      "result": {
+        "id": "chatcmpl-6ec68260b634402f9a06ba821b2ed085",
+        "object": "chat.completion",
+        "created": 1789919766,
+        "model": "qev-native",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "ready\n"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 19,
+          "completion_tokens": 4,
+          "total_tokens": 23
+        },
+        "qev": {
+          "backend": "torch",
+          "decision_adapter_enabled": false,
+          "media_frames": 0,
+          "latency_ms": 2143.26
+        }
+      }
+    },
+    "image_decision": {
+      "passed": true,
+      "seconds": 0.35458320299949264,
+      "result": {
+        "model": "jev-latest",
+        "answers": {
+          "color": {
+            "type": "choice",
+            "choice": "red",
+            "confidence": 0.9999422121531006,
+            "probabilities": {
+              "red": 0.9999614747687339,
+              "blue": 2.4335992469163703e-05,
+              "green": 1.4189238796964701e-05
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 96,
+          "output_tokens": 0
+        },
+        "latency_ms": 351.92,
+        "qev": {
+          "backend": "torch",
+          "temperature": 1.0,
+          "training_modalities": [
+            "text"
+          ],
+          "multimodal_decision_accuracy_validated": false,
+          "input_modalities": [
+            "text",
+            "image"
+          ],
+          "truncated_questions": []
+        }
+      }
+    },
+    "video_decision": {
+      "passed": true,
+      "seconds": 0.13933114700012084,
+      "result": {
+        "model": "jev-latest",
+        "answers": {
+          "motion": {
+            "type": "choice",
+            "choice": "left to right",
+            "confidence": 0.8299563970884873,
+            "probabilities": {
+              "left to right": 0.8866375980589917,
+              "right to left": 0.02856779012759758,
+              "stationary": 0.08479461181341072
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 145,
+          "output_tokens": 0
+        },
+        "latency_ms": 136.6,
+        "qev": {
+          "backend": "torch",
+          "temperature": 1.0,
+          "training_modalities": [
+            "text"
+          ],
+          "multimodal_decision_accuracy_validated": false,
+          "input_modalities": [
+            "text",
+            "video"
+          ],
+          "truncated_questions": []
+        }
+      }
+    },
+    "mixed_image_video_decision": {
+      "passed": true,
+      "seconds": 0.15015463000054297,
+      "result": {
+        "model": "jev-latest",
+        "answers": {
+          "color": {
+            "type": "choice",
+            "choice": "red",
+            "confidence": 0.9994233803665212,
+            "probabilities": {
+              "red": 0.9996155869110142,
+              "blue": 0.00029584761235369316,
+              "green": 8.856547663219281e-05
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 211,
+          "output_tokens": 0
+        },
+        "latency_ms": 147.17,
+        "qev": {
+          "backend": "torch",
+          "temperature": 1.0,
+          "training_modalities": [
+            "text"
+          ],
+          "multimodal_decision_accuracy_validated": false,
+          "input_modalities": [
+            "text",
+            "image",
+            "video"
+          ],
+          "truncated_questions": []
+        }
+      }
+    },
+    "native_image": {
+      "passed": true,
+      "seconds": 0.32806452499971783,
+      "result": {
+        "id": "chatcmpl-182fb6970a1d498f8774d9f1ea2672e6",
+        "object": "chat.completion",
+        "created": 1789919767,
+        "model": "qev-native",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": " red\n"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 92,
+          "completion_tokens": 4,
+          "total_tokens": 96
+        },
+        "qev": {
+          "backend": "torch",
+          "decision_adapter_enabled": false,
+          "media_frames": 1,
+          "latency_ms": 325.71
+        }
+      }
+    },
+    "native_video": {
+      "passed": true,
+      "seconds": 0.7729934170001798,
+      "result": {
+        "id": "chatcmpl-39dbc7113e8e43e9b7c8d57f1ea64d10",
+        "object": "chat.completion",
+        "created": 1789919768,
+        "model": "qev-native",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "The blue circle moves from left to right.\n"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 140,
+          "completion_tokens": 12,
+          "total_tokens": 152
+        },
+        "qev": {
+          "backend": "torch",
+          "decision_adapter_enabled": false,
+          "media_frames": 4,
+          "latency_ms": 770.57
+        }
+      }
+    },
+    "native_text_after_media": {
+      "passed": true,
+      "seconds": 0.30673688700062485,
+      "result": {
+        "identical_continuation_and_usage": true,
+        "response": {
+          "id": "chatcmpl-368e8de02f2b4df88e896dee337a0887",
+          "object": "chat.completion",
+          "created": 1789919768,
+          "model": "qev-native",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "ready\n"
+              },
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 19,
+            "completion_tokens": 4,
+            "total_tokens": 23
+          },
+          "qev": {
+            "backend": "torch",
+            "decision_adapter_enabled": false,
+            "media_frames": 0,
+            "latency_ms": 304.36
+          }
+        }
+      }
+    },
+    "decision_adapter_restored": {
+      "passed": true,
+      "seconds": 0.3067950329996165,
+      "result": {
+        "max_probability_error": 0.0,
+        "atol": 1e-05
+      }
+    },
+    "concurrent_adapter_modes": {
+      "passed": true,
+      "seconds": 0.6084623179995106,
+      "result": {
+        "decision": {
+          "max_probability_error": 0.0,
+          "atol": 1e-05
+        },
+        "native_identical": true
+      }
+    },
+    "invalid_inputs": {
+      "passed": true,
+      "seconds": 0.035876683000424237,
+      "result": {
+        "unknown_model": {
+          "status": 404,
+          "detail": "Unknown model alias"
+        },
+        "remote_image": {
+          "status": 422,
+          "detail": "images must be inline base64 PNG/JPEG/WebP data URLs; paths and remote URLs are not supported"
+        },
+        "invalid_fps": {
+          "status": 422,
+          "detail": "video fps must be finite and between zero and 60"
+        },
+        "too_many_frames": {
+          "status": 422,
+          "detail": "too many images/video frames in one request"
+        },
+        "invalid_score": {
+          "status": 422,
+          "detail": [
+            {
+              "type": "too_short",
+              "loc": [
+                "body",
+                "questions",
+                "q",
+                "score",
+                "criteria"
+              ],
+              "msg": "List should have at least 2 items after validation, not 1",
+              "input": [
+                "only"
+              ],
+              "ctx": {
+                "field_type": "List",
+                "min_length": 2,
+                "actual_length": 1
+              }
+            }
+          ]
+        },
+        "too_many_questions": {
+          "status": 422,
+          "detail": "At most 64 questions per request"
+        },
+        "streaming": {
+          "status": 422,
+          "detail": [
+            {
+              "type": "literal_error",
+              "loc": [
+                "body",
+                "stream"
+              ],
+              "msg": "Input should be False",
+              "input": true,
+              "ctx": {
+                "expected": "False"
+              }
+            }
+          ]
+        },
+        "conflicting_budgets": {
+          "status": 422,
+          "detail": [
+            {
+              "type": "value_error",
+              "loc": [
+                "body"
+              ],
+              "msg": "Value error, set max_tokens or max_completion_tokens, not both",
+              "input": {
+                "model": "qev-native",
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Reply with the single word ready."
+                  }
+                ],
+                "temperature": 0,
+                "max_tokens": 16,
+                "enable_thinking": false,
+                "max_completion_tokens": 16
+              },
+              "ctx": {
+                "error": {}
+              }
+            }
+          ]
+        },
+        "native_path": {
+          "status": 422,
+          "detail": "images must be inline base64 PNG/JPEG/WebP data URLs; paths and remote URLs are not supported"
+        },
+        "oversized_body": {
+          "status": 413
+        }
+      }
+    },
+    "healthy_after_rejections": {
+      "passed": true,
+      "seconds": 0.001546339999549673,
+      "result": {
+        "status": "ok",
+        "backend": "torch"
+      }
+    }
+  },
+  "passed": true,
+  "scope": "Real checkpoint via HTTP and the official TypeSafe SDK. Checks schemas, media plumbing, question isolation, adapter restoration, and repeated greedy text. These are functional checks, not held-out accuracy or cross-runtime native parity.",
+  "artifact_sha256": {
+    "pointer.safetensors": "f56860b954742fee0399b50c372c1f262699b84d4500ab52e27d72bff8d49749",
+    "adapter/adapter_model.safetensors": "a1ba15eb0deb91bd9b0b4b9649999c57f0a5b8aac70f52488138a62fd9978549"
+  },
+  "versions": {
+    "typesafe-sdk": "0.7.0",
+    "httpx": "0.28.1",
+    "transformers": "5.17.0",
+    "torch": "2.11.0+cu128"
+  },
+  "server_log": "/content/qev/runs/service_torch.server.log",
+  "server_command": [
+    "/usr/bin/python3",
+    "-m",
+    "qev.cli",
+    "serve",
+    "--model",
+    "/content/qev/models/qev-0.8b",
+    "--backend",
+    "torch",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "46027",
+    "--device",
+    "cuda"
+  ],
+  "base_url": "http://127.0.0.1:46027",
+  "seconds": 24.379233022000335
+}

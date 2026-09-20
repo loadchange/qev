@@ -1,0 +1,151 @@
+{
+  "checkpoint": "/content/qev/models/qev-0.8b",
+  "base_model": "Qwen/Qwen3.5-0.8B",
+  "base_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+  "torch": "2.11.0+cu128",
+  "precision": {
+    "device": "cuda:0",
+    "weight_dtype": "float32",
+    "autocast_dtype": "bfloat16",
+    "pointer_dtype": "float32",
+    "arithmetic": "bf16_autocast"
+  },
+  "vision_and_lm_head_frozen": true,
+  "base_integrity": {
+    "before": {
+      "sha256": "1021eaeed8a1528b435a90a690d42245f07e1b65c7c2dc8a37ec9516a8cf4bee",
+      "parameters": 852985920
+    },
+    "after": {
+      "sha256": "1021eaeed8a1528b435a90a690d42245f07e1b65c7c2dc8a37ec9516a8cf4bee",
+      "parameters": 852985920
+    },
+    "unchanged": true,
+    "generation": "Native generation disables the decision LoRA adapter; original vision and language weights are frozen."
+  },
+  "image_native": {
+    "input_tokens": 92,
+    "token_ids": [
+      2438,
+      248046,
+      198,
+      248044
+    ],
+    "text": " red\n",
+    "max_new_tokens": 16,
+    "seconds": 2.354453939999985,
+    "decision_adapter_enabled": false,
+    "processor_fields": [
+      "attention_mask",
+      "image_grid_thw",
+      "input_ids",
+      "mm_token_type_ids",
+      "pixel_values"
+    ],
+    "baseline_token_ids": [
+      2438,
+      248046,
+      198,
+      248044
+    ],
+    "baseline_text": " red\n",
+    "baseline_precision": "cuda bf16 autocast",
+    "same_token_ids": true,
+    "same_input_length": true,
+    "comparable_precision": true,
+    "preservation_passed": true
+  },
+  "video_native": {
+    "input_tokens": 143,
+    "token_ids": [
+      760,
+      6105,
+      12307,
+      10480,
+      494,
+      2047,
+      310,
+      1245,
+      13,
+      248046,
+      198,
+      248044
+    ],
+    "text": "The blue circle moves from left to right.\n",
+    "max_new_tokens": 48,
+    "seconds": 0.754305370000111,
+    "decision_adapter_enabled": false,
+    "processor_fields": [
+      "attention_mask",
+      "input_ids",
+      "mm_token_type_ids",
+      "pixel_values_videos",
+      "video_grid_thw"
+    ],
+    "frames": 4,
+    "fps": 2.0,
+    "accuracy_asserted": false
+  },
+  "image_decision": {
+    "input_tokens": 91,
+    "options": [
+      "red",
+      "blue",
+      "green"
+    ],
+    "raw_probabilities": [
+      0.9999469518661499,
+      3.054602348129265e-05,
+      2.2545551473740488e-05
+    ],
+    "choice": "red",
+    "probability_sum": 1.000000043441105,
+    "temperature": 1.0,
+    "processor_fields": [
+      "attention_mask",
+      "decision_positions",
+      "image_grid_thw",
+      "input_ids",
+      "mm_token_type_ids",
+      "option_mask",
+      "option_positions",
+      "pixel_values"
+    ],
+    "accuracy_asserted": false,
+    "training_modalities": [
+      "text"
+    ]
+  },
+  "video_decision": {
+    "input_tokens": 147,
+    "options": [
+      "left to right",
+      "right to left",
+      "stationary"
+    ],
+    "raw_probabilities": [
+      0.9525653719902039,
+      0.019003212451934814,
+      0.02843131311237812
+    ],
+    "choice": "left to right",
+    "probability_sum": 0.9999998975545168,
+    "temperature": 1.0,
+    "processor_fields": [
+      "attention_mask",
+      "decision_positions",
+      "input_ids",
+      "mm_token_type_ids",
+      "option_mask",
+      "option_positions",
+      "pixel_values_videos",
+      "video_grid_thw"
+    ],
+    "accuracy_asserted": false,
+    "training_modalities": [
+      "text"
+    ]
+  },
+  "scope": "Original foundation generation with decision adapters disabled. Image tokens compared with the same pre-training fixture; video and media decisions are functional smoke checks. The pointer was trained on text outcomes, not supervised image/video decisions.",
+  "passed": true
+}

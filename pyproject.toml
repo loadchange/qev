@@ -1,0 +1,33 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "qev"
+version = "0.1.0"
+description = "Qwen3.5 decision models with a Jev-compatible API and native MLX inference"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+dependencies = [
+  "numpy>=2.2,<3", "pydantic>=2.10,<3", "huggingface-hub>=0.34,<2",
+  "safetensors>=0.6", "tokenizers>=0.22", "transformers>=5.17,<5.18",
+  "torch>=2.10,<3", "torchvision>=0.25,<0.30", "peft>=0.21,<0.22", "accelerate>=1.12,<2",
+  "fastapi>=0.115", "uvicorn>=0.30", "pyarrow>=18", "Pillow>=11",
+]
+
+[project.optional-dependencies]
+mlx = ["mlx>=0.32.2,<0.33; sys_platform == 'darwin' and platform_machine == 'arm64'", "mlx-lm>=0.31.3,<0.32; sys_platform == 'darwin' and platform_machine == 'arm64'", "mlx-vlm>=0.7.1,<0.8; sys_platform == 'darwin' and platform_machine == 'arm64'"]
+dev = ["pytest>=8", "httpx>=0.28", "ruff>=0.12", "typesafe-sdk>=0.7,<0.8"]
+
+[project.scripts]
+qev = "qev.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["qev"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: requires a downloaded checkpoint"]
+
+[tool.ruff]
+line-length = 100

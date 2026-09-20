@@ -1,0 +1,276 @@
+{
+  "backend": "mlx",
+  "checkpoint": "/Volumes/ExternalDisk/UserData/code/loadchange/qev/models/qev-0.8b-mlx",
+  "permutation": {
+    "questions": 28,
+    "sources": {
+      "banking77": 4,
+      "agnews": 4,
+      "mnli": 4,
+      "trec": 4,
+      "dbpedia14": 4,
+      "synthetic_rules_en": 4,
+      "synthetic_rules_zh": 4
+    },
+    "same_choice_fraction": 0.9642857142857143,
+    "rows": [
+      {
+        "source": "banking77",
+        "question_id": "intent",
+        "options": 77,
+        "original_choice": "unable_to_verify_identity",
+        "reversed_choice": "verify_my_identity",
+        "same_choice": false,
+        "max_probability_difference": 0.5846556740264759
+      },
+      {
+        "source": "banking77",
+        "question_id": "intent",
+        "options": 77,
+        "original_choice": "verify_my_identity",
+        "reversed_choice": "verify_my_identity",
+        "same_choice": true,
+        "max_probability_difference": 0.18569031096686067
+      },
+      {
+        "source": "banking77",
+        "question_id": "intent",
+        "options": 77,
+        "original_choice": "pin_blocked",
+        "reversed_choice": "pin_blocked",
+        "same_choice": true,
+        "max_probability_difference": 0.017493352887650304
+      },
+      {
+        "source": "banking77",
+        "question_id": "intent",
+        "options": 77,
+        "original_choice": "transfer_timing",
+        "reversed_choice": "transfer_timing",
+        "same_choice": true,
+        "max_probability_difference": 0.030724155644277964
+      },
+      {
+        "source": "agnews",
+        "question_id": "topic",
+        "options": 4,
+        "original_choice": "scitech",
+        "reversed_choice": "scitech",
+        "same_choice": true,
+        "max_probability_difference": 0.10467711499378207
+      },
+      {
+        "source": "agnews",
+        "question_id": "topic",
+        "options": 4,
+        "original_choice": "business",
+        "reversed_choice": "business",
+        "same_choice": true,
+        "max_probability_difference": 0.03469076537055543
+      },
+      {
+        "source": "agnews",
+        "question_id": "topic",
+        "options": 4,
+        "original_choice": "sports",
+        "reversed_choice": "sports",
+        "same_choice": true,
+        "max_probability_difference": 0.001354907085731575
+      },
+      {
+        "source": "agnews",
+        "question_id": "topic",
+        "options": 4,
+        "original_choice": "world",
+        "reversed_choice": "world",
+        "same_choice": true,
+        "max_probability_difference": 0.008885063271330762
+      },
+      {
+        "source": "mnli",
+        "question_id": "relation",
+        "options": 3,
+        "original_choice": "contradiction",
+        "reversed_choice": "contradiction",
+        "same_choice": true,
+        "max_probability_difference": 0.017193519352806923
+      },
+      {
+        "source": "mnli",
+        "question_id": "relation",
+        "options": 3,
+        "original_choice": "neutral",
+        "reversed_choice": "neutral",
+        "same_choice": true,
+        "max_probability_difference": 0.01821849751788185
+      },
+      {
+        "source": "mnli",
+        "question_id": "relation",
+        "options": 3,
+        "original_choice": "entailment",
+        "reversed_choice": "entailment",
+        "same_choice": true,
+        "max_probability_difference": 0.16379613632846324
+      },
+      {
+        "source": "mnli",
+        "question_id": "relation",
+        "options": 3,
+        "original_choice": "neutral",
+        "reversed_choice": "neutral",
+        "same_choice": true,
+        "max_probability_difference": 0.14897097611524268
+      },
+      {
+        "source": "trec",
+        "question_id": "answer_type",
+        "options": 6,
+        "original_choice": "description",
+        "reversed_choice": "description",
+        "same_choice": true,
+        "max_probability_difference": 0.014707227407006827
+      },
+      {
+        "source": "trec",
+        "question_id": "answer_type",
+        "options": 6,
+        "original_choice": "number",
+        "reversed_choice": "number",
+        "same_choice": true,
+        "max_probability_difference": 0.001573216275592642
+      },
+      {
+        "source": "trec",
+        "question_id": "answer_type",
+        "options": 6,
+        "original_choice": "human",
+        "reversed_choice": "human",
+        "same_choice": true,
+        "max_probability_difference": 0.18189024792109654
+      },
+      {
+        "source": "trec",
+        "question_id": "answer_type",
+        "options": 6,
+        "original_choice": "abbreviation",
+        "reversed_choice": "abbreviation",
+        "same_choice": true,
+        "max_probability_difference": 0.013821959995372744
+      },
+      {
+        "source": "dbpedia14",
+        "question_id": "category",
+        "options": 14,
+        "original_choice": "plant",
+        "reversed_choice": "plant",
+        "same_choice": true,
+        "max_probability_difference": 0.0015829884841804809
+      },
+      {
+        "source": "dbpedia14",
+        "question_id": "category",
+        "options": 14,
+        "original_choice": "animal",
+        "reversed_choice": "animal",
+        "same_choice": true,
+        "max_probability_difference": 0.005334688502208862
+      },
+      {
+        "source": "dbpedia14",
+        "question_id": "category",
+        "options": 14,
+        "original_choice": "writtenwork",
+        "reversed_choice": "writtenwork",
+        "same_choice": true,
+        "max_probability_difference": 0.01540131424401894
+      },
+      {
+        "source": "dbpedia14",
+        "question_id": "category",
+        "options": 14,
+        "original_choice": "film",
+        "reversed_choice": "film",
+        "same_choice": true,
+        "max_probability_difference": 0.0030798836597858426
+      },
+      {
+        "source": "synthetic_rules_en",
+        "question_id": "decision",
+        "options": 2,
+        "original_choice": "reject",
+        "reversed_choice": "reject",
+        "same_choice": true,
+        "max_probability_difference": 2.7163878111330418e-05
+      },
+      {
+        "source": "synthetic_rules_zh",
+        "question_id": "decision",
+        "options": 2,
+        "original_choice": "approve",
+        "reversed_choice": "approve",
+        "same_choice": true,
+        "max_probability_difference": 7.304276399944243e-06
+      },
+      {
+        "source": "synthetic_rules_en",
+        "question_id": "decision",
+        "options": 2,
+        "original_choice": "reject",
+        "reversed_choice": "reject",
+        "same_choice": true,
+        "max_probability_difference": 2.6196910149822727e-05
+      },
+      {
+        "source": "synthetic_rules_zh",
+        "question_id": "decision",
+        "options": 2,
+        "original_choice": "reject",
+        "reversed_choice": "reject",
+        "same_choice": true,
+        "max_probability_difference": 1.4487245765137935e-05
+      },
+      {
+        "source": "synthetic_rules_en",
+        "question_id": "decision",
+        "options": 2,
+        "original_choice": "approve",
+        "reversed_choice": "approve",
+        "same_choice": true,
+        "max_probability_difference": 0.00032896631615243673
+      },
+      {
+        "source": "synthetic_rules_zh",
+        "question_id": "decision",
+        "options": 2,
+        "original_choice": "reject",
+        "reversed_choice": "reject",
+        "same_choice": true,
+        "max_probability_difference": 0.0012103083682858506
+      },
+      {
+        "source": "synthetic_rules_en",
+        "question_id": "decision",
+        "options": 2,
+        "original_choice": "reject",
+        "reversed_choice": "reject",
+        "same_choice": true,
+        "max_probability_difference": 7.801725102253229e-05
+      },
+      {
+        "source": "synthetic_rules_zh",
+        "question_id": "decision",
+        "options": 2,
+        "original_choice": "reject",
+        "reversed_choice": "reject",
+        "same_choice": true,
+        "max_probability_difference": 0.0005474301860744637
+      }
+    ]
+  },
+  "independent_questions": {
+    "maximum_probability_difference": 0.0,
+    "passed": true
+  },
+  "scope": "Deterministic development probes. Candidate reversal is measured, not promised invariant. These are not new held-out accuracy or Jev comparisons."
+}

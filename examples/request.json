@@ -1,0 +1,19 @@
+{
+  "model": "qev-latest",
+  "state": "客户被重复扣款，需要退还多扣的费用。",
+  "questions": {
+    "route": {
+      "type": "choice",
+      "instructions": "选择最适合处理这个请求的部门。",
+      "criteria": {
+        "billing": "账单、扣款和退款",
+        "technical": "软件故障和技术问题",
+        "sales": "购买咨询"
+      }
+    },
+    "refund": {
+      "type": "noul",
+      "instructions": "客户是否请求退款？"
+    }
+  }
+}

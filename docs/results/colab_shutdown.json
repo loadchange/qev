@@ -1,0 +1,16 @@
+{
+  "session": "qev-08b-train",
+  "hardware": "NVIDIA L4",
+  "endpoint": "gpu-l4-s-kkb-ass1a1-21207v6jph7rz",
+  "stopped": true,
+  "verified_at_utc": "2026-09-20T15:59:35.989004+00:00",
+  "stop_output": "[colab] Session terminated.",
+  "server_sessions_output": "[colab] No active sessions found on server.",
+  "artifacts_downloaded_before_stop": [
+    "models/qev-0.8b",
+    "docs/results/native_validation.json",
+    "docs/results/service_torch.json",
+    "runs/qev-trained.tar.gz",
+    "runs/service_torch.server.log"
+  ]
+}

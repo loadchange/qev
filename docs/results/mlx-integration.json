@@ -1,0 +1,316 @@
+{
+  "questions": 20,
+  "max_probability_error": 5.088259196539546e-06,
+  "argmax_flips": 0,
+  "atol": 0.002,
+  "require_same_argmax": true,
+  "passed": true,
+  "calibrated": {
+    "temperature": 1.4640856959456252,
+    "questions": 20,
+    "max_probability_error": 4.4109285519677854e-06,
+    "argmax_flips": 0,
+    "atol": 0.002,
+    "require_same_argmax": true,
+    "passed": true
+  },
+  "reference": "Torch fp32 full foundation + unmerged LoRA, independent rows",
+  "candidate": "Native mlx-vlm full foundation + switchable unmerged LoRA + float32 pointer",
+  "mlx_dtype": "float32",
+  "encoded_cases_sha256": "306ad188cf59f1839b7f9f159c7541960fb94f3bf75e21607250e974933245d4",
+  "checkpoint": "/Volumes/ExternalDisk/UserData/code/loadchange/qev/models/qev-0.8b",
+  "output_model": "/Volumes/ExternalDisk/UserData/code/loadchange/qev/models/qev-0.8b-mlx",
+  "completed_epochs": 2,
+  "validation_scope": "Numerical integration and four native-generation smoke cases; not a statistical accuracy benchmark",
+  "text_cases": 17,
+  "media_cases": 3,
+  "dataset_cases": 14,
+  "media_validation_scope": "No media supervision was used; numerical parity and input plumbing only, no multimodal decision accuracy claim",
+  "manual_instruction_probabilities": [
+    {
+      "state": "The customer loved the product, but delivery arrived two days late.",
+      "instr": "Does the customer express a positive opinion about the product itself?",
+      "options": [
+        "false",
+        "true"
+      ],
+      "raw_probabilities": [
+        0.06136516181834149,
+        0.9386348381816585
+      ],
+      "calibrated_probabilities": [
+        0.13435434910930172,
+        0.8656456508906982
+      ]
+    },
+    {
+      "state": "The customer loved the product, but delivery arrived two days late.",
+      "instr": "Did the delivery arrive on time?",
+      "options": [
+        "false",
+        "true"
+      ],
+      "raw_probabilities": [
+        0.9996357486221445,
+        0.000364251377855421
+      ],
+      "calibrated_probabilities": [
+        0.9955379575263139,
+        0.004462042473685999
+      ]
+    },
+    {
+      "state": "用户说：昨天重复扣费了两次，请退还多扣的钱。",
+      "instr": "请选择最适合处理这条请求的部门。",
+      "options": [
+        "账单与退款",
+        "技术支持",
+        "销售咨询"
+      ],
+      "raw_probabilities": [
+        0.9854337995283957,
+        0.011823379352320846,
+        0.0027428211192834433
+      ],
+      "calibrated_probabilities": [
+        0.937449466570017,
+        0.04570294437925767,
+        0.0168475890507254
+      ]
+    }
+  ],
+  "native_generation": {
+    "text": {
+      "torch_tokens": [
+        2232,
+        248046,
+        198,
+        248044
+      ],
+      "mlx_tokens": [
+        2232,
+        248046,
+        198,
+        248044
+      ],
+      "tokens_equal": true,
+      "torch_text": "ready\n",
+      "mlx_text": "ready\n"
+    },
+    "image": {
+      "torch_tokens": [
+        2438,
+        248046,
+        198,
+        248044
+      ],
+      "mlx_tokens": [
+        2438,
+        248046,
+        198,
+        248044
+      ],
+      "tokens_equal": true,
+      "torch_text": " red\n",
+      "mlx_text": " red\n"
+    },
+    "video": {
+      "torch_tokens": [
+        2438,
+        248046,
+        198,
+        248044
+      ],
+      "mlx_tokens": [
+        2438,
+        248046,
+        198,
+        248044
+      ],
+      "tokens_equal": true,
+      "torch_text": " red\n",
+      "mlx_text": " red\n"
+    },
+    "mixed_image_video": {
+      "torch_tokens": [
+        2438,
+        248046,
+        198,
+        248044
+      ],
+      "mlx_tokens": [
+        2438,
+        248046,
+        198,
+        248044
+      ],
+      "tokens_equal": true,
+      "torch_text": " red\n",
+      "mlx_text": " red\n"
+    }
+  },
+  "native_tokens_equal": true,
+  "elapsed_seconds": 191.847054791986,
+  "cases": [
+    {
+      "source": "agnews",
+      "language": "en",
+      "record_id": "agnews/test/989",
+      "question_id": "topic",
+      "tokens": 86,
+      "options": 4
+    },
+    {
+      "source": "amazon",
+      "language": "en",
+      "record_id": "amazon/test/3489",
+      "question_id": "stars",
+      "tokens": 88,
+      "options": 5
+    },
+    {
+      "source": "banking77",
+      "language": "en",
+      "record_id": "banking77/test/2269",
+      "question_id": "intent",
+      "tokens": 850,
+      "options": 77
+    },
+    {
+      "source": "boolq",
+      "language": "en",
+      "record_id": "boolq/validation/342",
+      "question_id": "answer",
+      "tokens": 231,
+      "options": 2
+    },
+    {
+      "source": "dbpedia14",
+      "language": "en",
+      "record_id": "dbpedia14/test/53082",
+      "question_id": "category",
+      "tokens": 165,
+      "options": 14
+    },
+    {
+      "source": "imdb",
+      "language": "en",
+      "record_id": "imdb/test/23399",
+      "question_id": "positive",
+      "tokens": 122,
+      "options": 2
+    },
+    {
+      "source": "mnli",
+      "language": "en",
+      "record_id": "mnli/validation_matched/5828",
+      "question_id": "relation",
+      "tokens": 87,
+      "options": 3
+    },
+    {
+      "source": "sst5",
+      "language": "en",
+      "record_id": "sst5/test/722",
+      "question_id": "sentiment",
+      "tokens": 44,
+      "options": 5
+    },
+    {
+      "source": "synthetic_refund_en",
+      "language": "en",
+      "record_id": "qev-rules/091ddf3fbe4d17fb7ed5c8d5c9322ce5726b3b0092ced54bf09624db8ee67818",
+      "question_id": "decision",
+      "tokens": 50,
+      "options": 2
+    },
+    {
+      "source": "synthetic_approval_en",
+      "language": "en",
+      "record_id": "qev-rules/fd80dd87ab99f36a4886cda46f54dee8a4e3ec6222f3ee2ceb162806818e36d4",
+      "question_id": "decision",
+      "tokens": 57,
+      "options": 2
+    },
+    {
+      "source": "synthetic_refund_zh",
+      "language": "zh",
+      "record_id": "qev-rules/96704388575609b495959890fbe3ab4d3b06467ea500594db3b54249532940a6",
+      "question_id": "decision",
+      "tokens": 41,
+      "options": 2
+    },
+    {
+      "source": "synthetic_approval_zh",
+      "language": "zh",
+      "record_id": "qev-rules/30769d5e0be946ef6419eca16e5fedaccb3cd5f2179d9c54ca8fc462555c5e80",
+      "question_id": "decision",
+      "tokens": 52,
+      "options": 2
+    },
+    {
+      "source": "trec",
+      "language": "en",
+      "record_id": "trec/test/276",
+      "question_id": "answer_type",
+      "tokens": 116,
+      "options": 6
+    },
+    {
+      "source": "yelp",
+      "language": "en",
+      "record_id": "yelp/test/26028",
+      "question_id": "rating",
+      "tokens": 177,
+      "options": 5
+    },
+    {
+      "source": "manual_instruction_0",
+      "language": null,
+      "record_id": null,
+      "question_id": null,
+      "tokens": 34,
+      "options": 2
+    },
+    {
+      "source": "manual_instruction_1",
+      "language": null,
+      "record_id": null,
+      "question_id": null,
+      "tokens": 29,
+      "options": 2
+    },
+    {
+      "source": "manual_instruction_2",
+      "language": null,
+      "record_id": null,
+      "question_id": null,
+      "tokens": 39,
+      "options": 3
+    },
+    {
+      "source": "media_image",
+      "language": null,
+      "record_id": null,
+      "question_id": null,
+      "tokens": 87,
+      "options": 3
+    },
+    {
+      "source": "media_video",
+      "language": null,
+      "record_id": null,
+      "question_id": null,
+      "tokens": 68,
+      "options": 3
+    },
+    {
+      "source": "media_mixed_image_video",
+      "language": null,
+      "record_id": null,
+      "question_id": null,
+      "tokens": 135,
+      "options": 3
+    }
+  ]
+}

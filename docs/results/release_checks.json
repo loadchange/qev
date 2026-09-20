@@ -1,0 +1,91 @@
+{
+  "verified_at_utc": "2026-09-20T16:20:51.154450+00:00",
+  "quality_gates": {
+    "ruff": {
+      "passed": true,
+      "command": ".venv/bin/ruff check qev scripts tests"
+    },
+    "pytest": {
+      "passed": 81,
+      "failed": 0,
+      "warnings": 1,
+      "command": ".venv/bin/python -m pytest -q",
+      "warning": "Starlette uses a deprecated AnyIO BlockingPortal alias."
+    },
+    "cli": {
+      "passed": true,
+      "command": "HF_HUB_OFFLINE=1 uv run --offline qev predict --model models/qev-0.8b-mlx --request examples/request.json",
+      "response": "docs/results/example_prediction.json"
+    },
+    "wheel": {
+      "passed": true,
+      "path": "dist/qev-0.1.0-py3-none-any.whl",
+      "sha256": "a64471ce371143231ffc61d64b311b190fe1cea91a8aa5ed5af4e4e073dc5bd5",
+      "package_sources_match": true
+    }
+  },
+  "final_reports": {
+    "service_torch.json": {
+      "sha256": "c6791ceea88dcf07603da558b2111cf0461f1ee1293ad5d139cda15fcec22443",
+      "passed": true,
+      "passed_checks": 17
+    },
+    "service_mlx.json": {
+      "sha256": "2a43b673de7f995742faa38ad9c4c192ace0ae0db0af282fca3e5b4710f0a39f",
+      "passed": true,
+      "passed_checks": 19
+    },
+    "native_validation.json": {
+      "sha256": "43d92516b678139856460b0e63a4eb9bdd471cca9ff21682b07d8a55c7c0bf6f",
+      "passed": true
+    },
+    "mlx-integration.json": {
+      "sha256": "9d90c781c1fc21a4cfdef63592fae13e95e2418747a8e3c268ce23e2938c5a83",
+      "passed": true
+    }
+  },
+  "runtime_source_sha256": {
+    "qev/__init__.py": "8e0d68067cf8ee652956dbab3c4e573414d2f8ddd5ab78c677628599f25bca13",
+    "qev/__main__.py": "6d8b7d7846a845059d7a3107143f11131f63c5511d669b44085b15ec5e3d2279",
+    "qev/api.py": "c1791c5f197e72ac12789c9cd9da2ff411aca171c20bea92229220d561ee6767",
+    "qev/cli.py": "6c60937ceac2fef323f06a0ca31469eb535fdc78c79b1d4f509077657d61faa1",
+    "qev/data.py": "4e9fd9dc973fe19256e085ede83ea6a9b8522d1b7d374866a6ec34b3329c7a8f",
+    "qev/evaluation.py": "7799b27cba7d8b4228569c13cea1f8ec4d390f9ca0464d70d9b0904d98247178",
+    "qev/export.py": "38979228f2bfaf5d4bbf1cce0d1346cf8e3eb1eabdfc8ba50223e1f51e2503bb",
+    "qev/inference.py": "673bd9d9e7c3a393dc3f79057de558a863eef9191d4baab34e2c55a337898e4b",
+    "qev/mlx_runtime.py": "33832d9ff139f2eeb35e69c9010a1191ae657bb7c43ae1cbdf406fde95ee48f3",
+    "qev/model.py": "2dec3e86955678930afa807c272f7715a382429b7fcab4423b5d698095d97ae0",
+    "qev/processing.py": "962d58f7c39cf4d257a2838836ecd1c3107d9cdbb9c59559534d76c2c04b8cd3",
+    "qev/serve.py": "e69f141cd7fdde601423ca9f0a47a00e93fedb39a5be8564ba15f06dbc5de0cf",
+    "qev/tokenization.py": "53ca04e97221c6c14a3acf0bdac74e3014943324f9986bea549a7bf36135c895",
+    "qev/train.py": "9cdce5b1214a846154d472a725de448697a56811ce397615b0b4335b18e07d50",
+    "pyproject.toml": "16fed4e78410f1577d365900e8b1cb17174268101b1b397beaea547c84438b82",
+    "uv.lock": "444a7dcae20991eebfa791b359ddb20f8a445717eb51cdd06482e9ca8889f47b"
+  },
+  "training_source_archive": {
+    "path": "runs/training-source.tar.gz",
+    "sha256": "3d1dc499384761ae0ccd9a4fa4ede1dab356e043c729a7a49a1a54b49539d01d"
+  },
+  "downloaded_training_archive": {
+    "path": "runs/qev-trained.tar.gz",
+    "sha256": "202475d880249237fd22edaa09ea4f0a3e42882cf3766c7255ece9f1631c39e0"
+  },
+  "artifact_inventory_sha256": "7d830e721eab2cbc54faa700661a5e06ca4e9ae412372fcbd5124d4636f06176",
+  "colab_shutdown": {
+    "session": "qev-08b-train",
+    "hardware": "NVIDIA L4",
+    "endpoint": "gpu-l4-s-kkb-ass1a1-21207v6jph7rz",
+    "stopped": true,
+    "verified_at_utc": "2026-09-20T15:59:35.989004+00:00",
+    "stop_output": "[colab] Session terminated.",
+    "server_sessions_output": "[colab] No active sessions found on server.",
+    "artifacts_downloaded_before_stop": [
+      "models/qev-0.8b",
+      "docs/results/native_validation.json",
+      "docs/results/service_torch.json",
+      "runs/qev-trained.tar.gz",
+      "runs/service_torch.server.log"
+    ]
+  },
+  "scope": "Validation of the local v0.1 release. Development accuracy, numerical parity, functional multimodal checks and fixed short-request timing are distinct evidence, not Jev performance equivalence or a multimodal decision benchmark."
+}

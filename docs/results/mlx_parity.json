@@ -1,0 +1,21 @@
+{
+  "questions": 20,
+  "max_probability_error": 5.088259196539546e-06,
+  "argmax_flips": 0,
+  "atol": 0.002,
+  "require_same_argmax": true,
+  "passed": true,
+  "calibrated": {
+    "temperature": 1.4640856959456252,
+    "questions": 20,
+    "max_probability_error": 4.4109285519677854e-06,
+    "argmax_flips": 0,
+    "atol": 0.002,
+    "require_same_argmax": true,
+    "passed": true
+  },
+  "reference": "Torch fp32 full foundation + unmerged LoRA, independent rows",
+  "candidate": "Native mlx-vlm full foundation + switchable unmerged LoRA + float32 pointer",
+  "mlx_dtype": "float32",
+  "encoded_cases_sha256": "306ad188cf59f1839b7f9f159c7541960fb94f3bf75e21607250e974933245d4"
+}

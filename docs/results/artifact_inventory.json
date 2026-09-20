@@ -1,0 +1,202 @@
+{
+  "created_at_utc": "2026-09-20T16:03:56.949243+00:00",
+  "scope": "Locally delivered model artifacts, including post-training README and license copies. Original Colab download manifest remains unchanged.",
+  "artifacts": {
+    "qev-0.8b": {
+      "directory": "models/qev-0.8b",
+      "files": {
+        "BASE_MODEL_LICENSE": {
+          "bytes": 11544,
+          "sha256": "bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a"
+        },
+        "LICENSE": {
+          "bytes": 11343,
+          "sha256": "6b08bb37982c233aa12bcbdf19106da12f3f4fcf800773ea42e28ebeddd34fb8"
+        },
+        "NOTICE": {
+          "bytes": 1621,
+          "sha256": "51fe66986820c9e92931939ee399da5ee338767a595dc9bb30138dd0fa8eeea7"
+        },
+        "README.md": {
+          "bytes": 1790,
+          "sha256": "2a92209897238380326db2ce12285d5b5df18b84b28716f64100c4b842ddc1a6"
+        },
+        "SHA256SUMS.json": {
+          "bytes": 1940,
+          "sha256": "bffef7e5584bda1526aabe8e9bcd8c10f47e36348f967237921616acbd65d1e1"
+        },
+        "adapter/README.md": {
+          "bytes": 5128,
+          "sha256": "11dd55d83a1ea0f16dba855f17ba84aac849c05212940fca84010cdf49d1cd42"
+        },
+        "adapter/adapter_config.json": {
+          "bytes": 1253,
+          "sha256": "65eadbb8c3bf2c20e5f4b99bb55841115655155b3a966706dfdc89f90c9e0ed6"
+        },
+        "adapter/adapter_model.safetensors": {
+          "bytes": 43338624,
+          "sha256": "a1ba15eb0deb91bd9b0b4b9649999c57f0a5b8aac70f52488138a62fd9978549"
+        },
+        "base_integrity.json": {
+          "bytes": 403,
+          "sha256": "db823d6d5f2b5a06fbc53ba494e35283247415fc39601ea620b281af9e86aa15"
+        },
+        "calibration_rows.json": {
+          "bytes": 322159,
+          "sha256": "f94b5254a380c7322505dc71bb615346cba04486fe0a8d201e92238e9d813e6f"
+        },
+        "development_rows.json": {
+          "bytes": 462125,
+          "sha256": "c1f2843927a27678b93decdb9f9c2055d6ca13e990cd99d6295cb7ad539b1093"
+        },
+        "environment.json": {
+          "bytes": 288,
+          "sha256": "5c90e4c4ac9e1753b7ad3d4702afa8de81ad1c981d5ebeaf1ca275070126fb57"
+        },
+        "evaluation.json": {
+          "bytes": 14352,
+          "sha256": "35a7fcc5452b970cd4acecf34873596262dd579abc9ff178f557c005f2e6f9cb"
+        },
+        "pointer.safetensors": {
+          "bytes": 2097320,
+          "sha256": "f56860b954742fee0399b50c372c1f262699b84d4500ab52e27d72bff8d49749"
+        },
+        "processor/chat_template.jinja": {
+          "bytes": 7755,
+          "sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+        },
+        "processor/processor_config.json": {
+          "bytes": 1220,
+          "sha256": "bfbc24af59a3e73a9cd0653b8d4ae758dfaec4e3e6c15dfb1c6c8ee8d5683c85"
+        },
+        "processor/tokenizer.json": {
+          "bytes": 19989325,
+          "sha256": "06b9509352d2af50381ab2247e083b80d32d5c0aba91c272ca9ff729b6a0e523"
+        },
+        "processor/tokenizer_config.json": {
+          "bytes": 1166,
+          "sha256": "5f7aa0d810000c4a0940b35c8f16e56c3439260fccc13a321826ebc3ccf2501f"
+        },
+        "provenance.json": {
+          "bytes": 2551,
+          "sha256": "7acde75b433af6911d131c5762193b83f97c823a6027148aae70f3b7f3922281"
+        },
+        "qev_config.json": {
+          "bytes": 1160,
+          "sha256": "121ce48d84da856df67a469033a85825d3ab5a039fec986476aa5853fbb5f814"
+        },
+        "tokenizer/chat_template.jinja": {
+          "bytes": 7755,
+          "sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+        },
+        "tokenizer/tokenizer.json": {
+          "bytes": 19989325,
+          "sha256": "06b9509352d2af50381ab2247e083b80d32d5c0aba91c272ca9ff729b6a0e523"
+        },
+        "tokenizer/tokenizer_config.json": {
+          "bytes": 1125,
+          "sha256": "9cf04fffe3d8c3b85e439fb35c7acad0761ab51c422a8c4256d9f887c3a0be7d"
+        },
+        "training.jsonl": {
+          "bytes": 11840,
+          "sha256": "d94314f19509121290d874f51d8f39c159a41ed219225143d7272d0c10416086"
+        },
+        "untrained_development.json": {
+          "bytes": 6538,
+          "sha256": "630efe340b73ff1a9262faff28e78e1622ef0d80fccd3b24b64226323fe89fa6"
+        }
+      },
+      "total_bytes": 86289650
+    },
+    "qev-0.8b-mlx": {
+      "directory": "models/qev-0.8b-mlx",
+      "files": {
+        "LICENSE": {
+          "bytes": 11343,
+          "sha256": "6b08bb37982c233aa12bcbdf19106da12f3f4fcf800773ea42e28ebeddd34fb8"
+        },
+        "NOTICE": {
+          "bytes": 1621,
+          "sha256": "51fe66986820c9e92931939ee399da5ee338767a595dc9bb30138dd0fa8eeea7"
+        },
+        "README.md": {
+          "bytes": 1962,
+          "sha256": "64fecb2b1571904c0eefb4d5ec554b3e5127cc2db00f4e054f0228ea74421c77"
+        },
+        "backbone/BASE_MODEL_README.md": {
+          "bytes": 61705,
+          "sha256": "87a163af54f32fa608a0f8d3ac67945c53dd2b4a7c96740b3d7fdc28e8458864"
+        },
+        "backbone/LICENSE": {
+          "bytes": 11544,
+          "sha256": "bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a"
+        },
+        "backbone/README.md": {
+          "bytes": 84,
+          "sha256": "9a272b5949a803ab6eadf0703706dab183229952e2b374501d1069d0f6d16557"
+        },
+        "backbone/chat_template.jinja": {
+          "bytes": 7755,
+          "sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+        },
+        "backbone/config.json": {
+          "bytes": 2907,
+          "sha256": "b90b86f35c8e6925ef74ee04d0e758f0a845c83a42089ad82bbaa948de9b4204"
+        },
+        "backbone/foundation_manifest.json": {
+          "bytes": 406,
+          "sha256": "abd6ea2c0b53ccfbe45f1beb47e6b8050c989d4fedc60a48b9bed3ed6198c129"
+        },
+        "backbone/model.safetensors": {
+          "bytes": 3412001809,
+          "sha256": "d9c47ee9fd3e1ac66f0a4761c6dc961bc5dade2c9307e5b86695705140f24560"
+        },
+        "backbone/model.safetensors.index.json": {
+          "bytes": 38712,
+          "sha256": "e693d25c3656879e5f823af1fa423696a0018f95474b1329d79ff447e5bfc7f4"
+        },
+        "backbone/preprocessor_config.json": {
+          "bytes": 390,
+          "sha256": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516"
+        },
+        "backbone/processor_config.json": {
+          "bytes": 1220,
+          "sha256": "bfbc24af59a3e73a9cd0653b8d4ae758dfaec4e3e6c15dfb1c6c8ee8d5683c85"
+        },
+        "backbone/tokenizer.json": {
+          "bytes": 19989325,
+          "sha256": "06b9509352d2af50381ab2247e083b80d32d5c0aba91c272ca9ff729b6a0e523"
+        },
+        "backbone/tokenizer_config.json": {
+          "bytes": 1164,
+          "sha256": "7488550a894dcf741616126e322ea31d66cf9457b59ec5825f4c7efdced421f8"
+        },
+        "backbone/video_preprocessor_config.json": {
+          "bytes": 385,
+          "sha256": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13"
+        },
+        "backbone/vocab.json": {
+          "bytes": 6722759,
+          "sha256": "ce99b4cb2983d118806ce0a8b777a35b093e2000a503ebde25853284c9dfa003"
+        },
+        "decision_adapters.safetensors": {
+          "bytes": 43337494,
+          "sha256": "9d9ba43e601c56d13d068cbab28bc79d8168f3ff81811190f08ae07a29d26b74"
+        },
+        "parity.json": {
+          "bytes": 682,
+          "sha256": "12dd8219a750d6008b6d05833ef1f93778a67049920b973315d646bf606b3ca8"
+        },
+        "pointer.safetensors": {
+          "bytes": 2097320,
+          "sha256": "f56860b954742fee0399b50c372c1f262699b84d4500ab52e27d72bff8d49749"
+        },
+        "qev_config.json": {
+          "bytes": 2057,
+          "sha256": "0ca2fc61f7d348ebb2f88d2e178d1d81480a992b8d9931c60e372e735e0e0097"
+        }
+      },
+      "total_bytes": 3484292644
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "model": "qev-latest",
+  "answers": {
+    "route": {
+      "type": "choice",
+      "choice": "billing",
+      "confidence": 0.9960088174464001,
+      "probabilities": {
+        "billing": 0.9973392116309334,
+        "technical": 0.0013422165509540224,
+        "sales": 0.001318571818112578
+      }
+    },
+    "refund": {
+      "type": "noul",
+      "noul": 0.7297528905354115
+    }
+  },
+  "usage": {
+    "input_tokens": 76,
+    "output_tokens": 0
+  },
+  "latency_ms": 138.71,
+  "qev": {
+    "backend": "mlx",
+    "temperature": 1.4640856959456252,
+    "training_modalities": [
+      "text"
+    ],
+    "multimodal_decision_accuracy_validated": false,
+    "input_modalities": [
+      "text"
+    ],
+    "truncated_questions": []
+  }
+}

@@ -1,0 +1,241 @@
+{
+  "format": "qev-data-v1",
+  "seed": 20260920,
+  "partitions": {
+    "train": {
+      "sha256": "6b62720216c47d8727d3246e78b1cc28fc1fb50987ca9dce0772d3f56d79818f",
+      "records": 4692,
+      "questions": 5892,
+      "question_types": {
+        "choice": 2318,
+        "noul": 2126,
+        "score": 1448
+      },
+      "sources": {
+        "banking77": 442,
+        "boolq": 400,
+        "agnews": 428,
+        "mnli": 442,
+        "sst5": 400,
+        "yelp": 400,
+        "trec": 438,
+        "dbpedia14": 442,
+        "amazon": 400,
+        "imdb": 400,
+        "synthetic_rules_en": 250,
+        "synthetic_rules_zh": 250
+      }
+    },
+    "calibration": {
+      "sha256": "dc21a46d6d2a0a10185e3ebd22229d2745bc53581c7de8f9aef6a8f42c36a5b1",
+      "records": 500,
+      "questions": 620,
+      "question_types": {
+        "choice": 226,
+        "noul": 226,
+        "score": 168
+      },
+      "sources": {
+        "banking77": 40,
+        "boolq": 40,
+        "agnews": 40,
+        "mnli": 40,
+        "sst5": 40,
+        "yelp": 40,
+        "trec": 40,
+        "dbpedia14": 40,
+        "amazon": 40,
+        "imdb": 40,
+        "synthetic_rules_en": 50,
+        "synthetic_rules_zh": 50
+      }
+    },
+    "development": {
+      "sha256": "1473b7d04497862d68510d9b73c4878bb1c0d58ae32897c495a1760d1b92a009",
+      "records": 700,
+      "questions": 880,
+      "question_types": {
+        "choice": 326,
+        "noul": 326,
+        "score": 228
+      },
+      "sources": {
+        "banking77": 60,
+        "boolq": 60,
+        "agnews": 60,
+        "mnli": 60,
+        "sst5": 60,
+        "yelp": 60,
+        "trec": 60,
+        "dbpedia14": 60,
+        "amazon": 60,
+        "imdb": 60,
+        "synthetic_rules_en": 50,
+        "synthetic_rules_zh": 50
+      }
+    }
+  },
+  "upstream": {
+    "repository": "jaredpalmer/kev-suites",
+    "revision": "a3318ddc1f630c5673232efacd8123a84de3f480",
+    "path": "public-pool-v4",
+    "manifest_sha256": "aac28e07c739d05178a7da4ee6caf097efeb2e8938d0d8742d1518dd64d30d2c",
+    "partition_sha256": {
+      "train": "21807df00aa0ab67b5c499f902316e76f8b65b609c31cc3f12f07e9fcbdcb525",
+      "calibration": "820160ceb5332c3f964e9e4b61c9a55876e69358fe3a127a2370d8bf8d548fa4",
+      "development": "1542b2def96f9c86510ea2976bbc68f878acef0c36aff4cd6ed19868c2d2349f"
+    },
+    "conversion_code": "https://github.com/jaredpalmer/kev",
+    "conversion_code_license": "Apache-2.0"
+  },
+  "source_datasets": [
+    {
+      "repository": "CogComp/trec",
+      "revision": "65752bf53af25bc935a0dce92fb5b6c930728450",
+      "model_card_url": "https://huggingface.co/datasets/CogComp/trec/blob/65752bf53af25bc935a0dce92fb5b6c930728450/README.md",
+      "declared_license": "not_declared",
+      "license_name": null,
+      "license_link": null,
+      "card_metadata_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "repository": "SetFit/amazon_reviews_multi_en",
+      "revision": "ec73b665e4be0f567b69d39425355401cfe0d29b",
+      "model_card_url": "https://huggingface.co/datasets/SetFit/amazon_reviews_multi_en/blob/ec73b665e4be0f567b69d39425355401cfe0d29b/README.md",
+      "declared_license": "apache-2.0",
+      "license_name": null,
+      "license_link": null,
+      "card_metadata_sha256": "3589dbeb94a252b2c2324b8fe22cc037100f84b05a59656c6e8ee4a0b46cbb22"
+    },
+    {
+      "repository": "SetFit/sst5",
+      "revision": "e51bdcd8cd3a30da231967c1a249ba59361279a3",
+      "model_card_url": "https://huggingface.co/datasets/SetFit/sst5/blob/e51bdcd8cd3a30da231967c1a249ba59361279a3/README.md",
+      "declared_license": "not_declared",
+      "license_name": null,
+      "license_link": null,
+      "card_metadata_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+    },
+    {
+      "repository": "Yelp/yelp_review_full",
+      "revision": "c1f9ee939b7d05667af864ee1cb066393154bf85",
+      "model_card_url": "https://huggingface.co/datasets/Yelp/yelp_review_full/blob/c1f9ee939b7d05667af864ee1cb066393154bf85/README.md",
+      "declared_license": [
+        "other"
+      ],
+      "license_name": null,
+      "license_link": null,
+      "card_metadata_sha256": "faf74150c2fa3934ee7eff1d4c6ed8b6484a5dfbcb8450f6fb27702756219d3b"
+    },
+    {
+      "repository": "fancyzhx/ag_news",
+      "revision": "eb185aade064a813bc0b7f42de02595523103ca4",
+      "model_card_url": "https://huggingface.co/datasets/fancyzhx/ag_news/blob/eb185aade064a813bc0b7f42de02595523103ca4/README.md",
+      "declared_license": [
+        "unknown"
+      ],
+      "license_name": null,
+      "license_link": null,
+      "card_metadata_sha256": "a4c7c6afd1ef705e44237a98cdbcb9c6c33bfef2aa6ec3079cdbe7793151f1f8"
+    },
+    {
+      "repository": "fancyzhx/dbpedia_14",
+      "revision": "9abd46cf7fc8b4c64290f26993c540b92aa145ac",
+      "model_card_url": "https://huggingface.co/datasets/fancyzhx/dbpedia_14/blob/9abd46cf7fc8b4c64290f26993c540b92aa145ac/README.md",
+      "declared_license": [
+        "cc-by-sa-3.0"
+      ],
+      "license_name": null,
+      "license_link": null,
+      "card_metadata_sha256": "74a20bf49cf3e42ab269e0a4a70299043b8c89f2167d90652331fab8e77cb27d"
+    },
+    {
+      "repository": "google/boolq",
+      "revision": "35b264d03638db9f4ce671b711558bf7ff0f80d5",
+      "model_card_url": "https://huggingface.co/datasets/google/boolq/blob/35b264d03638db9f4ce671b711558bf7ff0f80d5/README.md",
+      "declared_license": [
+        "cc-by-sa-3.0"
+      ],
+      "license_name": null,
+      "license_link": null,
+      "card_metadata_sha256": "2b6422e3d2f955185163c7091ff79f69f0b60b5af0fa64b9e230174e786b1aae"
+    },
+    {
+      "repository": "legacy-datasets/banking77",
+      "revision": "f54121560de48f2852f90be299010d1d6dc612ec",
+      "model_card_url": "https://huggingface.co/datasets/legacy-datasets/banking77/blob/f54121560de48f2852f90be299010d1d6dc612ec/README.md",
+      "declared_license": [
+        "cc-by-4.0"
+      ],
+      "license_name": null,
+      "license_link": null,
+      "card_metadata_sha256": "935860d63d7491d37656637444da0dba78ff1338383093b2eabbd77f16253804"
+    },
+    {
+      "repository": "nyu-mll/multi_nli",
+      "revision": "da70db2af9d09693783c3320c4249840212ee221",
+      "model_card_url": "https://huggingface.co/datasets/nyu-mll/multi_nli/blob/da70db2af9d09693783c3320c4249840212ee221/README.md",
+      "declared_license": [
+        "cc-by-3.0",
+        "cc-by-sa-3.0",
+        "mit",
+        "other"
+      ],
+      "license_name": null,
+      "license_link": null,
+      "card_metadata_sha256": "e98c1e3f3c09fddb903196533fb80e2c1ada3239ebed39e0895e7ced730a02ce"
+    },
+    {
+      "repository": "stanfordnlp/imdb",
+      "revision": "e6281661ce1c48d982bc483cf8a173c1bbeb5d31",
+      "model_card_url": "https://huggingface.co/datasets/stanfordnlp/imdb/blob/e6281661ce1c48d982bc483cf8a173c1bbeb5d31/README.md",
+      "declared_license": [
+        "other"
+      ],
+      "license_name": null,
+      "license_link": null,
+      "card_metadata_sha256": "d1af90bf5e6e4b232f62f50fefeb92bae62fa33f2a71316fad4ab80fb3f314c1"
+    }
+  ],
+  "license": "Mixed source dataset licenses; see source_datasets",
+  "synthetic": {
+    "code": "qev/data.py",
+    "code_sha256": "9cc0e0bc7f6f8211299dec3f058427888e4a9d997c82c0c0720d13ec963e4ff3",
+    "license": "Apache-2.0",
+    "labels": "executable programmatic rules; no external model or Jev labels",
+    "languages": [
+      "en",
+      "zh"
+    ],
+    "families": [
+      "refund",
+      "approval",
+      "deadline",
+      "membership"
+    ]
+  },
+  "protocol": {
+    "locked_test_read": false,
+    "original_partitions_preserved": true,
+    "training_augmentation": {
+      "frozen_seed": 20260920,
+      "original_records": 4500,
+      "choice_permutation": true,
+      "p_none": 0.1,
+      "p_none_distractor": 0.12,
+      "p_unrelated_distractor": 0.15,
+      "none_pair_fraction": 0.05,
+      "extra_pair_records": 192,
+      "calibration_and_development_augmented": false
+    },
+    "development_selection": "clean original requests only; source and first-label balanced sampling",
+    "separation": "normalized exact states and group identities; synthetic semantic instances also disjoint",
+    "limitations": [
+      "No fuzzy or pretraining-contamination audit",
+      "Development participates in selection; not a final locked test",
+      "Chinese evidence is restricted to four programmatic rule families",
+      "Synthetic validation uses familiar families with new instances; no novel-family generalization claim"
+    ],
+    "calibration": "held aside for temperature fitting; softmax alone is not calibrated"
+  }
+}

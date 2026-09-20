@@ -1,0 +1,26 @@
+{
+  "train": {
+    "requests": 4692,
+    "questions": 5892,
+    "max_tokens": 881,
+    "p50_tokens": 107,
+    "p90_tokens": 312,
+    "state_truncated": 0
+  },
+  "calibration": {
+    "requests": 500,
+    "questions": 620,
+    "max_tokens": 810,
+    "p50_tokens": 94,
+    "p90_tokens": 280,
+    "state_truncated": 0
+  },
+  "development": {
+    "requests": 700,
+    "questions": 880,
+    "max_tokens": 850,
+    "p50_tokens": 102,
+    "p90_tokens": 309,
+    "state_truncated": 0
+  }
+}

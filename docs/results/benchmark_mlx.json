@@ -1,0 +1,65 @@
+{
+  "checkpoint": "/Volumes/ExternalDisk/UserData/code/loadchange/qev/models/qev-0.8b-mlx",
+  "backend": "mlx",
+  "machine": "arm64",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "hardware": {
+    "processor": "Apple M4",
+    "memory_bytes": 17179869184
+  },
+  "packages": {
+    "python": "3.12.12",
+    "mlx": "0.32.2",
+    "mlx-vlm": "0.7.1",
+    "torch": "2.14.0",
+    "transformers": "5.17.0"
+  },
+  "dtype": "float32",
+  "load_seconds": 6.870527791965287,
+  "repeats": 5,
+  "results": [
+    {
+      "questions": 1,
+      "milliseconds": [
+        42.095666052773595,
+        41.55675001675263,
+        41.81775002507493,
+        41.56833398155868,
+        42.377165984362364
+      ],
+      "median_ms": 41.81775002507493,
+      "max_ms": 42.377165984362364,
+      "questions_per_second": 23.913290394638064,
+      "input_tokens": 40
+    },
+    {
+      "questions": 4,
+      "milliseconds": [
+        165.3158749686554,
+        166.91337496740744,
+        166.1174999899231,
+        167.11650002980605,
+        166.81612498359755
+      ],
+      "median_ms": 166.81612498359755,
+      "max_ms": 167.11650002980605,
+      "questions_per_second": 23.978497284919584,
+      "input_tokens": 160
+    },
+    {
+      "questions": 16,
+      "milliseconds": [
+        674.7316250111908,
+        668.0193750071339,
+        667.8129590000026,
+        673.6539999837987,
+        669.5324169704691
+      ],
+      "median_ms": 669.5324169704691,
+      "max_ms": 674.7316250111908,
+      "questions_per_second": 23.897274567223395,
+      "input_tokens": 640
+    }
+  ],
+  "scope": "Warm sequential wall-clock latency for a short fixed request; independent question rows, no shared-prefix cache. Not a general speed benchmark."
+}

@@ -1,0 +1,254 @@
+{
+  "development": {
+    "raw": {
+      "n": 880,
+      "accuracy": 0.8125,
+      "nll": 0.5506187980226673,
+      "brier": 0.2670425739909962,
+      "ece": 0.07098507406620969,
+      "confident_error_rate": 0.038636363636363635,
+      "score_mae": 0.44914946662044425
+    },
+    "calibrated": {
+      "n": 880,
+      "accuracy": 0.8125,
+      "nll": 0.4887441296185572,
+      "brier": 0.2577204835211587,
+      "ece": 0.039453019158180946,
+      "confident_error_rate": 0.025,
+      "score_mae": 0.46757901369662275
+    },
+    "temperature": 1.4640856959456252,
+    "by_source": {
+      "agnews": {
+        "n": 60,
+        "accuracy": 0.85,
+        "nll": 0.4977233965308085,
+        "brier": 0.23780966472359735,
+        "ece": 0.08685158686487536,
+        "confident_error_rate": 0.05
+      },
+      "agnews_yn": {
+        "n": 120,
+        "accuracy": 0.9083333333333333,
+        "nll": 0.22147711163573489,
+        "brier": 0.13138176558063064,
+        "ece": 0.021178276564433003,
+        "confident_error_rate": 0.03333333333333333
+      },
+      "amazon": {
+        "n": 60,
+        "accuracy": 0.5,
+        "nll": 1.023396168662777,
+        "brier": 0.5656893501897019,
+        "ece": 0.10186484956160145,
+        "confident_error_rate": 0.0,
+        "score_mae": 0.6479178450785897
+      },
+      "banking77": {
+        "n": 60,
+        "accuracy": 0.7666666666666667,
+        "nll": 0.9676339098901994,
+        "brier": 0.3825787393144313,
+        "ece": 0.1483843804869815,
+        "confident_error_rate": 0.05
+      },
+      "boolq": {
+        "n": 60,
+        "accuracy": 0.7,
+        "nll": 0.5811804844098982,
+        "brier": 0.386954178022376,
+        "ece": 0.09198348477202434,
+        "confident_error_rate": 0.05
+      },
+      "dbpedia14": {
+        "n": 60,
+        "accuracy": 0.9666666666666667,
+        "nll": 0.2546665456211266,
+        "brier": 0.07325250735793569,
+        "ece": 0.039347958082680004,
+        "confident_error_rate": 0.03333333333333333
+      },
+      "imdb": {
+        "n": 60,
+        "accuracy": 0.85,
+        "nll": 0.3958464631709257,
+        "brier": 0.2163046214536865,
+        "ece": 0.07837166896064601,
+        "confident_error_rate": 0.03333333333333333
+      },
+      "mnli": {
+        "n": 60,
+        "accuracy": 0.8,
+        "nll": 0.6268218472380683,
+        "brier": 0.33969806391197205,
+        "ece": 0.12269144882860508,
+        "confident_error_rate": 0.03333333333333333
+      },
+      "sst5": {
+        "n": 60,
+        "accuracy": 0.5166666666666667,
+        "nll": 1.03283435741655,
+        "brier": 0.5917907386607716,
+        "ece": 0.10107503439819944,
+        "confident_error_rate": 0.0,
+        "score_mae": 0.5828914576106986
+      },
+      "synthetic_approval_en": {
+        "n": 13,
+        "accuracy": 1.0,
+        "nll": 0.00022979365343514302,
+        "brier": 1.7038005746274838e-07,
+        "ece": 0.0002297510460051999,
+        "confident_error_rate": 0.0
+      },
+      "synthetic_approval_zh": {
+        "n": 13,
+        "accuracy": 1.0,
+        "nll": 0.00046370924107212843,
+        "brier": 9.216573409624542e-07,
+        "ece": 0.00046347864410556383,
+        "confident_error_rate": 0.0
+      },
+      "synthetic_deadline_en": {
+        "n": 12,
+        "accuracy": 0.9166666666666666,
+        "nll": 0.15114495492008137,
+        "brier": 0.07797020882322098,
+        "ece": 0.11486775325653123,
+        "confident_error_rate": 0.0,
+        "score_mae": 0.1032461192016141
+      },
+      "synthetic_deadline_zh": {
+        "n": 12,
+        "accuracy": 1.0,
+        "nll": 0.20084724054158845,
+        "brier": 0.08362679004703157,
+        "ece": 0.1670141544932728,
+        "confident_error_rate": 0.0,
+        "score_mae": 0.17279618225056356
+      },
+      "synthetic_membership_en": {
+        "n": 12,
+        "accuracy": 1.0,
+        "nll": 0.008851704893782253,
+        "brier": 0.001068541002844395,
+        "ece": 0.008565379378439375,
+        "confident_error_rate": 0.0,
+        "score_mae": 0.00792206998538017
+      },
+      "synthetic_membership_zh": {
+        "n": 12,
+        "accuracy": 1.0,
+        "nll": 0.0010163647247604184,
+        "brier": 4.132333497036353e-06,
+        "ece": 0.0010150958682676459,
+        "confident_error_rate": 0.0,
+        "score_mae": 0.0008056840289718722
+      },
+      "synthetic_refund_en": {
+        "n": 13,
+        "accuracy": 1.0,
+        "nll": 0.0010087534261688335,
+        "brier": 3.4723587233177317e-06,
+        "ece": 0.0010078841675570382,
+        "confident_error_rate": 0.0
+      },
+      "synthetic_refund_zh": {
+        "n": 13,
+        "accuracy": 1.0,
+        "nll": 0.0010634064668085983,
+        "brier": 3.98854977931861e-06,
+        "ece": 0.0010624078261525227,
+        "confident_error_rate": 0.0
+      },
+      "trec": {
+        "n": 60,
+        "accuracy": 0.9666666666666667,
+        "nll": 0.16017058503202156,
+        "brier": 0.06843399340398341,
+        "ece": 0.032083818338027544,
+        "confident_error_rate": 0.016666666666666666
+      },
+      "yelp": {
+        "n": 60,
+        "accuracy": 0.6166666666666667,
+        "nll": 0.8813693233251717,
+        "brier": 0.4875273745969469,
+        "ece": 0.11462966064564369,
+        "confident_error_rate": 0.0,
+        "score_mae": 0.4890369382645724
+      },
+      "yelp_yn": {
+        "n": 60,
+        "accuracy": 0.9166666666666666,
+        "nll": 0.23067864988315886,
+        "brier": 0.13456187460073302,
+        "ece": 0.04931401245251316,
+        "confident_error_rate": 0.03333333333333333
+      }
+    },
+    "by_language": {
+      "en": {
+        "n": 830,
+        "accuracy": 0.8012048192771084,
+        "nll": 0.5152441184300381,
+        "brier": 0.2720366151775431,
+        "ece": 0.04218214120395046,
+        "confident_error_rate": 0.02650602409638554,
+        "score_mae": 0.5123764349386057
+      },
+      "zh": {
+        "n": 50,
+        "accuracy": 1.0,
+        "nll": 0.0488443153479727,
+        "brier": 0.020072698025178144,
+        "ece": 0.04072375056903682,
+        "confident_error_rate": 0.0,
+        "score_mae": 0.08680093313976772
+      }
+    },
+    "by_qtype": {
+      "choice": {
+        "n": 326,
+        "accuracy": 0.8803680981595092,
+        "nll": 0.46144169508086513,
+        "brier": 0.2027803445374275,
+        "ece": 0.06211851626651449,
+        "confident_error_rate": 0.03374233128834356
+      },
+      "noul": {
+        "n": 326,
+        "accuracy": 0.8680981595092024,
+        "nll": 0.3038850531372265,
+        "brier": 0.18415689971194463,
+        "ece": 0.03868786325200666,
+        "confident_error_rate": 0.03374233128834356
+      },
+      "score": {
+        "n": 228,
+        "accuracy": 0.6359649122807017,
+        "nll": 0.792097869058037,
+        "brier": 0.44145826260229987,
+        "ece": 0.0725270564884888,
+        "confident_error_rate": 0.0,
+        "score_mae": 0.46757901369662275
+      }
+    },
+    "prediction_precision": [
+      "mlx:float32:fp32_pointer"
+    ]
+  },
+  "seconds": 258.74421979201725,
+  "backend": "mlx_vlm",
+  "mlx_dtype": "float32",
+  "temperature_fit": "Original CUDA calibration partition; not refitted on development or MLX predictions",
+  "checkpoint": "/Volumes/ExternalDisk/UserData/code/loadchange/qev/models/qev-0.8b-mlx",
+  "cuda_bf16_comparison": {
+    "questions": 880,
+    "argmax_flips": 1,
+    "max_probability_difference": 0.023412356389329703,
+    "median_probability_difference": 0.0007322612607573754,
+    "scope": "Different inference arithmetic (CUDA BF16 vs MLX FP32); diagnostic, not the CPU FP32 export-parity gate."
+  }
+}

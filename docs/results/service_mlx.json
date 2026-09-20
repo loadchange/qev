@@ -1,0 +1,640 @@
+{
+  "checkpoint": "/Volumes/ExternalDisk/UserData/code/loadchange/qev/models/qev-0.8b-mlx",
+  "backend": "mlx",
+  "base_model": "Qwen/Qwen3.5-0.8B",
+  "base_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+  "config_sha256": "0ca2fc61f7d348ebb2f88d2e178d1d81480a992b8d9931c60e372e735e0e0097",
+  "checks": {
+    "health": {
+      "passed": true,
+      "seconds": 0.0020327920210547745,
+      "result": {
+        "status": "ok",
+        "backend": "mlx"
+      }
+    },
+    "models_http": {
+      "passed": true,
+      "seconds": 0.00120133301243186,
+      "result": {
+        "models": [
+          {
+            "name": "qev-0.8b",
+            "description": "Qwen3.5 typed decisions; multimodal decision accuracy is not yet validated",
+            "release_date": "2026-09-20"
+          },
+          {
+            "name": "qev-latest",
+            "description": "Alias of qev-0.8b",
+            "release_date": "2026-09-20"
+          },
+          {
+            "name": "qev:0.8b",
+            "description": "Alias of loaded checkpoint qev-0.8b",
+            "release_date": "2026-09-20"
+          },
+          {
+            "name": "qev:0.8b-mlx",
+            "description": "Alias of loaded checkpoint qev-0.8b; aliases do not switch the runtime",
+            "release_date": "2026-09-20"
+          },
+          {
+            "name": "qev-native",
+            "description": "Native Qwen text/image/video generation with the decision adapter disabled",
+            "release_date": "2026-09-20"
+          }
+        ]
+      }
+    },
+    "text_decision": {
+      "passed": true,
+      "seconds": 0.22050566697726026,
+      "result": {
+        "model": "jev-latest",
+        "answers": {
+          "department": {
+            "type": "choice",
+            "choice": "billing",
+            "confidence": 0.9968337448610521,
+            "probabilities": {
+              "billing": 0.9978891632407014,
+              "technical": 0.0005760144631200805,
+              "sales": 0.001534822296178384
+            }
+          },
+          "refund": {
+            "type": "noul",
+            "noul": 0.9774901952380713
+          },
+          "urgency": {
+            "type": "score",
+            "score": 1.3488685664241222,
+            "confidence": 0.6744342832120611,
+            "legend": {
+              "0": "No time pressure",
+              "1": "Soon",
+              "2": "Today or a blocking issue"
+            },
+            "probabilities": {
+              "0": 0.18161621340634795,
+              "1": 0.2878990067631819,
+              "2": 0.5304847798304702
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 172,
+          "output_tokens": 0
+        },
+        "latency_ms": 218.55,
+        "qev": {
+          "backend": "mlx",
+          "temperature": 1.4640856959456252,
+          "training_modalities": [
+            "text"
+          ],
+          "multimodal_decision_accuracy_validated": false,
+          "input_modalities": [
+            "text"
+          ],
+          "truncated_questions": []
+        }
+      }
+    },
+    "official_sdk_over_http": {
+      "passed": true,
+      "seconds": 0.17198295798152685,
+      "result": {
+        "response": {
+          "model": "jev-latest",
+          "usage": {
+            "input_tokens": 172,
+            "output_tokens": 0
+          },
+          "answers": {
+            "department": {
+              "type": "choice",
+              "choice": "billing",
+              "confidence": 0.9968337448610521,
+              "probabilities": {
+                "billing": 0.9978891632407014,
+                "technical": 0.0005760144631200805,
+                "sales": 0.001534822296178384
+              }
+            },
+            "refund": {
+              "type": "noul",
+              "noul": 0.9774901952380713
+            },
+            "urgency": {
+              "type": "score",
+              "score": 1.3488685664241222,
+              "confidence": 0.6744342832120611,
+              "legend": {
+                "0": "No time pressure",
+                "1": "Soon",
+                "2": "Today or a blocking issue"
+              },
+              "probabilities": {
+                "0": 0.18161621340634795,
+                "1": 0.2878990067631819,
+                "2": 0.5304847798304702
+              }
+            }
+          }
+        },
+        "comparison": {
+          "max_probability_error": 0.0,
+          "atol": 1e-05
+        },
+        "typed_accessors": true
+      }
+    },
+    "typed_model_aliases": {
+      "passed": true,
+      "seconds": 0.7092469159979373,
+      "result": {
+        "qev-latest": {
+          "max_probability_error": 0.0,
+          "atol": 1e-05
+        },
+        "qev:0.8b": {
+          "max_probability_error": 0.0,
+          "atol": 1e-05
+        },
+        "qev:0.8b-mlx": {
+          "max_probability_error": 0.0,
+          "atol": 1e-05
+        },
+        "qev-0.8b": {
+          "max_probability_error": 0.0,
+          "atol": 1e-05
+        },
+        "qev-0.8b-mlx": {
+          "max_probability_error": 0.0,
+          "atol": 1e-05
+        }
+      }
+    },
+    "independent_question_rows": {
+      "passed": true,
+      "seconds": 0.2945646250154823,
+      "result": {
+        "department": {
+          "max_probability_error": 0.0,
+          "atol": 0.005
+        },
+        "refund": {
+          "max_probability_error": 0.0,
+          "atol": 0.005
+        },
+        "urgency": {
+          "max_probability_error": 0.0,
+          "atol": 0.005
+        },
+        "reversed": {
+          "max_probability_error": 0.0,
+          "atol": 0.005
+        }
+      }
+    },
+    "native_text_before_media": {
+      "passed": true,
+      "seconds": 0.20656204200349748,
+      "result": {
+        "id": "chatcmpl-053115cf500547c1bd16282fc1ec066c",
+        "object": "chat.completion",
+        "created": 1789921153,
+        "model": "qev-native",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "ready\n"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 19,
+          "completion_tokens": 4,
+          "total_tokens": 23
+        },
+        "qev": {
+          "backend": "mlx",
+          "decision_adapter_enabled": false,
+          "media_frames": 0,
+          "latency_ms": 203.59
+        }
+      }
+    },
+    "native_sampling": {
+      "passed": true,
+      "seconds": 0.15821341599803418,
+      "result": {
+        "id": "chatcmpl-b14697475d034cd185ebabb55e01588a",
+        "object": "chat.completion",
+        "created": 1789921153,
+        "model": "qev-native",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "ready\n"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 19,
+          "completion_tokens": 4,
+          "total_tokens": 23
+        },
+        "qev": {
+          "backend": "mlx",
+          "decision_adapter_enabled": false,
+          "media_frames": 0,
+          "latency_ms": 155.3
+        }
+      }
+    },
+    "image_decision": {
+      "passed": true,
+      "seconds": 0.13087704201461747,
+      "result": {
+        "model": "jev-latest",
+        "answers": {
+          "color": {
+            "type": "choice",
+            "choice": "red",
+            "confidence": 0.999947229273673,
+            "probabilities": {
+              "red": 0.9999648195157821,
+              "blue": 2.2326723103650294e-05,
+              "green": 1.2853761114232803e-05
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 96,
+          "output_tokens": 0
+        },
+        "latency_ms": 128.53,
+        "qev": {
+          "backend": "mlx",
+          "temperature": 1.0,
+          "training_modalities": [
+            "text"
+          ],
+          "multimodal_decision_accuracy_validated": false,
+          "input_modalities": [
+            "text",
+            "image"
+          ],
+          "truncated_questions": []
+        }
+      }
+    },
+    "video_decision": {
+      "passed": true,
+      "seconds": 0.15614029200514778,
+      "result": {
+        "model": "jev-latest",
+        "answers": {
+          "motion": {
+            "type": "choice",
+            "choice": "left to right",
+            "confidence": 0.8340214639671399,
+            "probabilities": {
+              "left to right": 0.8893476426447601,
+              "right to left": 0.025888877984136707,
+              "stationary": 0.08476347937110322
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 145,
+          "output_tokens": 0
+        },
+        "latency_ms": 153.78,
+        "qev": {
+          "backend": "mlx",
+          "temperature": 1.0,
+          "training_modalities": [
+            "text"
+          ],
+          "multimodal_decision_accuracy_validated": false,
+          "input_modalities": [
+            "text",
+            "video"
+          ],
+          "truncated_questions": []
+        }
+      }
+    },
+    "mixed_image_video_decision": {
+      "passed": true,
+      "seconds": 0.2181726669659838,
+      "result": {
+        "model": "jev-latest",
+        "answers": {
+          "color": {
+            "type": "choice",
+            "choice": "red",
+            "confidence": 0.9994914342960679,
+            "probabilities": {
+              "red": 0.9996609561973786,
+              "blue": 0.00025907772616334503,
+              "green": 7.996607645806717e-05
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 211,
+          "output_tokens": 0
+        },
+        "latency_ms": 216.16,
+        "qev": {
+          "backend": "mlx",
+          "temperature": 1.0,
+          "training_modalities": [
+            "text"
+          ],
+          "multimodal_decision_accuracy_validated": false,
+          "input_modalities": [
+            "text",
+            "image",
+            "video"
+          ],
+          "truncated_questions": []
+        }
+      }
+    },
+    "native_image": {
+      "passed": true,
+      "seconds": 0.21908691700082272,
+      "result": {
+        "id": "chatcmpl-0efa648dfdcc4eefb616fee03ebf155f",
+        "object": "chat.completion",
+        "created": 1789921154,
+        "model": "qev-native",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": " red\n"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 92,
+          "completion_tokens": 4,
+          "total_tokens": 96
+        },
+        "qev": {
+          "backend": "mlx",
+          "decision_adapter_enabled": false,
+          "media_frames": 1,
+          "latency_ms": 216.97
+        }
+      }
+    },
+    "native_video": {
+      "passed": true,
+      "seconds": 0.5694629999925382,
+      "result": {
+        "id": "chatcmpl-c3d82b9409284dc89ed543c7225d704a",
+        "object": "chat.completion",
+        "created": 1789921154,
+        "model": "qev-native",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "The blue circle moves from left to right.\n"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 140,
+          "completion_tokens": 12,
+          "total_tokens": 152
+        },
+        "qev": {
+          "backend": "mlx",
+          "decision_adapter_enabled": false,
+          "media_frames": 4,
+          "latency_ms": 567.22
+        }
+      }
+    },
+    "native_text_after_media": {
+      "passed": true,
+      "seconds": 0.16060616698814556,
+      "result": {
+        "identical_continuation_and_usage": true,
+        "response": {
+          "id": "chatcmpl-318587f5941644e4a4f1c8903b70f43c",
+          "object": "chat.completion",
+          "created": 1789921154,
+          "model": "qev-native",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "content": "ready\n"
+              },
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 19,
+            "completion_tokens": 4,
+            "total_tokens": 23
+          },
+          "qev": {
+            "backend": "mlx",
+            "decision_adapter_enabled": false,
+            "media_frames": 0,
+            "latency_ms": 158.18
+          }
+        }
+      }
+    },
+    "decision_adapter_restored": {
+      "passed": true,
+      "seconds": 0.15110770799219608,
+      "result": {
+        "max_probability_error": 0.0,
+        "atol": 1e-05
+      }
+    },
+    "concurrent_adapter_modes": {
+      "passed": true,
+      "seconds": 0.3038816250045784,
+      "result": {
+        "decision": {
+          "max_probability_error": 0.0,
+          "atol": 1e-05
+        },
+        "native_identical": true
+      }
+    },
+    "invalid_inputs": {
+      "passed": true,
+      "seconds": 0.02780670899664983,
+      "result": {
+        "unknown_model": {
+          "status": 404,
+          "detail": "Unknown model alias"
+        },
+        "remote_image": {
+          "status": 422,
+          "detail": "images must be inline base64 PNG/JPEG/WebP data URLs; paths and remote URLs are not supported"
+        },
+        "invalid_fps": {
+          "status": 422,
+          "detail": "video fps must be finite and between zero and 60"
+        },
+        "too_many_frames": {
+          "status": 422,
+          "detail": "too many images/video frames in one request"
+        },
+        "invalid_score": {
+          "status": 422,
+          "detail": [
+            {
+              "type": "too_short",
+              "loc": [
+                "body",
+                "questions",
+                "q",
+                "score",
+                "criteria"
+              ],
+              "msg": "List should have at least 2 items after validation, not 1",
+              "input": [
+                "only"
+              ],
+              "ctx": {
+                "field_type": "List",
+                "min_length": 2,
+                "actual_length": 1
+              }
+            }
+          ]
+        },
+        "too_many_questions": {
+          "status": 422,
+          "detail": "At most 64 questions per request"
+        },
+        "streaming": {
+          "status": 422,
+          "detail": [
+            {
+              "type": "literal_error",
+              "loc": [
+                "body",
+                "stream"
+              ],
+              "msg": "Input should be False",
+              "input": true,
+              "ctx": {
+                "expected": "False"
+              }
+            }
+          ]
+        },
+        "conflicting_budgets": {
+          "status": 422,
+          "detail": [
+            {
+              "type": "value_error",
+              "loc": [
+                "body"
+              ],
+              "msg": "Value error, set max_tokens or max_completion_tokens, not both",
+              "input": {
+                "model": "qev-native",
+                "messages": [
+                  {
+                    "role": "user",
+                    "content": "Reply with the single word ready."
+                  }
+                ],
+                "temperature": 0,
+                "max_tokens": 16,
+                "enable_thinking": false,
+                "max_completion_tokens": 16
+              },
+              "ctx": {
+                "error": {}
+              }
+            }
+          ]
+        },
+        "native_path": {
+          "status": 422,
+          "detail": "images must be inline base64 PNG/JPEG/WebP data URLs; paths and remote URLs are not supported"
+        },
+        "oversized_body": {
+          "status": 413
+        }
+      }
+    },
+    "healthy_after_rejections": {
+      "passed": true,
+      "seconds": 0.0017183329910039902,
+      "result": {
+        "status": "ok",
+        "backend": "mlx"
+      }
+    },
+    "inference_after_rejections": {
+      "passed": true,
+      "seconds": 0.14110441697994247,
+      "result": {
+        "max_probability_error": 0.0,
+        "atol": 1e-05
+      }
+    }
+  },
+  "passed": true,
+  "scope": "Real checkpoint via HTTP and the official TypeSafe SDK. Checks schemas, media plumbing, question isolation, adapter restoration, and repeated greedy text. These are functional checks, not held-out accuracy or cross-runtime native parity.",
+  "artifact_sha256": {
+    "pointer.safetensors": "f56860b954742fee0399b50c372c1f262699b84d4500ab52e27d72bff8d49749",
+    "decision_adapters.safetensors": "9d9ba43e601c56d13d068cbab28bc79d8168f3ff81811190f08ae07a29d26b74"
+  },
+  "versions": {
+    "typesafe-sdk": "0.7.0",
+    "httpx": "0.28.1",
+    "transformers": "5.17.0",
+    "torch": "2.14.0",
+    "mlx": "0.32.2",
+    "mlx-vlm": "0.7.1"
+  },
+  "server_log": "/Volumes/ExternalDisk/UserData/code/loadchange/qev/docs/results/service_mlx.server.log",
+  "server_command": [
+    "/Volumes/ExternalDisk/UserData/code/loadchange/qev/.venv/bin/python",
+    "-m",
+    "qev.cli",
+    "serve",
+    "--model",
+    "/Volumes/ExternalDisk/UserData/code/loadchange/qev/models/qev-0.8b-mlx",
+    "--backend",
+    "mlx",
+    "--host",
+    "127.0.0.1",
+    "--port",
+    "65045"
+  ],
+  "base_url": "http://127.0.0.1:65045",
+  "seconds": 11.167488459032029
+}

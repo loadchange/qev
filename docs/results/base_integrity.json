@@ -1,0 +1,12 @@
+{
+  "before": {
+    "sha256": "1021eaeed8a1528b435a90a690d42245f07e1b65c7c2dc8a37ec9516a8cf4bee",
+    "parameters": 852985920
+  },
+  "after": {
+    "sha256": "1021eaeed8a1528b435a90a690d42245f07e1b65c7c2dc8a37ec9516a8cf4bee",
+    "parameters": 852985920
+  },
+  "unchanged": true,
+  "generation": "Native generation disables the decision LoRA adapter; original vision and language weights are frozen."
+}

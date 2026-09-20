@@ -1,0 +1,12 @@
+{
+  "prompt": "red square on white background",
+  "input_tokens": 92,
+  "token_ids": [
+    2438,
+    248046,
+    198,
+    248044
+  ],
+  "text": " red\n",
+  "precision": "cuda bf16 autocast"
+}

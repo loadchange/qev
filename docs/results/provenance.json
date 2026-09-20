@@ -1,0 +1,69 @@
+{
+  "arguments": {
+    "data": "data/v1",
+    "out": "models/qev-0.8b",
+    "base": "Qwen/Qwen3.5-0.8B",
+    "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "epochs": 2,
+    "batch": 4,
+    "accum": 4,
+    "lr": 5e-05,
+    "seed": 42,
+    "max_length": 1024,
+    "max_state": 384,
+    "device": "cuda",
+    "limit_train": 0,
+    "eval_limit": 0,
+    "checkpointing": true,
+    "baseline": true
+  },
+  "dataset_manifest_sha256": "77805c57b30dd34bba4b5840d975f8f9421f4839fef83d24948bf0df09a5aab0",
+  "questions": {
+    "train": 5892,
+    "calibration": 620,
+    "development": 880
+  },
+  "state_truncations": {
+    "train": 0,
+    "calibration": 0,
+    "development": 0
+  },
+  "trainable_parameters": 11346944,
+  "torch": "2.11.0+cu128",
+  "training_dtype": "fp32 master weights; bf16 autocast; fp32 pointer",
+  "evaluation_precision": {
+    "device": "cuda:0",
+    "weight_dtype": "float32",
+    "autocast_dtype": "bfloat16",
+    "pointer_dtype": "float32",
+    "arithmetic": "bf16_autocast"
+  },
+  "hardware": "NVIDIA L4",
+  "frozen_before": {
+    "sha256": "1021eaeed8a1528b435a90a690d42245f07e1b65c7c2dc8a37ec9516a8cf4bee",
+    "parameters": 852985920
+  },
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "transformers": "5.17.0",
+    "peft": "0.21.0",
+    "safetensors": "0.8.0",
+    "numpy": "2.5.3"
+  },
+  "source_sha256": {
+    "__init__.py": "bf77da7ebff53f70a0eea423b85909253782a4cfd0f1b2349ccf4b6d1af9487a",
+    "__main__.py": "6d8b7d7846a845059d7a3107143f11131f63c5511d669b44085b15ec5e3d2279",
+    "api.py": "ff2b7c23505362ce5e5a10aed3d6cdb9a4786cf4f39570ee5d073c2d035a9d61",
+    "cli.py": "9a40f57fdbae7e4d81f119e25a8bed3d9127d8653b215d69b88317687fa22c44",
+    "data.py": "9cc0e0bc7f6f8211299dec3f058427888e4a9d997c82c0c0720d13ec963e4ff3",
+    "evaluation.py": "236be40fecf3941ba0c1059c60f81d8e3dced003924c5190a70725ece5622361",
+    "export.py": "ad89e2edaecdf0ad84ed1cc1dacbf48550f73382b343f617e1879cdf1f3d695c",
+    "inference.py": "a69eced52c5f9d56286b902d59716a518fad1e8c8845f64d0212cd2b30713f7e",
+    "mlx_runtime.py": "bd96c9d70a0053dc7bd23a273ac66b47e2dcf71777be817b09f33964fb6014ed",
+    "model.py": "1d1a97ae0830d478bd649cf9bcfcbd766bb8dbd1d23d777a8b070a7a1ad994fb",
+    "serve.py": "774a6330f61274273c19dd993358adecda71c738166f70cfdc081018cb19da5a",
+    "tokenization.py": "2117e824e609728e2132bcb7689e9d4979da5d5c067b50bb17625baf04ff839e",
+    "train.py": "1b3e62554c71dac935800ad196e652ee7bad499f6a3fb43252ce381537ece3be"
+  },
+  "objective": "supervised cross-entropy over candidate options; no Jev labels or RL"
+}
