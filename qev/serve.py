@@ -51,8 +51,15 @@ class RequestBodyLimit:
         await self.app(scope, replay, send)
 
 
-def create_app(agent):
+def create_app(agent, *, request_log=None):
     app = FastAPI(title="Qev", version=__version__)
+    app.state.request_log = request_log
+    if request_log is not None:
+        from .request_log import RequestLogMiddleware
+
+        app.add_middleware(RequestLogMiddleware, request_log=request_log)
+    # The byte limit runs before logging, so oversized bodies are never copied
+    # into the journal. Accepted bodies include validation-error responses.
     app.add_middleware(RequestBodyLimit)
     from .demo import create_demo_router
 

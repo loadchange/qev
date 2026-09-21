@@ -18,6 +18,8 @@ tags:
   - snake
 ---
 
+[English](qev-0.8b-mlx.md) | [简体中文](qev-0.8b-mlx.zh-CN.md)
+
 # Qev-0.8B-MLX — full multimodal FP32 checkpoint
 
 This repository publishes the **Qev v0.3.0 Snake continuation checkpoint for Apple Silicon**. It contains the complete converted Qwen3.5-0.8B foundation, separate decision LoRA weights, a candidate pointer head and text/image/video preprocessing assets. Its local training/export name is `qev-snake-0.8b-mlx`; `qev-0.8b` remains the API model alias. This is the newer continuation checkpoint, not the original v0.2 weights.
@@ -46,9 +48,9 @@ uv run qev serve --model models/qev-snake-0.8b-mlx --port 8008
 
 The Qev loader accepts local paths. Download the complete repository and retain its `backbone/` subdirectory. Run these commands from the cloned project directory, or provide absolute checkpoint and request paths. The MLX checkpoint contains the foundation and requires no separate base-model download for inference.
 
-**中文：** 这是 Mac Apple Silicon 的完整 FP32 模型。下载后运行 `uv run qev snake`，终端默认优先查找 `models/qev-snake-0.8b-mlx`。空格暂停/继续，`N` 单步，`+` / `-` 调速，`Q` 或 Ctrl-C 退出。模型每步自行选择方向，界面展示候选概率和实际动作。
+This is the complete FP32 model for Apple Silicon Macs. After downloading, run `uv run qev snake`; the terminal prefers `models/qev-snake-0.8b-mlx` by default. Space pauses/resumes, `N` advances one step, `+` / `-` adjusts speed, and `Q` or Ctrl-C quits. The model chooses its direction at each step, while the interface displays candidate probabilities and the executed action.
 
-The server binds to `127.0.0.1` by default. Typed decisions use `POST /v1/systemone`; adapter-disabled native generation uses `POST /v1/chat/completions`. See the [API examples](https://github.com/loadchange/qev/blob/d68c468/docs/API.md). Checkpoint aliases do not switch the inference backend.
+The server binds to `127.0.0.1` by default. Typed decisions use `POST /v1/systemone`; adapter-disabled native generation uses `POST /v1/chat/completions`. See the [API examples](https://github.com/loadchange/qev/blob/main/docs/API.md). Checkpoint aliases do not switch the inference backend.
 
 ## Contents and requirements
 
@@ -73,7 +75,7 @@ The foundation is `Qwen/Qwen3.5-0.8B`, pinned to `2fc06364715b967f1860aea9cf3877
 
 **Fresh Torch CPU FP32 versus MLX FP32 logit parity was not run for this continuation.** The exported configuration deliberately records `parity_status: not_run`. The adapter conversion/integrity checks and actual MLX gameplay do not establish identical probabilities across runtimes.
 
-Full training details and evidence are in the [Snake model report](https://github.com/loadchange/qev/blob/d68c468/docs/SNAKE_MODEL.md) and [training instructions](https://github.com/loadchange/qev/blob/d68c468/docs/TRAINING.md).
+Full training details and evidence are in the [Snake model report](https://github.com/loadchange/qev/blob/main/docs/SNAKE_MODEL.md) and [training instructions](https://github.com/loadchange/qev/blob/main/docs/TRAINING.md).
 
 ## Actual MLX gameplay
 
@@ -98,7 +100,7 @@ Native generation disables the decision adapter. Original foundation hashes were
 
 These checks establish implementation and limited regression evidence; they are **not a comprehensive vision/video quality benchmark**. Multimodal decision accuracy has not been measured, and media decision probabilities remain uncalibrated. General decision and Chinese training coverage are limited. Finite Snake results do not guarantee optimal play or absence of collisions; none of the reported games filled the board.
 
-Qev provides Jev-compatible interface conventions, not private Jev weights or evidence of equivalent quality. No direct Laya superiority claim is made. Hardware, precision and batching can change decisions and trajectories. See the [complete conditions and limitations](https://github.com/loadchange/qev/blob/d68c468/docs/SNAKE_MODEL.md).
+Qev provides Jev-compatible interface conventions, not private Jev weights or evidence of equivalent quality. No direct Laya superiority claim is made. Hardware, precision and batching can change decisions and trajectories. See the [complete conditions and limitations](https://github.com/loadchange/qev/blob/main/docs/SNAKE_MODEL.md).
 
 ## License and attribution
 

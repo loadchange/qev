@@ -227,6 +227,29 @@ def decode_state(state: JSONContent, budget: MediaBudget | None = None) -> Decod
     return decode_content(content, budget)
 
 
+def decode_question_options(question: Question, budget: MediaBudget) -> list[DecodedContent]:
+    """Decode candidate images in answer-key order using the whole request budget.
+
+    Explicit content wrappers/arrays use the same inline-image protocol as state.
+    Ordinary strings and JSON descriptions keep their existing text rendering.
+    Candidate video is not part of this protocol; state video remains supported.
+    """
+    if question.type == "noul":
+        criteria = question.criteria or {}
+        values = [criteria.get("false"), criteria.get("true")]
+    elif question.type == "choice":
+        values = list(question.criteria.values())
+    else:
+        values = question.criteria
+    decoded = []
+    for value in values:
+        content = state_content(value)
+        if content is not None and any(isinstance(item, dict) and item.get("type") == "video" for item in content):
+            raise ValueError("candidate content supports text and inline images; video belongs in state")
+        decoded.append(decode_state(value, budget))
+    return decoded
+
+
 def decode_chat_messages(messages: list[ChatMessage]) -> tuple[list[dict], MediaBudget, list[float]]:
     budget, result, video_fps = MediaBudget(), [], []
     for message in messages:
@@ -261,7 +284,7 @@ def render(value: JSONContent, indent: int = 0) -> str:
 
 
 def option_text(name: str, description: JSONContent) -> str:
-    return name if description is None or description == "" else f"{name}: {render(description)}"
+    return name if description is None or description == "" else f"{name}: {render_state(description)}"
 
 
 def to_record(request: SystemOneRequest | dict) -> tuple[dict, list[dict]]:
@@ -279,7 +302,7 @@ def to_record(request: SystemOneRequest | dict) -> tuple[dict, list[dict]]:
             keys = list(question.criteria)
             options = [option_text(key, value) for key, value in question.criteria.items()]
         else:
-            options = [render(value) for value in question.criteria]
+            options = [render_state(value) for value in question.criteria]
             keys = [str(i) for i in range(len(options))]
             meta["legend"] = dict(zip(keys, options))
         meta["keys"] = keys

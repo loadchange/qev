@@ -17,6 +17,8 @@ tags:
   - snake
 ---
 
+[English](qev-0.8b.md) | [简体中文](qev-0.8b.zh-CN.md)
+
 # Qev-0.8B — PyTorch decision adapter
 
 This repository publishes the **Qev v0.3.0 Snake continuation checkpoint**, trained from the earlier Qev decision adapter with Snake supervision and replay of the original general decision tasks. Its local training name is `qev-snake-0.8b`; `qev-0.8b` remains the API model alias. This is the newer checkpoint, not the original v0.2 weights.
@@ -47,9 +49,9 @@ uv run qev serve --model models/qev-snake-0.8b --port 8008
 
 The Qev loader accepts local paths: download the repository before passing its local directory to `--model`. Run these commands from the cloned project directory, or provide absolute checkpoint and request paths. NVIDIA CUDA is the evaluated PyTorch path; Apple Silicon users should prefer the MLX release.
 
-**中文：** 下载后运行 `uv run qev snake --model models/qev-snake-0.8b` 即可在终端观看模型逐步决策。空格暂停/继续，`N` 单步，`+` / `-` 调速，`Q` 或 Ctrl-C 退出。首次运行需要下载固定版本的 Qwen 基座。
+After downloading, run `uv run qev snake --model models/qev-snake-0.8b` to watch the model decide each step in the terminal. Space pauses/resumes, `N` advances one step, `+` / `-` adjusts speed, and `Q` or Ctrl-C quits. The first run downloads the pinned Qwen foundation.
 
-The server binds to `127.0.0.1` by default. Typed decisions use `POST /v1/systemone`; adapter-disabled native generation uses `POST /v1/chat/completions`. See the [API examples](https://github.com/loadchange/qev/blob/d68c468/docs/API.md). Checkpoint aliases do not switch the inference backend.
+The server binds to `127.0.0.1` by default. Typed decisions use `POST /v1/systemone`; adapter-disabled native generation uses `POST /v1/chat/completions`. See the [API examples](https://github.com/loadchange/qev/blob/main/docs/API.md). Checkpoint aliases do not switch the inference backend.
 
 ## Contents and requirements
 
@@ -81,7 +83,7 @@ The original foundation's 852,985,920 parameters remained frozen. Qev continued 
 
 Snake labels come from a deterministic teacher that uses the same explicit fields visible to the model. The environment supplies collision and food facts, static BFS reachable space, tail connectivity, food path distance and recent visit counts. No teacher direction, preferred-action marker or ranking is inserted in runtime input. The three non-reversing candidates include potential collisions, and runtime execution uses the model's argmax directly without a safety override. Snake is a **text-feature task**; the displayed board is not supplied as an image.
 
-The dataset manifest SHA-256 is `f41151c68d6465b90bb8ea66ca0ea8611a6b37ed48596ba9484abc8ef4deda33`. Full provenance, source licenses, split isolation and reproduction commands are recorded in the [training documentation](https://github.com/loadchange/qev/blob/d68c468/docs/TRAINING.md) and [Snake model report](https://github.com/loadchange/qev/blob/d68c468/docs/SNAKE_MODEL.md).
+The dataset manifest SHA-256 is `f41151c68d6465b90bb8ea66ca0ea8611a6b37ed48596ba9484abc8ef4deda33`. Full provenance, source licenses, split isolation and reproduction commands are recorded in the [training documentation](https://github.com/loadchange/qev/blob/main/docs/TRAINING.md) and [Snake model report](https://github.com/loadchange/qev/blob/main/docs/SNAKE_MODEL.md).
 
 ## Evaluation
 
@@ -99,13 +101,13 @@ Closed-loop results use held-out seeds, the same spatial features and a 500-step
 | 8×8 / 10000–10019, 20 games | 3.10 | 42.90 | 20 / 20 | 0 / 20 |
 | 12×12 / 10000–10007, 8 games | 0.625 | 42.00 | 8 / 8 | 0 / 8 |
 
-All 28 new-model games reached the step cap; none filled the board. These are finite closed-loop tests, not a guarantee of collision-free or optimal play. The corresponding MLX export averaged 42.6 food over five 8×8 games on an Apple M4. Numerical precision, batch size and action-dependent trajectories can change results. See the [complete benchmark conditions and evidence](https://github.com/loadchange/qev/blob/d68c468/docs/SNAKE_MODEL.md).
+All 28 new-model games reached the step cap; none filled the board. These are finite closed-loop tests, not a guarantee of collision-free or optimal play. The corresponding MLX export averaged 42.6 food over five 8×8 games on an Apple M4. Numerical precision, batch size and action-dependent trajectories can change results. See the [complete benchmark conditions and evidence](https://github.com/loadchange/qev/blob/main/docs/SNAKE_MODEL.md).
 
 ## Multimodal preservation and limitations
 
 Full frozen-foundation hashes matched before and after training. On the same A100, adapter-disabled native generation produced identical token IDs for three fixed probes covering text, image and video. This is weight-preservation and limited regression evidence, **not a comprehensive multimodal quality evaluation**. Decision accuracy on image/video inputs has not been measured; multimodal decision probabilities remain uncalibrated.
 
-The checkpoint is a small supervised decision experiment. General task coverage and Chinese task evidence are limited. It does not establish performance parity with Jev, TypeSafe or Laya; Jev compatibility refers to interface and answer types. It does not learn Snake geometry directly from pixels. The initial generic model, dataset provenance and additional limitations are documented in the [original model card](https://github.com/loadchange/qev/blob/d68c468/docs/MODEL_CARD.md); v0.3.0 results above supersede the original checkpoint's metrics for this release.
+The checkpoint is a small supervised decision experiment. General task coverage and Chinese task evidence are limited. It does not establish performance parity with Jev, TypeSafe or Laya; Jev compatibility refers to interface and answer types. It does not learn Snake geometry directly from pixels. The initial generic model, dataset provenance and additional limitations are documented in the [original model card](https://github.com/loadchange/qev/blob/main/docs/MODEL_CARD.md); v0.3.0 results above supersede the original checkpoint's metrics for this release.
 
 ## License and attribution
 

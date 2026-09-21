@@ -225,6 +225,7 @@ def run_checks(args, report, base_url):
             initial["decision"] = result
             return result
         run("text_decision", initial_decision)
+        run("text_choice", lambda: decision(questions={"department": QUESTIONS["department"]}))
 
         def sdk_roundtrip():
             with sdk.TypeSafeClient(api_key="local-acceptance", base_url=base_url, model="jev-latest",
@@ -283,6 +284,18 @@ def run_checks(args, report, base_url):
                                        "criteria": {"left to right": None, "right to left": None, "stationary": None}}}
         run("image_decision", lambda: decision(state=[{"type": "text", "text": "Inspect the attached image."}, image],
             questions=color_questions, modalities=("text", "image")))
+        option_criteria = {}
+        for index, color in enumerate(("red", "blue", "green")):
+            picture = Image.new("RGB", (224, 224), "white")
+            ImageDraw.Draw(picture).rectangle((48, 48, 176, 176), fill=color)
+            option_criteria[f"option_{index + 1}"] = {"content": [
+                {"type": "text", "text": f"Candidate {index + 1}"},
+                {"type": "image_url", "image_url": {"url": data_url(picture)}},
+            ]}
+        option_questions = {"picture": {"type": "choice", "instructions": "Select the image of a red square.",
+                                       "criteria": option_criteria}}
+        run("option_image_choice", lambda: decision(state="Compare the supplied candidate images.",
+            questions=option_questions, modalities=("text", "image")))
         run("video_decision", lambda: decision(state={"content": [video]}, questions=motion_questions,
             modalities=("text", "video")))
         run("mixed_image_video_decision", lambda: decision(state={"content": [image, video]}, questions=color_questions,
@@ -319,6 +332,12 @@ def run_checks(args, report, base_url):
                 "remote_image": ("/v1/systemone", {"state": [{"type": "image_url", "image_url": {"url": "https://example.com/image.png"}}], "questions": binary}, 422),
                 "invalid_fps": ("/v1/systemone", {"state": [{**video, "fps": 0}], "questions": binary}, 422),
                 "too_many_frames": ("/v1/systemone", {"state": [image] * 9, "questions": binary}, 422),
+                "remote_option_image": ("/v1/systemone", {"state": "Choose an image.", "questions": {
+                    "q": {"type": "choice", "criteria": {"a": {"content": [
+                        {"type": "image_url", "image_url": {"url": "https://example.com/image.png"}},
+                    ]}}}}}, 422),
+                "shared_state_option_budget": ("/v1/systemone", {"state": [image] * 6,
+                    "questions": option_questions}, 422),
                 "invalid_score": ("/v1/systemone", {"state": "hello", "questions": {"q": {"type": "score", "criteria": ["only"]}}}, 422),
                 "too_many_questions": ("/v1/systemone", {"state": "hello", "questions": {str(i): {"type": "noul"} for i in range(65)}}, 422),
                 "streaming": ("/v1/chat/completions", {**TEXT_CHAT, "stream": True}, 422),

@@ -1,35 +1,45 @@
 # Qev API
 
-Qev 提供两个入口：`/v1/systemone` 返回固定候选的概率；`/v1/chat/completions` 使用完整 Qwen3.5 的原生文本、图像和视频生成能力。原生生成会禁用 Qev 决策 LoRA，使用保留的视觉模块、语言模型和词表输出头。
+**English** | [简体中文](API.zh-CN.md)
 
-当前决策适配器只使用文本训练。图像和视频可以进入决策前向计算，但**尚未验证多模态决策准确率**；文本任务拟合的温度不会应用到这些概率。API 兼容不表示与 Jev 的模型质量或置信度数值相同。
+Qev provides two endpoints: `/v1/systemone` returns probabilities over fixed candidates, while `/v1/chat/completions` uses the complete Qwen3.5 foundation's native text, image, and video generation. Native generation disables Qev's decision LoRA and uses the preserved vision modules, language model, and vocabulary output head.
 
-## 启动与模型名
+The current decision adapter was trained only on text. Images and videos can participate in the decision forward pass, but **multimodal decision accuracy has not been validated**. Temperature fitted on text tasks is not applied to these probabilities. API compatibility does not imply matching Jev's model quality or confidence values.
+
+## Startup and model names
 
 ```bash
-uv run qev serve --model models/qev-0.8b-mlx --port 8008
-# 或指定完整 Torch checkpoint：
+uv run qev serve --model models/qev-snake-0.8b-mlx --backend mlx --port 8008
+# Or select a complete Torch checkpoint:
 uv run qev serve --model models/qev-0.8b --backend torch --port 8008
 ```
 
-默认只监听 `127.0.0.1`。本地接口不要求 API key。
+The service listens on `127.0.0.1` by default. The local API does not require an API key.
 
-| 接口 | 用途 |
+| Endpoint | Purpose |
 |---|---|
-| `GET /`、`GET /snake` | 内置自主贪吃蛇页面 |
-| `GET /playground` | 接口测试页面 |
-| `GET /health` | 服务与当前 backend |
-| `GET /v1/models` | TypeSafe 风格模型列表 |
-| `POST /v1/systemone` | Noul、Choice、Score 决策 |
-| `POST /v1/chat/completions` | 非流式原生 Qwen 生成 |
+| `GET /`, `GET /snake` | Built-in model lab / autonomous Snake page |
+| `GET /playground` | API playground |
+| `GET /health` | Service status and current backend |
+| `GET /v1/models` | TypeSafe-style model list |
+| `POST /v1/systemone` | Noul, Choice, and Score decisions |
+| `POST /v1/chat/completions` | Non-streaming native Qwen generation |
 
-页面与模型接口同源，无需单独构建前端。贪吃蛇的创建、单步、导出等接口位于 `/api/snake/games`，状态与决策均由服务端维护，具体协议见 [实验室说明](DEMO.md)。这些演示接口不改变原有 Jev / TypeSafe 协议。
+Pages and model endpoints share the same origin and require no separate frontend build. On the first visit, the page chooses English or Simplified Chinese from the browser language; a manual language switch is saved in the current browser and survives refreshes. Interface language does not rewrite user input or API fields. Snake creation, stepping, export, and related endpoints live under `/api/snake/games`, with state and decisions maintained by the server. See the [demo guide](DEMO.md) for that protocol. These demo endpoints do not change the existing Jev / TypeSafe protocol.
 
-可用别名包括 `qev-latest`、`qev:0.8b`、`qev:0.8b-mlx`、`qev-0.8b`、`qev-0.8b-mlx` 和旧客户端的 `jev-latest`。生成入口默认 `qev-native`。这些名称指向**当前已加载的 checkpoint**，不会在请求内切换权重或 Torch/MLX 后端。
+Available aliases include `qev-latest`, `qev:0.8b`, `qev:0.8b-mlx`, `qev-0.8b`, `qev-0.8b-mlx`, and `jev-latest` for older clients. The generation endpoint defaults to `qev-native`. These names refer to the **currently loaded checkpoint**; a request does not switch weights or the Torch/MLX backend.
+
+## Local request logs
+
+`qev serve` logs `POST /v1/systemone` and `POST /v1/chat/completions` to `runs/request-logs` by default, relative to the working directory. Use `--request-log-dir PATH` to change the directory or `--no-request-log` to disable logging. Programmatic `create_app(agent)` does not enable file logging unless a `request_log` is supplied. GET requests and Snake demo endpoints are outside this log.
+
+Each request gets a directory named with UTC time and a UUID. It contains the original `request.json`, including complete data URLs for replay; `response.json` for a completed response; and `metadata.json` with the request ID, time, endpoint, status, elapsed time and model information. Malformed JSON is also preserved verbatim and marked with `request_parse_error`. `media/` stores extracted original PNG/JPEG/WebP bytes, including sampled video frames, without re-encoding. Each media entry records `json_pointer`, `path`, `mime`, `bytes` and `sha256` so it can be matched to the request. A compact `index.jsonl` in the log root lists records. Request headers, including authentication credentials, are not collected, and these files are not served over HTTP.
+
+Completed logged responses include `X-Qev-Request-Id` and `X-Qev-Log-Status: saved` or `error`; a log-writing failure leaves the model response unchanged. Disabled logging adds neither header. Bodies over the 12 MiB HTTP limit are rejected before logging and are not retained. An unhandled inference exception retains the request and exception state when logging succeeds; it may have no `response.json` or log headers because the outer error handler produces the final error response.
 
 ## TypeSafe SDK
 
-已使用官方 `typesafe-sdk==0.7.0` 检查请求序列化、模型列表及三种回答的 SDK 解析。`instructions` 可以省略；SDK 的默认 `None` 与空说明兼容。
+Request serialization, model listing, and SDK decoding of all three answer types have been checked with the official `typesafe-sdk==0.7.0`. `instructions` is optional; the SDK's default `None` is accepted as empty instructions.
 
 ```python
 from typesafe_sdk import TypeSafeClient, Choice, Noul, Score
@@ -54,54 +64,87 @@ print(result.nouls["refund"].noul)
 print(result.scores["urgency"].score)
 ```
 
-`state` 仍接受字符串、对象、数组等 JSON。普通结构化 JSON 按字段名和顺序渲染，保持原文本接口。Choice 接受 1–255 个命名候选；Score 接受 2–255 个有序等级；每个请求最多 64 个问题。
+`state` continues to accept JSON strings, objects, arrays, and other JSON values. Ordinary structured JSON is rendered with field names and ordering, preserving the original text interface. Choice accepts 1–255 named candidates; Score accepts 2–255 ordered levels. Each request allows at most 64 questions.
 
-回答包含：
+Answers contain:
 
-- Noul：`noul = P(true)`。
-- Choice：`choice`、候选概率及 `confidence`。
-- Score：从 0 开始的期望等级、`legend`、等级概率及 `confidence`。
+- Noul: `noul = P(true)`.
+- Choice: `choice`, candidate probabilities, and `confidence`.
+- Score: the expected zero-based level, `legend`, level probabilities, and `confidence`.
 
-概率保留数值精度，不以生成 JSON 文本的方式产生。`confidence` 不是正确率保证；Score 的置信度是按离众数等级的期望距离计算的近似约定，TypeSafe 的精确公式未公开。文本请求的 `qev.temperature` 显示实际使用的校准温度；校准对未见任务的效果需要独立测量。决策接口的 `usage.output_tokens` 恒为 0。
+Probabilities retain numerical precision and are not produced by generating JSON text. `confidence` does not guarantee correctness. Score confidence is an approximate convention based on the expected distance from the modal level; TypeSafe's exact formula is not public. `qev.question_temperatures` reports the actual temperature by question name: text-only questions retain checkpoint calibration, while questions containing images or video use `1.0`. `qev.temperature` reports that value when all questions use the same temperature, otherwise `null`. Text-only questions in mixed requests still retain text calibration. The decision endpoint always returns `usage.output_tokens=0`.
 
-默认 HTTP 服务和 Python `Agent` 逐题推理，Torch 的默认 `batch_size=1` 与 MLX 的逐题行为一致，避免一个问题的计算形状随同请求内其他问题变化。Python 使用者可显式创建 `Agent(checkpoint, batch_size=4)` 以提高 Torch 吞吐；CUDA BF16 下批量与 padding 形状变化可能带来概率差异，因此该可选模式不保证与逐题结果相同。训练和离线评估仍保持各自的 batch 4 设置。
+The default HTTP service and Python `Agent` run one question at a time. Torch's default `batch_size=1` matches MLX's per-question behavior and prevents a question's computation shape from changing with other questions in the request. Python users may explicitly create `Agent(checkpoint, batch_size=4)` to improve Torch throughput. CUDA BF16 batch and padding changes can alter probabilities, so this optional mode is not guaranteed to match per-question results. Training and offline evaluation retain their respective batch-4 settings.
 
-## 图像决策
+## Image decisions
 
-使用 OpenAI 风格 content array，或 `{"content": [...]}` 包装。图片只能作为 PNG、JPEG 或 WebP 的 base64 data URL 传入。
+The playground at <http://127.0.0.1:8008/playground> offers three `choice` scenarios: text only, an image in the background, and images in every option. All call `/v1/systemone`, returning `choice` and `probabilities` without generating answer text. Text-only backgrounds and candidate descriptions can still be strings. For background or candidate images, use an OpenAI-style content array or a `{"content": [...]}` wrapper. Images must be PNG, JPEG, or WebP base64 data URLs.
+
+The background image area and each candidate image area support both upload and paste. Select the target area's paste input and press Ctrl/Cmd+V, or use its clipboard button when browser clipboard reading is available. Both paths convert images in the browser to the same inline protocol and obey the media budgets below. Images are submitted to the service only when the request is sent.
+
+Background image example:
 
 ```python
 import base64
 import httpx
 from pathlib import Path
 
-# 文件由客户端主动读取；服务端不会打开客户端指定的路径。
+# The client reads the file explicitly; the server never opens a client-supplied path.
 image = "data:image/png;base64," + base64.b64encode(Path("photo.png").read_bytes()).decode()
 state = [
-    {"type": "text", "text": "判断图片的主要内容。"},
+    {"type": "text", "text": "Identify the main subject of the image."},
     {"type": "image_url", "image_url": {"url": image}},
 ]
 response = httpx.post("http://127.0.0.1:8008/v1/systemone", json={
     "model": "qev:0.8b",
     "state": state,
     "questions": {
-        "scene": {"type": "choice", "instructions": "选择主要场景。",
-                  "criteria": {"indoors": "室内", "outdoors": "室外"}},
+        "scene": {"type": "choice", "instructions": "Choose the main setting.",
+                  "criteria": {"indoors": "Indoors", "outdoors": "Outdoors"}},
     },
 }, timeout=120)
 response.raise_for_status()
 print(response.json())
 ```
 
-此路径会保留视觉 patch、图像网格和多模态位置编码，每个问题独立运行。不会把 base64 当成文本，也不会用图片说明替代真实视觉输入。响应会标明 `multimodal_decision_accuracy_validated: false`。
+When each candidate has an image, place it in the corresponding `criteria[key].content` and keep stable candidate keys. Candidate content supports text and images; sampled video frames still belong in `state`. The following client code reuses the imports above, reads two local PNGs, and submits their bytes to the service:
 
-## 原生多模态生成
+```python
+def candidate(path, description):
+    url = "data:image/png;base64," + base64.b64encode(Path(path).read_bytes()).decode()
+    return {"content": [
+        {"type": "text", "text": description},
+        {"type": "image_url", "image_url": {"url": url}},
+    ]}
+
+response = httpx.post("http://127.0.0.1:8008/v1/systemone", json={
+    "model": "qev:0.8b",
+    "state": "Choose the red circle from the candidate images below.",
+    "questions": {
+        "shape": {
+            "type": "choice",
+            "instructions": "Choose the image that best matches the background requirement.",
+            "criteria": {
+                "a": candidate("candidate-a.png", "Candidate A"),
+                "b": candidate("candidate-b.png", "Candidate B"),
+            },
+        },
+    },
+}, timeout=120)
+response.raise_for_status()
+answer = response.json()["answers"]["shape"]
+print(answer["choice"], answer["probabilities"])
+```
+
+Candidate images are encoded inside their own candidate boundaries, retaining visual patches, image grids, and multimodal position encoding. Each question runs independently, and one question may contain both background and candidate images. Base64 is not treated as text, and captions do not replace real visual input. Questions containing media use `T=1`, and the response reports `multimodal_decision_accuracy_validated: false`. Current training supervision remains textual; this input capability does not establish validated visual selection accuracy.
+
+## Native multimodal generation
 
 ```python
 response = httpx.post("http://127.0.0.1:8008/v1/chat/completions", json={
     "model": "qev-native",
     "messages": [{"role": "user", "content": [
-        {"type": "text", "text": "请描述这张图片。"},
+        {"type": "text", "text": "Please describe this image."},
         {"type": "image_url", "image_url": {"url": image}},
     ]}],
     "max_tokens": 128,
@@ -111,13 +154,13 @@ response.raise_for_status()
 print(response.json()["choices"][0]["message"]["content"])
 ```
 
-返回 OpenAI 风格 `chat.completion`，包括 `choices`、`finish_reason` 及真实 `prompt_tokens/completion_tokens/total_tokens`。`qev.decision_adapter_enabled` 为 `false`。此入口调用原生生成头，不使用候选指针头；决策训练的准确率不用于描述原生生成质量。
+The response is an OpenAI-style `chat.completion`, including `choices`, `finish_reason`, and actual `prompt_tokens/completion_tokens/total_tokens`. `qev.decision_adapter_enabled` is `false`. This endpoint uses the native generation head, not the candidate pointer head. Decision training accuracy does not describe native generation quality.
 
-支持 `system/user/assistant` 消息，`max_tokens` 或 `max_completion_tokens` 二选一，范围 1–2048，默认 256。`temperature=0` 使用贪心生成；大于 0 时支持 `top_p`。可传 `enable_thinking: true` 使用原生 thinking 模板。当前仅支持 `stream: false`，未实现工具调用或音频协议。
+`system/user/assistant` messages are supported. Set either `max_tokens` or `max_completion_tokens`, with a range of 1–2048 and a default of 256. `temperature=0` uses greedy generation; values above 0 support `top_p`. Set `enable_thinking: true` to use the native thinking template. Only `stream: false` is currently supported; tool calling and audio protocols are not implemented.
 
-## 视频
+## Video
 
-视频采用 Qev 的显式采样帧扩展；先在客户端抽帧，再提交按时间排序、尺寸相同的图像 data URL：
+Video uses Qev's explicit sampled-frame extension. Sample frames on the client, then submit chronologically ordered image data URLs with identical dimensions:
 
 ```python
 video_content = {
@@ -125,17 +168,17 @@ video_content = {
     "frames": [first_frame_data_url, second_frame_data_url],
     "fps": 2.0,
 }
-# 原生生成：messages=[{"role":"user","content":[
-#   {"type":"text","text":"描述两个画面间的变化。"}, video_content]}]
-# 候选决策：state={"content":[video_content]}
+# Native generation: messages=[{"role":"user","content":[
+#   {"type":"text","text":"Describe the change between these two frames."}, video_content]}]
+# Candidate decisions: state={"content":[video_content]}
 ```
 
-`fps` 表示**已提交帧序列的采样帧率**，不是原文件帧率；原生 processor 按此计算帧时间，并禁用再次抽帧。接口不接收本地视频路径、远程 `video_url` 或原始 MP4 字节；这是一项 API 输入约定，不是删除 Qwen3.5 的视频模块。
+`fps` is the **sampling frame rate of the submitted frame sequence**, not the original file's frame rate. The native processor uses it to calculate frame times, with additional frame sampling disabled. The API does not accept local video paths, remote `video_url` values, or raw MP4 bytes. This is an API input convention; Qwen3.5's video modules have not been removed.
 
-## 输入预算与错误
+## Input budgets and errors
 
-整个请求最多 8 张图片/视频帧，单图解码后文件字节不超过 2 MiB，总计不超过 8 MiB；单图最多 400 万像素，总计最多 800 万像素；HTTP body 最多 12 MiB。帧率必须大于 0 且不超过 60。只接受单帧 PNG/JPEG/WebP，动画需拆成视频帧。
+Images/video frames in `state` and candidate images in every question's `criteria` share one request-wide media budget: at most 8 images, at most 2 MiB of file bytes per image after base64 decoding, and at most 8 MiB total. Each image allows at most 4 million pixels, with at most 8 million pixels total. The HTTP body limit is 12 MiB. Frame rate must be greater than 0 and no more than 60. Only single-frame PNG/JPEG/WebP files are accepted; animations must be split into video frames.
 
-默认多模态决策展开后最多 8192 tokens；原生生成的 prompt 加生成预算最多 16384 tokens。超限明确报错，不静默丢弃图片、视频帧或候选项。原有纯文本决策仍采用 checkpoint 的文本长度预算，并在 `qev.truncated_questions` 报告状态截断。
+Expanded multimodal decisions allow at most 8192 tokens by default. Native generation allows at most 16384 tokens for the prompt plus generation budget. Excess input is rejected explicitly; images, video frames, and candidates are not silently dropped. Existing text-only decisions retain the checkpoint's text length budget and report state truncation in `qev.truncated_questions`.
 
-无效媒体、超出内容预算或不支持的选项返回 422；HTTP body 超限返回 413；未知模型返回 404；不支持完整多模态能力的旧 checkpoint/backend 返回 501。服务端不会下载图片 URL、打开 `file://` 或执行客户端提供的本地路径。
+Invalid media, exceeded content budgets, and unsupported options return 422. Excessive HTTP bodies return 413, unknown models return 404, and older checkpoints/backends without complete multimodal capabilities return 501. The server does not download image URLs, open `file://` resources, or execute client-supplied local paths.

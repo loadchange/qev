@@ -1,47 +1,49 @@
-# Qev 与参考项目的关系
+# Qev and its reference projects
 
-| 项目 | Qev 采用的思路 | 本项目的区别 |
+**English** | [简体中文](ARCHITECTURE.zh-CN.md)
+
+| Project | Ideas adopted by Qev | How Qev differs |
 |---|---|---|
-| Kev | 监督学习、候选指针头、typed answers、数据与校准分区 | 完整 Qwen3.5 多模态基座，每题独立序列，可切换决策 LoRA |
-| Laya-MLX | 原生 MLX 实现与跨运行时数值对照 | 不使用 Laya 的 ModernBERT 权重；这里需要保留视觉模块和生成头 |
-| Jev / TypeSafe | `state + questions → typed answers` 接口 | 不知道其未公开权重与训练细节，不声称复现或性能相等 |
-| Qwen3.5-0.8B | 原始文字、图像、视频理解与语言生成 | 冻结基座，增加约 1,135 万可训练决策参数 |
+| Kev | Supervised learning, a candidate pointer head, typed answers, separate data and calibration splits | A complete Qwen3.5 multimodal foundation, an independent sequence per question, and switchable decision LoRA |
+| Laya-MLX | Native MLX execution and numerical comparisons across runtimes | Does not use Laya's ModernBERT weights; Qev must retain vision modules and the generation head |
+| Jev / TypeSafe | The `state + questions → typed answers` interface | Its unpublished weights and training details are unknown; Qev makes no claim of reproduction or equivalent performance |
+| Qwen3.5-0.8B | Original text, image, and video understanding, plus language generation | Freezes the foundation and adds about 11.35 million trainable decision parameters |
 
 ```mermaid
 flowchart LR
-    X[文字 / 图片 / 视频] --> P[原始多模态 Processor]
-    P --> V[冻结的视觉编码器]
-    P --> L[冻结的 Qwen3.5 语言模型]
+    X[Text / images / video] --> P[Original multimodal processor]
+    P --> V[Frozen vision encoder]
+    P --> L[Frozen Qwen3.5 language model]
     V --> L
-    A[决策 LoRA 可开关] --> L
-    L --> H[候选指针头]
+    A[Switchable decision LoRA] --> L
+    L --> H[Candidate pointer head]
     H --> J[choice / noul / score]
-    L --> G[原始生成头]
-    G --> C[普通对话输出：关闭决策 LoRA]
+    L --> G[Original generation head]
+    G --> C[Ordinary chat output: decision LoRA disabled]
 ```
 
-Qwen3.5-0.8B 是混合线性注意力和全注意力的稠密模型。24 个语言层按每 3 个 GatedDeltaNet 加 1 个全注意力层排列，隐藏维度为 1024。Jev 兼容不等于 JEPA 训练：本项目的目标函数是候选交叉熵，没有预测目标潜在表示的 JEPA 目标。
+Qwen3.5-0.8B is a dense model combining linear and full attention. Its 24 language layers repeat three GatedDeltaNet layers followed by one full-attention layer, with a hidden dimension of 1024. Jev compatibility does not imply JEPA training: Qev uses candidate cross-entropy, not a JEPA objective that predicts target latent representations.
 
-## 决策路径
+## Decision path
 
-每个问题分别编码状态、指令和完整候选项，复用 Qwen 已有特殊 token，不扩词表。取各候选结束标记和最终决策标记的隐藏向量，分别投影到 256 维，再通过点积计算候选分数。
+Each question independently encodes the state, instructions, and complete candidate set. It reuses Qwen's existing special tokens without extending the vocabulary. Hidden vectors at each candidate-end marker and the final decision marker are projected to 256 dimensions, then scored with dot products.
 
-训练只更新语言模块中的 rank 16 LoRA 及小型指针头。`choice` 取最大概率候选，`noul` 返回 yes 的概率，`score` 返回有序等级的概率期望。JSON 由程序构造。
+Training updates only rank-16 LoRA in the language module and the small pointer head. `choice` selects the candidate with the highest probability, `noul` returns the probability of yes, and `score` returns the expected value over ordered levels. Application code constructs the JSON.
 
-Qwen 的 GatedDeltaNet 有循环状态与卷积状态，普通 attention mask 不能隔离同一序列内的多题分支。因此这里按独立 batch row 推理，MLX 使用逐题无缓存 prefill；生成则为每次请求建立全新的缓存。吞吐不会按 Kev 的共享前缀方式扩展。
+Qwen's GatedDeltaNet carries recurrent and convolutional state. Ordinary attention masks cannot isolate multiple question branches within one sequence. Qev therefore uses independent batch rows; MLX performs an uncached prefill for each question, while generation creates a fresh cache for every request. Throughput does not scale through Kev-style shared prefixes.
 
-公开 API 的 Torch 路径也默认逐题调用（`Agent(..., batch_size=1)`），使一个问题的计算形状不随同请求的其他问题变化。CUDA BF16 的批量与 padding 形状会带来数值差异，即使各行之间没有共享状态。Python 调用方可显式设置更大的 `batch_size` 换取吞吐，但此时不保证与逐题概率相同。训练和离线评估保持 batch 4，它们的指标对应报告中的实际精度与批量策略。
+The public Torch API also calls the model one question at a time by default (`Agent(..., batch_size=1)`), so a question's computation shape does not change with other questions in the request. CUDA BF16 batch and padding shapes can cause numerical differences even when rows share no state. Python callers may explicitly choose a larger `batch_size` for throughput, but probabilities are then not guaranteed to match individual-question execution. Training and offline evaluation retain batch 4; reported metrics correspond to their actual precision and batching policies.
 
-文本训练预算为 1024 token，状态最多 384。多模态决策扩展后最多 8192 token，超限明确报错；HTTP 原生生成受本地运行的 16384 token 总预算限制。这些是运行时资源限制，并非修改基座自身的位置配置。
+The text training budget is 1024 tokens, with at most 384 state tokens. Expanded multimodal decisions allow at most 8192 tokens and explicitly reject excess input. HTTP native generation has a local total budget of 16384 tokens. These are runtime resource limits, not changes to the foundation model's position configuration.
 
-## 多模态保留
+## Preserving multimodal capabilities
 
-保留多模态不能只保留 tokenizer 或文件名中的 Qwen 标签。本项目实例化完整 `Qwen3_5ForConditionalGeneration`，保留 vision、完整 processor、语言层、词表与生成头。训练时冻结所有原始参数，保存 LoRA sidecar；原生生成在禁用 LoRA 的上下文中执行，结束后恢复适配器状态。
+Retaining multimodal capabilities requires more than retaining a tokenizer or a Qwen label in a filename. Qev instantiates the complete `Qwen3_5ForConditionalGeneration`, including vision, the full processor, language layers, vocabulary, and generation head. Training freezes all original parameters and saves LoRA separately. Native generation runs with LoRA disabled and restores adapter state afterward.
 
-基座冻结哈希与 native token 对照验证这条路径。该保证针对原始生成路径：新指针头的视觉决策效果不由权重保留自动保证。本轮决策监督样本为文本，视觉决策目前属于可运行但未经过专门准确率评估的功能。
+Frozen foundation hashes and native token comparisons validate this path. The guarantee concerns the original generation path: retaining weights does not automatically guarantee the new pointer head's visual decision quality. Decision supervision in this run is textual; visual decisions are executable but have not undergone a dedicated accuracy evaluation.
 
 ## MLX
 
-使用 `mlx-vlm` 完整转换视觉和语言权重，独立保存指针头和可开关 LoRA。转换需要处理卷积权重布局、Qwen 零中心 RMSNorm 和混合层布局。运行时显式匹配 HF/FLA 的 GatedDeltaNet L2 归一化 epsilon，避免仅靠放宽容差掩盖算子差异。
+`mlx-vlm` converts the complete vision and language weights, with the pointer head and switchable LoRA saved separately. Conversion handles convolution weight layouts, Qwen's zero-centered RMSNorm, and the hybrid layer arrangement. The runtime explicitly matches the HF/FLA GatedDeltaNet L2 normalization epsilon, rather than hiding operator differences by merely loosening tolerances.
 
-小型模型测试用于验证布局和计算图；真实训练 checkpoint 还需对照相同输入的候选概率、argmax、图像/视频生成与跨请求隔离。具体误差以 `docs/results` 的实际报告为准，不能把 FP16 / BF16 转换称为所有输入都逐值相同。
+Tiny-model tests validate layouts and computation graphs. Real trained checkpoints also require comparisons of candidate probabilities, argmax, image/video generation, and isolation across requests on identical inputs. Refer to the actual reports in `docs/results` for numerical errors. FP16 / BF16 conversion cannot be described as elementwise identical for every input.

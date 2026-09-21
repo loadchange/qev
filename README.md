@@ -1,12 +1,14 @@
 # Qev
 
-以完整 **Qwen3.5-0.8B 多模态模型**为基座的结构化决策模型，提供 Jev / TypeSafe 风格接口和 Apple Silicon MLX 运行时。
+**English** | [简体中文](README.zh-CN.md)
 
-Qev 增加独立的语言 LoRA 决策适配器与候选指针头，保留原始视觉编码器、语言模型、图像/视频处理器和生成头。普通对话关闭决策适配器，使用原始基座；结构化决策开启适配器，用候选概率直接构造 JSON，不靠生成文本再解析。
+A structured decision model built on the complete **Qwen3.5-0.8B multimodal foundation**, with a Jev / TypeSafe-style API and an Apple Silicon MLX runtime.
 
-当前版本是小规模监督训练实验。模型产物、实测指标与限制以 [模型说明](docs/MODEL_CARD.md) 为准。Jev 兼容指 API 和输出类型，不代表复现 Jev 的私有架构或达到相同质量。
+Qev adds a separate language LoRA decision adapter and a candidate pointer head while retaining the original vision encoder, language model, image/video processors, and generation head. Ordinary chat disables the decision adapter and uses the original foundation. Structured decisions enable the adapter and construct JSON directly from candidate probabilities, without generating and parsing answer text.
 
-## 安装与运行
+This release is a small supervised training experiment. See the [model card](docs/MODEL_CARD.md) for artifacts, measured results, and limitations. Jev compatibility refers to the API and output types; it does not imply reproducing Jev's private architecture or matching its quality.
+
+## Install and run
 
 ```bash
 uv sync --python 3.12 --extra mlx --extra dev
@@ -16,86 +18,90 @@ uv run qev predict --model models/qev-snake-0.8b-mlx --request examples/request.
 uv run qev serve --model models/qev-snake-0.8b-mlx --port 8008
 ```
 
-代码位于 [GitHub](https://github.com/loadchange/qev)，模型权重单独发布到 Hugging Face，Git clone 不包含权重：
+`qev serve` records the two model API POST endpoints under `runs/request-logs` by default. Change the location with `--request-log-dir PATH` or disable logging with `--no-request-log`; see [local request logs](docs/API.md#local-request-logs).
 
-| 下载仓库 | 内容 | 适用环境 |
+The code is on [GitHub](https://github.com/loadchange/qev). Model weights are published separately on Hugging Face and are not included in a Git clone:
+
+| Repository | Contents | Runtime |
 | --- | --- | --- |
-| [twainsk/qev-0.8b](https://huggingface.co/twainsk/qev-0.8b) | 约 85 MB，LoRA、指针头与处理器；首次运行另外下载固定版本 Qwen3.5 基座 | PyTorch / NVIDIA |
-| [twainsk/qev-0.8b-mlx](https://huggingface.co/twainsk/qev-0.8b-mlx) | 约 3.48 GB，完整 FP32 多模态基座、适配器与指针头 | Apple Silicon / MLX |
+| [twainsk/qev-0.8b](https://huggingface.co/twainsk/qev-0.8b) | About 85 MB: LoRA, pointer head, and processor; the pinned Qwen3.5 foundation is downloaded separately on first use | PyTorch / NVIDIA |
+| [twainsk/qev-0.8b-mlx](https://huggingface.co/twainsk/qev-0.8b-mlx) | About 3.48 GB: complete FP32 multimodal foundation, adapters, and pointer head | Apple Silicon / MLX |
 
-两个仓库均为 v0.3.0 贪吃蛇专项续训后的模型，保留原通用任务回放训练和原生多模态生成。它们需要 Qev 运行时，不能直接当作标准 Transformers pipeline 或 Ollama 模型使用。PyTorch 版下载命令为 `uv run hf download twainsk/qev-0.8b --local-dir models/qev-snake-0.8b`。每个仓库包含模型卡、许可证、评测摘要与 `release_manifest.json` 文件校验清单。
+Both repositories contain the v0.3.0 models after Snake-specific continued training, with replay of the original general tasks and preserved native multimodal generation. They require the Qev runtime and cannot be used directly as a standard Transformers pipeline or Ollama model. Download the PyTorch version with `uv run hf download twainsk/qev-0.8b --local-dir models/qev-snake-0.8b`. Each repository includes a model card, license, evaluation summary, and a `release_manifest.json` file checksum manifest.
 
-本次专项模型的 GPU / PyTorch 版本为 `models/qev-snake-0.8b`，Mac 版本为 `models/qev-snake-0.8b-mlx`；原 `models/qev-0.8b[-mlx]` 保留。Mac 优先使用 MLX；MLX 通过 Apple Silicon CPU/GPU 和统一内存运行，不表示调用 Apple Neural Engine，也不会自动提高模型准确率。
+The Snake-specific GPU / PyTorch checkpoint is `models/qev-snake-0.8b`, and the Mac checkpoint is `models/qev-snake-0.8b-mlx`; the original `models/qev-0.8b[-mlx]` checkpoints remain available. Prefer MLX on Mac. MLX runs on Apple Silicon CPUs/GPUs with unified memory; this does not mean it uses the Apple Neural Engine or automatically improves model accuracy.
 
-**贪吃蛇首选终端入口 `qev snake`。** 棋盘旁显示模型候选概率、实际动作、得分和推理耗时；空格暂停/继续，`N` 单步，`+` / `-` 调速，`Q` 或 Ctrl-C 退出。默认优先加载存在的 `models/qev-snake-0.8b-mlx`，否则加载 `models/qev-0.8b-mlx`；使用 `--model` 可固定 checkpoint。专项训练已完成；终端默认加载新权重，原权重仍可显式选择。
+**Use `qev snake` as the primary Snake interface.** The terminal shows candidate probabilities, the executed action, score, and inference time beside the board. Space pauses/resumes, `N` steps once, `+` / `-` changes the speed, and `Q` or Ctrl-C exits. It prefers `models/qev-snake-0.8b-mlx` when present, otherwise `models/qev-0.8b-mlx`; use `--model` to select a checkpoint explicitly. Snake-specific training is complete, and the terminal loads the new weights by default while allowing explicit selection of the original weights.
 
-默认 `--observation spatial` 提供静态 BFS 可达空间、尾部连通性、食物路径距离和近期访问次数；这些是引擎计算的环境特征，画面明确标注“静态BFS环境特征·无动作接管”。`--observation local` 保留历史碰撞/食物距离观测，便于固定模型、种子和规则做对照。模型仍直接选择并执行方向，可能碰撞的候选不会被剔除。
+The default `--observation spatial` supplies static BFS reachable space, tail connectivity, food path distance, and recent visit counts. These are engine-computed environment features, explicitly labeled in the interface as static BFS features with no action override. `--observation local` retains the historical collision/food-distance observations for comparisons with a fixed model, seed, and rules. The model still chooses and executes the direction directly; candidates that may collide are not removed.
 
 ```bash
-# 历史模型 + 历史局部观测
+# Historical model with historical local observations
 uv run qev snake --model models/qev-0.8b-mlx --observation local --seed 7
-# 无界面连续运行十局，种子依次为 10000..10009，逐步保存真实请求与响应
+# Run ten games without a UI, seeds 10000..10009, recording real requests and responses
 uv run qev snake --headless --fps 0 --seed 10000 --episodes 10 \
   --report runs/snake-terminal.jsonl
 ```
 
-JSONL 报告逐条写入且拒绝覆盖已有文件；没有 TTY 时自动使用 headless 模式。专项数据与训练复现见 [训练说明](docs/TRAINING.md)，终端/HTTP 模式与完整操作见 [演示说明](docs/DEMO.md)。历史 v0.2 checkpoint 未接受贪吃蛇训练。新模型在相同 8×8、500 步、20 个保留种子的 CUDA 对照中，平均吃食从 3.1 提升到 42.9，碰撞从 20 局降至 0 局；这是有限回合实测，不是永不碰撞保证。完整条件、Mac 结果与多模态保留验证见 [专项模型说明](docs/SNAKE_MODEL.md)。
+The JSONL report is written one record at a time and refuses to overwrite an existing file. Without a TTY, the terminal automatically uses headless mode. See the [training guide](docs/TRAINING.md) for Snake data and training reproduction, and the [demo guide](docs/DEMO.md) for terminal/HTTP modes and all controls. The historical v0.2 checkpoint was not trained on Snake. In a CUDA comparison with the same 8×8 board, 500-step limit, and 20 held-out seeds, the new model improved mean food eaten from 3.1 to 42.9 and reduced games ending in collisions from 20 to 0. These are finite observed games, not a guarantee of collision-free play. See the [Snake model report](docs/SNAKE_MODEL.md) for complete conditions, Mac results, and multimodal preservation checks.
 
-服务默认只监听 `127.0.0.1:8008`。结构化接口为 `POST /v1/systemone`，原生生成接口为 `POST /v1/chat/completions`。多模态 HTTP 请求使用内嵌图片和采样视频帧，格式见 [接口示例](docs/API.md)。
+The service listens on `127.0.0.1:8008` by default. Structured decisions use `POST /v1/systemone`; native generation uses `POST /v1/chat/completions`. Multimodal HTTP requests carry inline images and sampled video frames; see the [API examples](docs/API.md).
 
-启动后打开 **http://127.0.0.1:8008** 即可使用内置实验室，无需额外前端服务：
+After startup, open **http://127.0.0.1:8008** for the built-in lab, with no separate frontend service. On the first visit, the page chooses English or Simplified Chinese from the browser language. You can switch manually; the selection is saved in the current browser and survives refreshes.
 
-- **网页贪吃蛇**：作为另一种可视化界面，支持开始、暂停、单步、固定种子重开，查看每步真实候选概率、耗时及请求，导出本局记录；与终端共用游戏规则和模型决策链路。
-- **接口测试**：编辑并发送真实 JSON 请求，测试 Choice / Noul / Score、原生文字、图片与采样视频帧；查看响应、耗时和 token 使用，并复制调用示例。
+- **Web Snake** provides another visualization with start, pause, single-step, and restart with a fixed seed. Inspect real candidate probabilities, timing, and requests for each step, and export the game record. It shares the terminal's game rules and model decision path.
+- **[API playground](http://127.0.0.1:8008/playground)** offers three Choice scenarios: text only, an image in the background, and images in every option. Edit the background, question, and candidates; upload or paste background and candidate images; then send a real request. The advanced JSON editor stays synchronized with the form and shows responses, timing, and token usage. Each image area has its own paste target for Ctrl/Cmd+V, plus a clipboard button when browser clipboard reading is available.
 
-网页与终端都使用文字环境特征；显示的棋盘不是模型图像输入，不属于视觉决策评估。
+All three scenarios call `POST /v1/systemone` and return `answers.<question>.choice` and `probabilities`, without generating answer text: `usage.output_tokens=0`. Background images belong in `state.content`; candidate images belong in `questions.<question>.criteria.<option>.content`. Each `content` contains `text` and inline `image_url` items. Built-in image examples can be sent immediately; see the [image decision protocol](docs/API.md#image-decisions). Other decision types, native generation, and service queries remain available under “More examples.”
+
+Both web and terminal Snake use textual environment features. The displayed board is not sent to the model as an image and is not a visual decision evaluation.
 
 ```bash
 curl http://127.0.0.1:8008/v1/systemone \
   -H 'Content-Type: application/json' --data-binary @examples/request.json
 ```
 
-产物名称 `qev-0.8b` / `qev-0.8b-mlx` 是 Qev checkpoint，不是可直接 `ollama run` 的通用生成模型。候选指针头和可切换适配器需要 Qev 运行时。
+The artifact names `qev-0.8b` / `qev-0.8b-mlx` refer to Qev checkpoints, not general generation models that can be run directly with `ollama run`. The candidate pointer head and switchable adapter require the Qev runtime.
 
-## 模型如何训练
+## How the model is trained
 
-1. 固定官方基座 revision：`2fc06364715b967f1860aea9cf38778875588b17`，加载完整多模态权重。
-2. 冻结原始参数，在语言注意力、GatedDeltaNet 和 MLP 投影中添加 rank 16 LoRA，另训练 256 维指针头。
-3. 把状态、问题和所有候选项编码为独立序列，从候选结束位置与决策位置的隐藏向量计算 logits，使用监督交叉熵。
-4. 在独立 calibration 分区拟合一个温度参数，随后报告 development 的准确率、NLL、Brier、ECE 和分类指标。
-5. 保存独立适配器、指针头、完整 processor 与固定基座引用；MLX 导出完整视觉/语言基座和可开关适配器。
+1. Pin the official foundation revision to `2fc06364715b967f1860aea9cf38778875588b17` and load its complete multimodal weights.
+2. Freeze the original parameters, add rank-16 LoRA to the language attention, GatedDeltaNet, and MLP projections, and train a separate 256-dimensional pointer head.
+3. Encode the state, question, and all candidates as an independent sequence. Compute logits from hidden vectors at candidate-end and decision positions, using supervised cross-entropy.
+4. Fit one temperature parameter on an independent calibration split, then report development accuracy, NLL, Brier score, ECE, and classification metrics.
+5. Save the separate adapter, pointer head, complete processor, and pinned foundation reference. MLX export includes the complete vision/language foundation and switchable adapters.
 
-Qwen3.5 的混合架构包含循环状态，普通 attention mask 不能隔离这些状态。因此每个问题独立编码，不使用 Kev 的共享状态分支打包，也不声称多个问题只计算一次状态。
+Qwen3.5's hybrid architecture includes recurrent state that ordinary attention masks cannot isolate. Each question is therefore encoded independently. Qev does not use Kev's shared-state branch packing or claim to compute the state only once for multiple questions.
 
-历史 v0.2 训练数据包含 10 个公开任务来源及中英可执行规则：5,892 条训练问题、620 条校准问题、880 条开发评估问题。全量输入检查未截断状态或候选。固定数据、分区校验与许可证来源在 `data/v1/manifest.json`；没有读取上游 locked test，也没有调用 Jev 获取标签。中文样本只覆盖四种程序规则，不能据此声称通用中文能力。新增贪吃蛇专项训练从该 checkpoint 继续，使用显式启发式教师生成的动作标签和原任务数据回放；教师不参与运行时的动作执行。
+The historical v0.2 training data contains 10 public task sources and executable English/Chinese rules: 5,892 training questions, 620 calibration questions, and 880 development evaluation questions. Full input checks found no truncated states or candidates. Fixed data, split checks, and license sources are recorded in `data/v1/manifest.json`. Upstream locked test sets were not read, and Jev was not queried for labels. Chinese samples cover only four programmatic rules and do not establish general Chinese-language ability. Snake-specific training continues from this checkpoint, using action labels from an explicit heuristic teacher and replay of the original tasks. The teacher does not participate in runtime action execution.
 
-## 实测与验证
+## Measurements and validation
 
-以下是历史 v0.2 通用决策 checkpoint 的结果，不是新贪吃蛇专项模型的结果。该版本已完成 NVIDIA L4 上的两轮训练，并生成 Torch 与 MLX checkpoint。相同的 880 条 development 问题上，训练前随机指针头准确率为 28.75%；训练后结果如下：
+The following results describe the historical v0.2 general decision checkpoint, not the new Snake-specific model. That version completed two training epochs on an NVIDIA L4 and produced Torch and MLX checkpoints. On the same 880 development questions, the random pointer head achieved 28.75% accuracy before training. Results after training:
 
-| 运行路径 | 准确率 | 校准 NLL | ECE |
+| Runtime | Accuracy | Calibrated NLL | ECE |
 | --- | --- | --- | --- |
-| CUDA BF16，batch 4 | 81.36% | 0.4890 | 0.0432 |
-| 交付 MLX FP32，逐题 | 81.25% | 0.4887 | 0.0395 |
+| CUDA BF16, batch 4 | 81.36% | 0.4890 | 0.0432 |
+| Delivered MLX FP32, one question at a time | 81.25% | 0.4887 | 0.0395 |
 
-两者沿用同一 calibration 温度 `T=1.464086`，没有在 MLX 或 development 上重新拟合。跨精度比较有 1 题的 argmax 改变。完整指标与分组结果见 [模型说明](docs/MODEL_CARD.md)。
+Both use the same calibration temperature, `T=1.464086`, without refitting on MLX or development data. One question changed argmax across precisions. See the [model card](docs/MODEL_CARD.md) for complete and grouped metrics.
 
-原始基座训练前后冻结参数哈希一致；原生文字、图像、视频和混合输入通过有限样例对照。真实 HTTP / 官方 SDK 验收：[Torch 17/17](docs/results/service_torch.json)、[MLX 19/19](docs/results/service_mlx.json)。在 Apple M4、16 GiB 内存、FP32 下，固定 40-token 单题的 5 次热启动测量中位数为 [41.82 ms](docs/results/benchmark_mlx.json)。
+Frozen foundation parameter hashes match before and after training. Native text, image, video, and mixed inputs passed finite comparison probes. Real HTTP / official SDK validation passed [17/17 on Torch](docs/results/service_torch.json) and [19/19 on MLX](docs/results/service_mlx.json). On an Apple M4 with 16 GiB memory and FP32, the median of five warm measurements for a fixed 40-token question was [41.82 ms](docs/results/benchmark_mlx.json).
 
-候选顺序会影响结果：28 道候选反转探针中，27 道保持同选；一题包含 77 个候选的 Banking77 问题发生翻转，单候选概率最大变化为 0.585。多模态决策准确率尚未评估；本轮中文证据只覆盖四类程序规则。
+Candidate order can affect the result: 27 of 28 candidate-reversal probes retained the same choice. One Banking77 question with 77 candidates changed its choice, with a maximum individual probability change of 0.585. Multimodal decision accuracy has not been evaluated, and the Chinese-language evidence in this run covers only four programmatic rule types.
 
-历史 v0.2 产物已下载到本地，其 Colab 训练会话已停止。该次文件校验、81 项测试、CLI 示例与 wheel 构建结果汇总在 [交付检查](docs/results/release_checks.json)。
+The historical v0.2 artifacts were downloaded locally, and that Colab training session was stopped. File verification, 81 tests, CLI examples, and wheel build results for that release are recorded in the [release checks](docs/results/release_checks.json).
 
-## 复现
+## Reproduce
 
-先在 NVIDIA GPU / Colab 上训练：
+First train on an NVIDIA GPU / Colab:
 
 ```bash
 uv run python -m qev.train --data data/v1 --out models/qev-new \
   --epochs 2 --batch 4 --accum 4 --lr 5e-5 --device cuda
 ```
 
-把完整 `models/qev-new` checkpoint 目录复制到 Apple Silicon Mac，安装 MLX 依赖后导出：
+Copy the complete `models/qev-new` checkpoint directory to an Apple Silicon Mac, install the MLX dependencies, and export it:
 
 ```bash
 uv sync --python 3.12 --extra mlx --extra dev
@@ -104,6 +110,6 @@ uv run python -m qev.export --checkpoint models/qev-new \
 uv run pytest -q
 ```
 
-本版 MLX 默认使用 FP32。FP16 转换在本次基础数值审计中超过预设误差门槛，因此没有作为默认交付格式。数据准备和 Colab 流程见 [训练说明](docs/TRAINING.md)。训练使用固定随机种子并记录软件版本、源码摘要、数据摘要、学习率、损失、算力与冻结权重前后哈希。数值精度和硬件变化可能导致结果差异。
+This release uses FP32 by default for MLX. FP16 conversion exceeded the predefined error threshold in the numerical audit and was therefore not selected as the default delivery format. See the [training guide](docs/TRAINING.md) for data preparation and the Colab workflow. Training uses fixed random seeds and records software versions, source and data digests, learning rates, losses, compute resources, and frozen-weight hashes before and after training. Changes in numerical precision and hardware may change results.
 
-代码许可为 Apache-2.0。基座、数据和依赖遵循各自许可，见 [NOTICE](NOTICE)。
+The code is licensed under Apache-2.0. The foundation model, datasets, and dependencies retain their respective licenses; see [NOTICE](NOTICE).

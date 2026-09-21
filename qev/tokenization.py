@@ -127,6 +127,7 @@ def encode_multimodal_question(
     images=None,
     videos=None,
     video_fps=None,
+    option_images=None,
     max_length: int = 8192,
     max_state: int | None = None,
 ) -> dict[str, Any]:
@@ -137,6 +138,8 @@ def encode_multimodal_question(
     are preserved, with explicit frame rates to produce correct timestamps.
     Media placeholders are expanded before locating option boundaries. Unlike
     text training, this path never silently truncates state or visual content.
+    ``option_images`` contains one image list per candidate. Their placeholders
+    stay inside that candidate's boundaries, after its text and before readout.
 
     The returned ``inputs`` dict can be passed directly to ``QevModel.forward``;
     the remaining fields are metadata, not model keyword arguments. Run each
@@ -157,7 +160,11 @@ def encode_multimodal_question(
     if max_state is not None and (max_state < 1 or len(state_tokens) + 1 > max_state):
         raise ValueError("Multimodal state exceeds max_state; content was not truncated")
     images, videos = list(images or []), list(videos or [])
-    if any(isinstance(media, (str, bytes, Path)) for media in [*images, *videos]):
+    if option_images is not None and len(option_images) != len(options):
+        raise ValueError("Provide one option_images list per candidate")
+    candidate_images = [list(group) for group in option_images] if option_images is not None else [[] for _ in options]
+    all_images = [*images, *(image for group in candidate_images for image in group)]
+    if any(isinstance(media, (str, bytes, Path)) for media in [*all_images, *videos]):
         raise ValueError("Media must be decoded in-memory objects, not paths or URLs")
     if videos and (video_fps is None or len(video_fps) != len(videos)):
         raise ValueError("Provide one explicit video_fps value per submitted video")
@@ -177,12 +184,15 @@ def encode_multimodal_question(
     # groups, each already wrapped in vision_start/vision_end tokens.
     prompt += processor.video_token * len(videos)
     prompt += SPECIAL["question"] + clean(instruction)
-    for option in options:
-        prompt += SPECIAL["option"] + clean(option) + SPECIAL["end_option"]
+    for option, attached in zip(options, candidate_images, strict=True):
+        prompt += SPECIAL["option"] + clean(option)
+        for _ in attached:
+            prompt += processor.vision_start_token + processor.image_token + processor.vision_end_token
+        prompt += SPECIAL["end_option"]
     prompt += SPECIAL["decision"]
     kwargs = {"text": [prompt], "return_tensors": "pt", "add_special_tokens": False}
-    if images:
-        kwargs["images"] = images
+    if all_images:
+        kwargs["images"] = all_images
     if videos:
         kwargs.update(videos=videos, video_metadata=metadata, do_sample_frames=False)
     processed = processor(**kwargs)

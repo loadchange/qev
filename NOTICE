@@ -8,6 +8,9 @@ https://github.com/jaredpalmer/kev
 
 Laya-MLX informed the native Apple Silicon implementation and numerical-parity
 verification approach. Qev does not use Laya's ModernBERT checkpoint.
+The terminal Snake presentation also references Laya-MLX's arcade layout and
+pixel-digit style. Copyright 2026 laya-mlx contributors, licensed under
+Apache License 2.0.
 
 The full frozen foundation is Qwen/Qwen3.5-0.8B, revision
 2fc06364715b967f1860aea9cf38778875588b17. Its original authors retain ownership

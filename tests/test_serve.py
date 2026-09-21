@@ -1,4 +1,6 @@
 import asyncio
+import json
+from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -51,7 +53,7 @@ def test_embedded_pages_and_assets_do_not_shadow_existing_api():
         assert response.status_code == 200
         assert response.headers["content-type"].startswith("text/html")
         assert '/assets/app.js' in response.text
-    for name in ("app.js", "snake.js", "playground.js", "style.css", "icon.svg"):
+    for name in ("app.js", "snake.js", "playground.js", "choice-form.js", "style.css", "icon.svg"):
         response = client.get(f"/assets/{name}")
         assert response.status_code == 200, name
         assert response.content
@@ -92,3 +94,40 @@ def test_official_typesafe_sdk_serialization_and_response_decoding():
         assert result.choices["department"].choice == "a"
         assert result.scores["priority"].legend == {0: "low", 1: "high"}
         assert result.usage.output_tokens == 0
+
+
+@pytest.mark.parametrize("directory", [None, "custom-journal"])
+def test_cli_records_requests_in_default_or_selected_directory(tmp_path, monkeypatch, directory):
+    from qev.cli import main
+
+    monkeypatch.chdir(tmp_path)
+    agent = SimpleNamespace(backend="torch", config={"model_name": "qev-0.8b"},
+                            predict=lambda *args, **kwargs: {"answers": {}, "qev": {"backend": "torch"}})
+    monkeypatch.setattr("qev.inference.Agent", lambda *args, **kwargs: agent)
+    applications = []
+    monkeypatch.setattr("uvicorn.run", lambda app, **kwargs: applications.append(app))
+    arguments = ["serve", "--model", "checkpoint", "--no-warmup", "--no-wired-memory"]
+    if directory:
+        arguments.extend(["--request-log-dir", directory])
+    main(arguments)
+    with TestClient(applications[0]) as client:
+        request = {"state": "record this request", "questions": {"q": {"type": "noul"}}}
+        response = client.post("/v1/systemone", json=request)
+    assert response.status_code == 200
+    assert response.headers["x-qev-log-status"] == "saved"
+    folder = tmp_path / (directory or "runs/request-logs") / response.headers["x-qev-request-id"]
+    assert json.loads((folder / "request.json").read_text()) == request
+    assert json.loads((folder / "response.json").read_text()) == response.json()
+    context = json.loads((folder / "metadata.json").read_text())["model_context"]
+    assert context["checkpoint"] == str(tmp_path / "checkpoint")
+    assert context["backend"] == "torch"
+    assert context["config"] == agent.config
+
+
+def test_programmatic_service_does_not_record_without_explicit_logger(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    with TestClient(create_app(StubAgent())) as client:
+        response = client.post("/v1/systemone", json={"state": "hello", "questions": {"q": {"type": "noul"}}})
+    assert response.status_code == 200
+    assert "x-qev-request-id" not in response.headers
+    assert not (tmp_path / "runs").exists()

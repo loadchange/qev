@@ -1,87 +1,105 @@
+import { t, m, getLocale, onLocaleChange, setText, setAttr } from "./i18n.js";
+import { CHOICE_SCENES, choicePreset, editableChoice, mountChoiceForm, validateChoiceScene } from "./choice-form.js";
+
 const MIB = 1024 * 1024;
 const ROUTES = {
-  "/v1/systemone": { method: "POST", label: "结构化决策" },
-  "/v1/chat/completions": { method: "POST", label: "原生生成" },
-  "/health": { method: "GET", label: "服务状态" },
-  "/v1/models": { method: "GET", label: "模型列表" },
+  "/v1/systemone": { method: "POST", label: m("pg.typed") },
+  "/v1/chat/completions": { method: "POST", label: m("pg.native") },
+  "/health": { method: "GET", label: m("pg.health") },
+  "/v1/models": { method: "GET", label: m("pg.models") },
 };
 const PRESETS = {
+  ...Object.fromEntries(Object.entries(CHOICE_SCENES).map(([key, value]) => [key, { ...value, endpoint: "/v1/systemone" }])),
   decisions: {
     label: "Choice + Noul + Score",
     endpoint: "/v1/systemone",
-    note: "一次请求测试分类、真假概率和有序评分；每个问题独立推理。",
+    note: m("pg.mixedNote"),
     body: {
       model: "qev-latest",
-      state: "用户说：昨天同一笔订单被扣了两次钱，请退还多扣的钱。",
+      state: m("pg.exampleState"),
       questions: {
-        team: { type: "choice", instructions: "请选择处理这条请求的部门。", criteria: {
-          billing: "账单与退款", technical: "软件与技术支持", sales: "售前咨询",
+        team: { type: "choice", instructions: m("pg.exampleTeam"), criteria: {
+          billing: m("pg.billing"), technical: m("pg.technical"), sales: m("pg.sales"),
         } },
-        refund: { type: "noul", instructions: "用户是否在请求退款？" },
-        urgency: { type: "score", instructions: "判断请求的紧急程度。", criteria: ["低", "中", "高"] },
+        refund: { type: "noul", instructions: m("pg.exampleRefund") },
+        urgency: { type: "score", instructions: m("pg.exampleUrgency"), criteria: [m("pg.low"), m("pg.medium"), m("pg.high")] },
       },
     },
   },
   text: {
-    label: "原生文字生成",
+    label: m("pg.nativeText"),
     endpoint: "/v1/chat/completions",
-    note: "关闭决策适配器，使用完整 Qwen 原生生成路径；此页面使用非流式响应。",
-    body: { model: "qev-native", messages: [{ role: "user", content: "用两句话解释什么是机器学习。" }], max_tokens: 128, temperature: 0, stream: false },
+    note: m("pg.nativeNote"),
+    body: { model: "qev-native", messages: [{ role: "user", content: m("pg.exampleText") }], max_tokens: 128, temperature: 0, stream: false },
   },
   image: {
-    label: "原生图片理解",
+    label: m("pg.nativeImage"),
     endpoint: "/v1/chat/completions",
-    note: "先添加图片，再发送。图片会以内嵌 data URL 放入当前用户消息。",
-    body: { model: "qev-native", messages: [{ role: "user", content: [{ type: "text", text: "请简洁描述图片中最主要的内容。" }] }], max_tokens: 128, temperature: 0, stream: false },
+    note: m("pg.imageNote"),
+    body: { model: "qev-native", messages: [{ role: "user", content: [{ type: "text", text: m("pg.exampleImage") }] }], max_tokens: 128, temperature: 0, stream: false },
   },
   video: {
-    label: "原生视频帧理解",
+    label: m("pg.nativeVideo"),
     endpoint: "/v1/chat/completions",
-    note: "添加多张图片作为采样帧，按文件名排序。帧尺寸须相同；fps 表示采样帧率。",
-    body: { model: "qev-native", messages: [{ role: "user", content: [{ type: "text", text: "请按时间顺序描述这些视频帧中的变化。" }] }], max_tokens: 160, temperature: 0, stream: false },
+    note: m("pg.videoNote"),
+    body: { model: "qev-native", messages: [{ role: "user", content: [{ type: "text", text: m("pg.exampleVideo") }] }], max_tokens: 160, temperature: 0, stream: false },
   },
-  health: { label: "GET · 服务状态", endpoint: "/health", note: "读取当前服务状态与后端。", body: null },
-  models: { label: "GET · 模型列表", endpoint: "/v1/models", note: "读取服务公开的模型别名。别名不会切换已加载的模型。", body: null },
+  health: { label: m("pg.getHealth"), endpoint: "/health", note: m("pg.healthNote"), body: null },
+  models: { label: m("pg.getModels"), endpoint: "/v1/models", note: m("pg.modelsNote"), body: null },
 };
 let mountCount = 0;
 
 function node(tag, className = "", text = "") {
   const element = document.createElement(tag);
   if (className) element.className = className;
-  if (text !== "") element.textContent = text;
+  if (text !== "") setText(element, text);
   return element;
 }
 
 function parsePayload(text) {
   const value = JSON.parse(text, (_key, item) => {
-    if (typeof item === "number" && !Number.isFinite(item)) throw new Error("JSON 数值超出有限范围。");
+    if (typeof item === "number" && !Number.isFinite(item)) throw new Error(m("pg.finiteJSON"));
     return item;
   });
-  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("请求 JSON 的最外层须为对象。");
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(m("pg.objectJSON"));
   return value;
 }
 
-function contentArrays(payload, endpoint) {
-  if (endpoint === "/v1/chat/completions") {
-    return Array.isArray(payload.messages) ? payload.messages.filter(Boolean).map((message) => message.content).filter(Array.isArray) : [];
-  }
+function stateContent(payload) {
   const state = payload.state;
   if (Array.isArray(state) && state.length
       && state.every((item) => item && typeof item === "object" && !Array.isArray(item))
-      && state.some((item) => ["text", "image_url", "video", "video_url", "audio_url", "input_audio"].includes(item.type))) return [state];
-  if (state && typeof state === "object" && Object.keys(state).length === 1 && Array.isArray(state.content)) return [state.content];
-  return [];
+      && state.some((item) => ["text", "image_url", "video", "video_url", "audio_url", "input_audio"].includes(item.type))) return state;
+  return state && typeof state === "object" && Object.keys(state).length === 1 && Array.isArray(state.content) ? state.content : null;
 }
+
+function contentGroups(payload, endpoint) {
+  if (endpoint === "/v1/chat/completions") {
+    return Array.isArray(payload.messages) ? payload.messages.filter(Boolean).flatMap((message, index) => Array.isArray(message.content) ? [{ content: message.content, label: m("pg.messageLabel", { number: index + 1 }) }] : []) : [];
+  }
+  const state = stateContent(payload);
+  const groups = state ? [{ content: state, label: m("pg.background") }] : [];
+  for (const [question, value] of Object.entries(payload.questions || {})) {
+    if (!value?.criteria || typeof value.criteria !== "object") continue;
+    for (const [key, criterion] of Object.entries(value.criteria)) {
+      const content = stateContent({ state: criterion });
+      if (content) groups.push({ content, label: m("pg.optionLabel", { question, key }) });
+    }
+  }
+  return groups;
+}
+
+function contentArrays(payload, endpoint) { return contentGroups(payload, endpoint).map((group) => group.content); }
 
 function mediaEntries(payload, endpoint) {
   const entries = [];
   let videos = 0;
-  for (const content of contentArrays(payload, endpoint)) {
+  for (const { content, label } of contentGroups(payload, endpoint)) {
     for (const item of content) {
-      if (item?.type === "image_url") entries.push({ url: item.image_url?.url, label: `图片 ${entries.length + 1}` });
+      if (item?.type === "image_url") entries.push({ url: item.image_url?.url, label: m("pg.imageLabel", { label, number: entries.length + 1 }) });
       if (item?.type === "video" && Array.isArray(item.frames)) {
         videos += 1;
-        item.frames.forEach((url, index) => entries.push({ url, label: `视频 ${videos} · 帧 ${index + 1}` }));
+        item.frames.forEach((url, index) => entries.push({ url, label: m("pg.videoLabel", { label, video: videos, frame: index + 1 }) }));
       }
     }
   }
@@ -97,17 +115,17 @@ function inlineImageBytes(url) {
 
 function mediaTarget(payload, endpoint) {
   if (endpoint === "/v1/chat/completions") {
-    if (!Array.isArray(payload.messages)) throw new Error("原生请求须包含 messages 数组。");
+    if (!Array.isArray(payload.messages)) throw new Error(m("pg.messagesRequired"));
     let message = null;
     for (let index = payload.messages.length - 1; index >= 0; index -= 1) {
       if (payload.messages[index]?.role === "user") { message = payload.messages[index]; break; }
     }
     if (!message) { message = { role: "user", content: [] }; payload.messages.push(message); }
     if (typeof message.content === "string") message.content = [{ type: "text", text: message.content }];
-    if (!Array.isArray(message.content)) throw new Error("用户消息的 content 须为文字或数组。");
+    if (!Array.isArray(message.content)) throw new Error(m("pg.contentRequired"));
     return message.content;
   }
-  const existing = contentArrays(payload, endpoint)[0];
+  const existing = stateContent(payload);
   if (existing) return existing;
   const text = typeof payload.state === "string" ? payload.state : JSON.stringify(payload.state ?? "", null, 2);
   payload.state = [{ type: "text", text }];
@@ -117,10 +135,10 @@ function mediaTarget(payload, endpoint) {
 function compactPreview(value) {
   const text = JSON.stringify(value, (_key, item) => {
     if (typeof item !== "string") return item;
-    if (item.startsWith("data:image/")) return `${item.slice(0, item.indexOf(",") + 1)}[媒体已折叠，${item.length.toLocaleString()} 字符]`;
-    return item.length > 5000 ? `${item.slice(0, 5000)}…[长文本已折叠]` : item;
+    if (item.startsWith("data:image/")) return `${item.slice(0, item.indexOf(",") + 1)}${t("pg.foldedMedia", { count: item.length.toLocaleString(getLocale()) })}`;
+    return item.length > 5000 ? `${item.slice(0, 5000)}${t("pg.foldedText")}` : item;
   }, 2);
-  return text.length > 16000 ? `${text.slice(0, 16000)}\n…[预览已截短；展开或复制可获取完整响应]` : text;
+  return text.length > 16000 ? `${text.slice(0, 16000)}\n${t("pg.shortPreview")}` : text;
 }
 
 function shellQuote(value) { return `'${value.replaceAll("'", "'\\''")}'`; }
@@ -140,7 +158,30 @@ function requestCode(snapshot, language, preview = false) {
 }
 
 function numeric(value, digits = 2) {
-  return typeof value === "number" && Number.isFinite(value) ? value.toLocaleString("zh-CN", { maximumFractionDigits: digits }) : "—";
+  return typeof value === "number" && Number.isFinite(value) ? value.toLocaleString(getLocale(), { maximumFractionDigits: digits }) : "—";
+}
+
+function responseTimings(data) {
+  const valid = (value) => typeof value === "number" && Number.isFinite(value) && value >= 0;
+  const server = [data?.latency_ms, data?.qev?.latency_ms].find(valid) ?? null;
+  const labels = { decode: m("pg.decode"), queue: m("pg.queue"), encode: m("pg.encode"), inference: m("pg.inference"), total: m("pg.total") };
+  const parts = Object.entries(labels).flatMap(([key, label]) => {
+    const value = data?.qev?.timings_ms?.[key];
+    return valid(value) ? [{ key, label, value }] : [];
+  });
+  return { server, parts };
+}
+
+function responseLog(headers) {
+  const requestId = headers?.get?.("X-Qev-Request-Id")?.trim() || "";
+  const rawStatus = headers?.get?.("X-Qev-Log-Status")?.trim() || "";
+  const status = ["saved", "error"].includes(rawStatus) ? rawStatus : null;
+  if (!requestId && !status) return null;
+  return { requestId, status };
+}
+
+function logLabel(log) {
+  return m(log?.status === "saved" ? "pg.logSaved" : log?.status === "error" ? "pg.logFailed" : "pg.requestId");
 }
 
 /** Mount a same-origin API workbench. All request history stays in this mount. */
@@ -159,16 +200,31 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
   let editorTimer = null;
   let historyId = 0;
   let fullResponse = "";
+  let lastResponse = null;
+  let lastLog = null;
   let language = "curl";
+  let activeScene = "choice_text";
+  let choiceForm = null;
 
   const root = node("section", "playground-grid");
-  root.setAttribute("aria-label", "API Playground");
+  setAttr(root, "aria-label", m("app.playground"));
+  const scenePicker = node("div", "pg-scene-picker");
+  scenePicker.setAttribute("role", "group");
+  setAttr(scenePicker, "aria-label", m("pg.scenePicker"));
+  for (const [key, value] of Object.entries(CHOICE_SCENES)) {
+    const card = node("button", "pg-scene-button");
+    card.type = "button";
+    card.dataset.scene = key;
+    card.append(node("span", "pg-scene-icon", value.icon), node("strong", "", value.label), node("span", "pg-scene-description", value.description));
+    scenePicker.append(card);
+  }
+  root.append(scenePicker);
   const requestPanel = node("section", "panel playground-request");
   const responsePanel = node("section", "panel playground-response");
   const requestHeading = node("div", "panel-header");
   const requestTitle = node("div");
-  requestTitle.append(node("p", "eyebrow", "API WORKBENCH"), node("h2", "section-title", "请求"));
-  requestHeading.append(requestTitle, node("span", "badge", "同源 · 真实接口"));
+  requestTitle.append(node("p", "eyebrow", "API WORKBENCH"), node("h2", "section-title", m("pg.request")));
+  requestHeading.append(requestTitle, node("span", "badge", m("pg.sameOrigin")));
   requestPanel.append(requestHeading);
 
   function on(element, event, callback) { element.addEventListener(event, callback, { signal: listeners.signal }); }
@@ -184,26 +240,29 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
   function tell(message, kind = "info") { if (!disposed) notify(message, kind); }
 
   const preset = node("select", "pg-select");
-  preset.append(new Option("自定义请求", ""));
-  for (const [key, value] of Object.entries(PRESETS)) preset.append(new Option(value.label, key));
+  preset.append(Object.assign(node("option", "", m("pg.custom")), { value: "" }));
+  for (const [key, value] of Object.entries(PRESETS)) preset.append(Object.assign(node("option", "", value.label), { value: key }));
   const endpoint = node("select", "pg-select code");
   for (const [path, route] of Object.entries(ROUTES)) endpoint.append(new Option(`${route.method} ${path}`, path));
   const pickers = node("div", "pg-pickers");
-  pickers.append(field("示例", preset, "preset"), field("接口", endpoint, "endpoint"));
+  pickers.append(field(m("pg.moreExamples"), preset, "preset"), field(m("pg.endpoint"), endpoint, "endpoint"));
   const presetNote = node("p", "hint");
   const getTools = node("div", "toolbar pg-get-tools");
-  const healthButton = button("检查服务", "btn small ghost");
-  const modelsButton = button("查看模型", "btn small ghost");
+  const healthButton = button(m("pg.checkHealth"), "btn small ghost");
+  const modelsButton = button(m("pg.viewModels"), "btn small ghost");
   getTools.append(healthButton, modelsButton);
   requestPanel.append(pickers, presetNote, getTools);
+  const choiceFormContainer = node("div", "pg-choice-form");
+  choiceFormContainer.dataset.choiceForm = "true";
+  requestPanel.append(choiceFormContainer);
 
   const mediaBox = node("details", "pg-media");
-  mediaBox.setAttribute("aria-label", "媒体附件");
-  mediaBox.append(node("summary", "", "图片与视频帧（可选）"));
+  setAttr(mediaBox, "aria-label", m("pg.attachments"));
+  mediaBox.append(node("summary", "", m("pg.moreMedia")));
   const mediaTools = node("div", "toolbar");
-  const imageButton = button("添加图片", "btn small");
-  const videoButton = button("添加视频帧", "btn small");
-  const clearMediaButton = button("移除所有媒体", "btn small ghost");
+  const imageButton = button(m("pg.addImage"), "btn small");
+  const videoButton = button(m("pg.addVideo"), "btn small");
+  const clearMediaButton = button(m("pg.clearMedia"), "btn small ghost");
   const fps = node("input", "pg-fps");
   Object.assign(fps, { type: "number", min: "0.001", max: "60", step: "any", value: "2" });
   const imageInput = node("input");
@@ -211,61 +270,61 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
   for (const input of [imageInput, videoInput]) {
     Object.assign(input, { type: "file", accept: "image/png,image/jpeg,image/webp", multiple: true, hidden: true });
   }
-  mediaTools.append(imageButton, videoButton, field("帧率 fps", fps, "fps"), clearMediaButton);
-  const mediaHint = node("p", "hint", "PNG / JPEG / WebP；每张 ≤ 2 MiB，总计 ≤ 8 MiB，最多 8 张图片/帧。视频帧按文件名排序、尺寸须一致。上传只在发送请求时传给服务。");
+  mediaTools.append(imageButton, videoButton, field(m("pg.fps"), fps, "fps"), clearMediaButton);
+  const mediaHint = node("p", "hint", m("pg.mediaHint"));
   const mediaPreview = node("div", "pg-media-grid");
   mediaBox.append(mediaTools, imageInput, videoInput, mediaHint, mediaPreview);
   requestPanel.append(mediaBox);
 
   const editorDetails = node("details", "pg-editor");
   editorDetails.open = true;
-  const editorSummary = node("summary", "", "请求 JSON");
+  const editorSummary = node("summary", "", m("pg.advanced"));
   const editor = node("textarea", "code pg-json-editor");
   Object.assign(editor, { rows: 18, spellcheck: false });
   editor.setAttribute("autocomplete", "off");
   editor.setAttribute("autocapitalize", "off");
-  editor.setAttribute("aria-label", "请求 JSON 编辑器");
-  const editorHelp = node("p", "hint", "此处保留完整请求。含大量 base64 时可折叠编辑器，用上方缩略图检查附件。");
+  setAttr(editor, "aria-label", m("pg.jsonEditor"));
+  const editorHelp = node("p", "hint", m("pg.editorHelp"));
   editorHelp.id = `${id}-editor-help`;
   editor.setAttribute("aria-describedby", editorHelp.id);
   editorDetails.append(editorSummary, editor, editorHelp);
   const editorTools = node("div", "toolbar pg-editor-tools");
-  const formatButton = button("格式化 JSON", "btn small ghost");
-  const copyRequestButton = button("复制请求 JSON", "btn small ghost");
+  const formatButton = button(m("pg.formatJSON"), "btn small ghost");
+  const copyRequestButton = button(m("pg.copyJSON"), "btn small ghost");
   editorTools.append(formatButton, copyRequestButton);
   const localError = node("p", "error pg-local-error");
   localError.setAttribute("role", "alert");
   localError.hidden = true;
   const sendTools = node("div", "toolbar pg-send-tools");
-  const sendButton = button("发送请求", "btn primary");
-  const cancelButton = button("停止等待", "btn ghost");
+  const sendButton = button(m("pg.send"), "btn primary");
+  const cancelButton = button(m("pg.cancel"), "btn ghost");
   cancelButton.disabled = true;
   sendTools.append(sendButton, cancelButton);
   requestPanel.insertBefore(sendTools, pickers);
   requestPanel.append(editorDetails, editorTools, localError,
-    node("p", "hint", "停止等待只取消浏览器的等待，服务可能仍在推理。"));
+    node("p", "hint", m("pg.cancelHint")));
 
   const examples = node("details", "pg-examples");
-  examples.append(node("summary", "", "在终端或 Python 中调用"));
+  examples.append(node("summary", "", m("pg.callCode")));
   const codeTools = node("div", "toolbar");
   const curlTab = button("curl", "btn small");
   const pythonTab = button("Python · httpx", "btn small ghost");
-  const copyCodeButton = button("复制 curl", "btn small ghost");
+  const copyCodeButton = button(m("pg.copyCurl"), "btn small ghost");
   codeTools.append(curlTab, pythonTab, copyCodeButton);
   const codePreview = node("pre", "code pg-code-preview");
   codePreview.tabIndex = 0;
   examples.append(codeTools, codePreview,
-    node("p", "hint", "代码预览会折叠媒体和超长文本；复制按钮保留完整请求。Python 示例需要 httpx。"));
+    node("p", "hint", m("pg.codeHint")));
   const historyBox = node("section", "pg-history-section");
-  historyBox.append(node("h3", "section-title", "最近请求"), node("p", "hint", "保留最近 5 次请求，含附件；刷新或关闭页面后清空。恢复后需要重新发送。"));
+  historyBox.append(node("h3", "section-title", m("pg.recent")), node("p", "hint", m("pg.historyHint")));
   const historyList = node("ol", "pg-history");
   historyBox.append(historyList);
   requestPanel.append(examples, historyBox);
 
   const responseHeader = node("div", "panel-header");
   const responseTitle = node("div");
-  responseTitle.append(node("p", "eyebrow", "LIVE RESPONSE"), node("h2", "section-title", "响应"));
-  const responseBadge = node("span", "badge", "尚未发送");
+  responseTitle.append(node("p", "eyebrow", "LIVE RESPONSE"), node("h2", "section-title", m("pg.response")));
+  const responseBadge = node("span", "badge", m("pg.notSent"));
   responseHeader.append(responseTitle, responseBadge);
   const metrics = node("dl", "pg-metrics");
   function metric(label) {
@@ -275,30 +334,46 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
     metrics.append(item);
     return value;
   }
-  const statusMetric = metric("HTTP 状态");
-  const timeMetric = metric("往返耗时");
-  const tokenMetric = metric("输入 / 输出 token");
-  const responseSummary = node("div", "pg-response-summary empty-state", "发送一个请求，查看模型的真实响应。");
+  const statusMetric = metric(m("pg.httpStatus"));
+  const timeMetric = metric(m("pg.roundtrip"));
+  const serverMetric = metric(m("pg.server"));
+  const tokenMetric = metric(m("pg.tokens"));
+  const timingHint = node("p", "hint pg-timing-hint", m("pg.timingHint"));
+  const timingDetails = node("details", "pg-timings");
+  timingDetails.dataset.serverTimings = "true";
+  timingDetails.hidden = true;
+  const timingBreakdown = node("dl", "pg-timing-breakdown");
+  timingDetails.append(node("summary", "", m("pg.timingDetails")), timingBreakdown,
+    node("p", "hint", m("pg.inferenceHint")));
+  const requestLog = node("p", "hint pg-request-log");
+  requestLog.dataset.requestLog = "true";
+  requestLog.setAttribute("aria-live", "polite");
+  requestLog.hidden = true;
+  const requestLogStatus = node("span");
+  const requestLogId = node("code", "code");
+  const copyLogIdButton = button(m("pg.copyRequestId"), "btn small ghost");
+  requestLog.append(requestLogStatus, requestLogId, copyLogIdButton);
+  const responseSummary = node("div", "pg-response-summary empty-state", m("pg.responseHint"));
   responseSummary.setAttribute("aria-live", "polite");
   const responseTools = node("div", "toolbar");
-  const copyResponseButton = button("复制完整响应", "btn small ghost");
+  const copyResponseButton = button(m("pg.copyResponse"), "btn small ghost");
   copyResponseButton.disabled = true;
-  responseTools.append(node("h3", "section-title", "响应预览"), copyResponseButton);
-  const responsePreview = node("pre", "code pg-response-preview", "尚无响应。");
+  responseTools.append(node("h3", "section-title", m("pg.responsePreview")), copyResponseButton);
+  const responsePreview = node("pre", "code pg-response-preview", m("pg.noResponse"));
   responsePreview.tabIndex = 0;
   const rawDetails = node("details", "pg-raw-response");
-  const rawSummary = node("summary", "", "展开完整原始响应");
+  const rawSummary = node("summary", "", m("pg.rawResponse"));
   const rawPre = node("pre", "code pg-response-raw");
   rawPre.tabIndex = 0;
   rawDetails.append(rawSummary, rawPre);
   rawDetails.hidden = true;
-  responsePanel.append(responseHeader, metrics, responseSummary, responseTools, responsePreview, rawDetails);
+  responsePanel.append(responseHeader, metrics, timingHint, timingDetails, requestLog, responseSummary, responseTools, responsePreview, rawDetails);
   root.append(requestPanel, responsePanel);
   container.replaceChildren(root);
 
   function isGet() { return ROUTES[endpoint.value].method === "GET"; }
-  function error(message) { if (disposed) return; localError.textContent = message; localError.hidden = false; tell(message, "error"); }
-  function clearError() { localError.hidden = true; localError.textContent = ""; }
+  function error(message) { if (disposed) return; setText(localError, message); localError.hidden = false; tell(message, "error"); }
+  function clearError() { localError.hidden = true; setText(localError, ""); }
   function setBusy() {
     const busy = Boolean(active) || uploading;
     for (const control of [preset, endpoint, fps, healthButton, modelsButton, sendButton]) control.disabled = busy;
@@ -307,9 +382,15 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
     cancelButton.disabled = !active;
     copyCodeButton.disabled = uploading;
     copyResponseButton.disabled = !fullResponse;
-    sendButton.textContent = active ? "请求中…" : uploading ? "正在读取附件…" : "发送请求";
+    setText(sendButton, active ? m("pg.sending") : uploading ? m("pg.reading") : m("pg.send"));
     responsePanel.setAttribute("aria-busy", String(Boolean(active)));
     for (const item of historyList.querySelectorAll("button")) item.disabled = busy;
+    for (const item of scenePicker.querySelectorAll("button")) {
+      item.disabled = busy;
+      item.classList.toggle("is-selected", item.dataset.scene === activeScene);
+      item.setAttribute("aria-pressed", String(item.dataset.scene === activeScene));
+    }
+    choiceForm?.setBusy(busy);
     mediaBox.hidden = isGet();
     editorDetails.hidden = isGet();
     editorTools.hidden = isGet();
@@ -317,10 +398,10 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
 
   function snapshot() {
     const route = ROUTES[endpoint.value];
-    if (!route) throw new Error("请选择支持的同源接口。");
+    if (!route) throw new Error(m("pg.selectEndpoint"));
     if (route.method === "GET") return { endpoint: endpoint.value, method: "GET", body: "", payload: null };
     const payload = parsePayload(editor.value);
-    if (new TextEncoder().encode(editor.value).byteLength > 12 * MIB) throw new Error("请求超过 12 MiB，请减少附件或文字。");
+    if (new TextEncoder().encode(editor.value).byteLength > 12 * MIB) throw new Error(m("pg.requestSize"));
     return { endpoint: endpoint.value, method: "POST", body: editor.value, payload };
   }
 
@@ -329,59 +410,69 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
     pythonTab.setAttribute("aria-pressed", String(language === "python"));
     curlTab.className = language === "curl" ? "btn small" : "btn small ghost";
     pythonTab.className = language === "python" ? "btn small" : "btn small ghost";
-    copyCodeButton.textContent = language === "curl" ? "复制 curl" : "复制 Python";
+    setText(copyCodeButton, language === "curl" ? m("pg.copyCurl") : m("pg.copyPython"));
     if (!examples.open) return;
-    try { codePreview.textContent = requestCode(snapshot(), language, true); }
-    catch (problem) { codePreview.textContent = `请先完成有效的 JSON 请求：${problem.message}`; }
+    try { setText(codePreview, requestCode(snapshot(), language, true)); }
+    catch (problem) { setText(codePreview, m("pg.invalidCodeJSON", { error: problem.message })); }
   }
 
-  function refreshEditor() {
+  function refreshEditor({ syncForm = true } = {}) {
     const bytes = new TextEncoder().encode(editor.value).byteLength;
-    editorSummary.textContent = `请求 JSON · ${numeric(bytes / 1024, 1)} KiB`;
+    setText(editorSummary, m("pg.editorBytes", { size: numeric(bytes / 1024, 1) }));
     mediaPreview.replaceChildren();
     if (!isGet()) {
       try {
-        const entries = mediaEntries(parsePayload(editor.value), endpoint.value);
+        const payload = parsePayload(editor.value);
+        if (syncForm) choiceForm?.sync(endpoint.value === "/v1/systemone" ? payload : null, activeScene);
+        const entries = mediaEntries(payload, endpoint.value);
         for (const entry of entries.slice(0, 8)) {
           const figure = node("figure", "pg-media-item");
           if (inlineImageBytes(entry.url) !== null) {
             const image = node("img", "pg-thumbnail");
             Object.assign(image, { src: entry.url, alt: entry.label, width: 72, height: 72 });
             figure.append(image);
-          } else figure.append(node("span", "hint", "无法预览此附件"));
+          } else figure.append(node("span", "hint", m("pg.noPreview")));
           const name = mediaNames.get(entry.url);
           figure.append(node("figcaption", "hint", `${entry.label}${name ? ` · ${name}` : ""}`));
           mediaPreview.append(figure);
         }
-        if (entries.length > 8) mediaPreview.append(node("p", "error", `当前有 ${entries.length} 张图片/帧；服务最多接受 8 张。`));
-      } catch { /* Incomplete JSON is normal while typing; send/format reports it. */ }
-    }
+        if (entries.length > 8) mediaPreview.append(node("p", "error", m("pg.tooManyPreviews", { count: entries.length })));
+      } catch { if (syncForm) choiceForm?.sync(null, activeScene); /* Incomplete JSON stays in the advanced editor. */ }
+    } else if (syncForm) choiceForm?.sync(null, null);
     refreshCode();
   }
 
-  function resetResponse(message = "请求已准备好，尚未发送。") {
+  function resetResponse(message = m("pg.ready")) {
     fullResponse = "";
-    responseBadge.textContent = "尚未发送";
+    lastResponse = null;
+    lastLog = null;
+    renderLog();
+    setText(responseBadge, m("pg.notSent"));
     responseBadge.className = "badge";
-    statusMetric.textContent = timeMetric.textContent = tokenMetric.textContent = "—";
+    setText(statusMetric, timeMetric.textContent = serverMetric.textContent = tokenMetric.textContent = "—");
+    timingDetails.hidden = true;
+    timingDetails.open = false;
+    timingBreakdown.replaceChildren();
     responseSummary.className = "pg-response-summary empty-state";
-    responseSummary.textContent = message;
-    responsePreview.textContent = "尚无响应。";
+    setText(responseSummary, message);
+    setText(responsePreview, m("pg.noResponse"));
     rawDetails.hidden = true;
     rawDetails.open = false;
-    rawPre.textContent = "";
+    setText(rawPre, "");
     setBusy();
   }
 
   function applyPreset(key) {
     if (active || uploading || !PRESETS[key]) return;
-    const example = PRESETS[key];
+    const example = CHOICE_SCENES[key] ? { ...PRESETS[key], ...CHOICE_SCENES[key] } : PRESETS[key];
     clearError();
     preset.value = key;
+    activeScene = Object.hasOwn(CHOICE_SCENES, key) ? key : null;
     endpoint.value = example.endpoint;
-    presetNote.textContent = example.note;
-    editor.value = example.body ? JSON.stringify(example.body, null, 2) : "";
-    editorDetails.open = true;
+    setText(presetNote, example.note);
+    const body = activeScene ? choicePreset(activeScene) : example.body;
+    editor.value = body ? JSON.stringify(body, null, 2) : "";
+    editorDetails.open = !activeScene;
     mediaBox.open = key === "image" || key === "video";
     resetResponse();
     refreshEditor();
@@ -389,13 +480,13 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
 
   function renderHistory() {
     historyList.replaceChildren();
-    if (!history.length) { historyList.append(node("li", "hint", "还没有请求。")); return; }
+    if (!history.length) { historyList.append(node("li", "hint", m("pg.noHistory"))); return; }
     for (const entry of history) {
       const item = node("li", "pg-history-item");
       const restore = button("", "btn small ghost pg-restore");
       restore.dataset.historyId = String(entry.id);
-      restore.textContent = `${entry.time} · ${entry.method} ${entry.endpoint} · ${entry.status}`;
-      restore.title = "恢复此请求；不会自动发送";
+      setText(restore, `${entry.time} · ${entry.method} ${entry.endpoint} · ${entry.status}`);
+      setAttr(restore, "title", entry.log?.requestId ? m("pg.restoreWithRequestId", { id: entry.log.requestId }) : m("pg.restore"));
       item.append(restore);
       historyList.append(item);
     }
@@ -405,39 +496,51 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
   async function copy(text, label) {
     try {
       await navigator.clipboard.writeText(text);
-      tell(`${label}已复制。`);
-    } catch (problem) { error(`无法复制：${problem.message || "浏览器未开放剪贴板权限"}。可展开内容后手动选择复制。`); }
+      tell(m("pg.copied", { label }));
+    } catch (problem) { error(m("pg.copyFailed", { error: problem.message || m("pg.clipboardDenied") })); }
   }
+
+  function renderLog() {
+    requestLog.hidden = !lastLog;
+    requestLog.className = `hint pg-request-log${lastLog?.status === "error" ? " error" : ""}`;
+    setText(requestLogStatus, lastLog ? logLabel(lastLog) : "");
+    setText(requestLogId, lastLog?.requestId || "");
+    requestLogId.hidden = !lastLog?.requestId;
+    copyLogIdButton.hidden = !lastLog?.requestId;
+  }
+  on(copyLogIdButton, "click", () => {
+    if (lastLog?.requestId) void copy(lastLog.requestId, m("pg.requestId"));
+  });
 
   function summarize(data, ok, httpStatus) {
     responseSummary.className = "pg-response-summary";
-    responseSummary.replaceChildren();
+    setText(responseSummary, "");
     if (!ok) {
-      responseSummary.append(node("h3", "error", `请求失败 · HTTP ${httpStatus}`));
+      responseSummary.append(node("h3", "error", m("pg.requestFailed", { status: httpStatus })));
       const detail = data?.detail;
       if (Array.isArray(detail)) {
         const list = node("ul", "pg-errors");
-        for (const item of detail.slice(0, 8)) list.append(node("li", "", `${Array.isArray(item?.loc) ? item.loc.join(".") : "请求"}：${item?.msg || "校验失败"}`));
-        if (detail.length > 8) list.append(node("li", "hint", `另有 ${detail.length - 8} 项，见完整响应。`));
+        for (const item of detail.slice(0, 8)) list.append(node("li", "", `${Array.isArray(item?.loc) ? item.loc.join(".") : m("pg.request")}：${item?.msg || m("pg.validationFailed")}`));
+        if (detail.length > 8) list.append(node("li", "hint", m("pg.moreErrors", { count: detail.length - 8 })));
         responseSummary.append(list);
-      } else responseSummary.append(node("p", "", typeof detail === "string" ? detail : "服务返回错误，详情见下方原始响应。"));
+      } else responseSummary.append(node("p", "", typeof detail === "string" ? detail : m("pg.serverError")));
       return;
     }
     if (data?.answers && typeof data.answers === "object") {
       for (const [name, answer] of Object.entries(data.answers)) {
         const block = node("article", "pg-answer");
-        block.append(node("h3", "", `${name} · ${answer?.type || "回答"}`));
-        let value = "详见响应 JSON";
+        block.append(node("h3", "", `${name} · ${answer?.type || m("pg.answer")}`));
+        let value = m("pg.seeJSON");
         if (answer?.type === "choice") value = String(answer.choice ?? "—");
         if (answer?.type === "noul") value = `P(true) = ${numeric(answer.noul * 100)}%`;
-        if (answer?.type === "score") value = `期望等级 ${numeric(answer.score, 4)}`;
+        if (answer?.type === "score") value = m("pg.expectedScore", { score: numeric(answer.score, 4) });
         block.append(node("p", "pg-answer-value", value));
         if (typeof answer?.confidence === "number") block.append(node("p", "hint", `confidence ${numeric(answer.confidence, 4)}`));
         if (answer?.probabilities && typeof answer.probabilities === "object") {
           const probabilities = Object.entries(answer.probabilities).sort((a, b) => Number(b[1]) - Number(a[1]));
           const list = node("ul", "pg-probabilities");
           for (const [key, probability] of probabilities.slice(0, 6)) list.append(node("li", "", `${key}：${numeric(probability * 100)}%`));
-          if (probabilities.length > 6) list.append(node("li", "hint", `另有 ${probabilities.length - 6} 个候选，见完整 JSON。`));
+          if (probabilities.length > 6) list.append(node("li", "hint", m("pg.moreCandidates", { count: probabilities.length - 6 })));
           block.append(list);
         }
         responseSummary.append(block);
@@ -445,78 +548,116 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
     } else if (Array.isArray(data?.choices)) {
       for (const choice of data.choices) {
         const content = choice?.message?.content;
-        responseSummary.append(node("p", "pg-native-text", typeof content === "string" ? content : "响应中没有文字 content，请查看原始 JSON。"));
-        if (choice?.finish_reason) responseSummary.append(node("p", "hint", `结束原因：${choice.finish_reason}`));
+        responseSummary.append(node("p", "pg-native-text", typeof content === "string" ? content : m("pg.noTextContent")));
+        if (choice?.finish_reason) responseSummary.append(node("p", "hint", m("pg.finishReason", { reason: choice.finish_reason })));
       }
     } else if (Array.isArray(data?.models)) {
       const list = node("ul", "pg-models");
-      for (const model of data.models) list.append(node("li", "", `${model?.name ?? model?.id ?? "未命名"}${model?.description ? ` — ${model.description}` : ""}`));
+      for (const model of data.models) list.append(node("li", "", `${model?.name ?? model?.id ?? m("pg.unnamed")}${model?.description ? ` — ${model.description}` : ""}`));
       responseSummary.append(list);
     } else if (data?.status) {
-      responseSummary.append(node("p", "pg-answer-value", `服务状态：${data.status}`));
-      if (data.backend) responseSummary.append(node("p", "hint", `当前后端：${data.backend}`));
-    } else responseSummary.append(node("p", "", "已收到响应，内容见下方预览。"));
-    if (data?.qev?.decision_adapter_enabled === false) responseSummary.append(node("p", "hint", "原生生成：决策适配器已关闭。"));
-    if (Array.isArray(data?.qev?.input_modalities) && data.qev.input_modalities.some((item) => item !== "text") && data.qev.multimodal_decision_accuracy_validated === false) responseSummary.append(node("p", "hint", "当前版本尚未评估多模态决策准确率。"));
+      responseSummary.append(node("p", "pg-answer-value", m("pg.serviceStatus", { status: data.status })));
+      if (data.backend) responseSummary.append(node("p", "hint", m("pg.currentBackend", { backend: data.backend })));
+    } else responseSummary.append(node("p", "", m("pg.received")));
+    if (data?.qev?.decision_adapter_enabled === false) responseSummary.append(node("p", "hint", m("pg.adapterOff")));
+    if (Array.isArray(data?.qev?.input_modalities) && data.qev.input_modalities.some((item) => item !== "text") && data.qev.multimodal_decision_accuracy_validated === false) responseSummary.append(node("p", "hint", m("pg.mediaAccuracy")));
   }
 
   async function send() {
     if (active || uploading || disposed) return;
     clearError();
+    lastLog = null;
+    renderLog();
     let request;
     try {
       request = snapshot();
+      if (request.endpoint === "/v1/systemone") {
+        // Ctrl+Enter can precede the editor debounce: the submitted JSON is
+        // authoritative even when the previous scenario is still highlighted.
+        if (activeScene && !editableChoice(request.payload)) { activeScene = null; setBusy(); }
+        validateChoiceScene(request.payload, activeScene);
+      }
       const content = request.payload ? contentArrays(request.payload, request.endpoint).flat() : [];
-      if (preset.value === "image" && !content.some((item) => item?.type === "image_url")) throw new Error("请先添加图片，再发送图片示例。");
-      if (preset.value === "video" && !content.some((item) => item?.type === "video" && item.frames?.length)) throw new Error("请先添加视频帧，再发送视频示例。");
-    } catch (problem) { resetResponse("当前请求未发送，请先修正输入。"); error(`未发送：${problem.message}`); return; }
-    resetResponse("请求已发送，等待服务返回…");
-    const run = { controller: new AbortController(), started: performance.now(), cancelled: false };
+      if (preset.value === "image" && !content.some((item) => item?.type === "image_url")) throw new Error(m("pg.needImage"));
+      if (preset.value === "video" && !content.some((item) => item?.type === "video" && item.frames?.length)) throw new Error(m("pg.needVideo"));
+      uploading = true;
+      setBusy();
+      if (request.payload) await validateMedia(request.payload, request.endpoint);
+    } catch (problem) { uploading = false; resetResponse(m("pg.fixInput")); error(m("pg.notSentError", { error: problem.message })); return; }
+    uploading = false;
+    if (disposed) return;
+    resetResponse(m("pg.waitingService"));
+    const run = { controller: new AbortController(), started: null, finished: null, cancelled: false };
     active = run;
-    const record = { ...request, payload: undefined, id: ++historyId, time: new Date().toLocaleTimeString("zh-CN", { hour12: false }), status: "等待响应" };
+    const record = { ...request, payload: undefined, scene: activeScene, id: ++historyId, time: new Date().toLocaleTimeString(getLocale(), { hour12: false }), status: m("pg.waiting") };
     history.unshift(record);
     history.splice(5);
     renderHistory();
-    responseBadge.textContent = "等待响应";
-    ticker = setInterval(() => { if (!disposed && active === run) timeMetric.textContent = `${numeric(performance.now() - run.started, 0)} ms`; }, 100);
+    setText(responseBadge, m("pg.waiting"));
+    ticker = setInterval(() => {
+      if (!disposed && active === run && run.started !== null && run.finished === null) setText(timeMetric, `${numeric(performance.now() - run.started, 1)} ms`);
+    }, 100);
     setBusy();
     try {
+      run.started = performance.now();
       const response = await fetch(request.endpoint, {
         method: request.method, credentials: "same-origin", signal: run.controller.signal,
         ...(request.method === "POST" ? { headers: { "Content-Type": "application/json" }, body: request.body } : {}),
       });
-      statusMetric.textContent = String(response.status);
       const text = await response.text();
+      run.finished = performance.now();
       if (disposed || active !== run) return;
+      if (run.cancelled) {
+        const cancelled = new Error();
+        cancelled.name = "AbortError";
+        throw cancelled;
+      }
+      lastLog = responseLog(response.headers);
+      record.log = lastLog;
+      renderLog();
+      setText(statusMetric, String(response.status));
       let data = null;
       try { data = JSON.parse(text); } catch { /* A real non-JSON response is shown unchanged. */ }
       fullResponse = text;
       rawDetails.hidden = !text;
-      rawSummary.textContent = `展开完整原始响应 · ${numeric(new TextEncoder().encode(text).byteLength / 1024, 1)} KiB`;
-      responsePreview.textContent = data === null ? (text.length > 16000 ? `${text.slice(0, 16000)}\n…[展开查看完整内容]` : text || "空响应体。") : compactPreview(data);
-      responseBadge.textContent = response.ok ? `HTTP ${response.status}` : `HTTP ${response.status} · 失败`;
+      setText(rawSummary, m("pg.rawBytes", { size: numeric(new TextEncoder().encode(text).byteLength / 1024, 1) }));
+      setText(responsePreview, data === null ? (text.length > 16000 ? `${text.slice(0, 16000)}\n${t("pg.expandFull")}` : text || m("pg.emptyBody")) : compactPreview(data));
+      setText(responseBadge, response.ok ? `HTTP ${response.status}` : m("pg.failedStatus", { status: response.status }));
       responseBadge.className = response.ok ? "badge" : "badge error";
       record.status = `HTTP ${response.status}`;
       const usage = data?.usage;
-      if (usage) tokenMetric.textContent = `${numeric(usage.input_tokens ?? usage.prompt_tokens, 0)} / ${numeric(usage.output_tokens ?? usage.completion_tokens, 0)}`;
+      if (usage) setText(tokenMetric, `${numeric(usage.input_tokens ?? usage.prompt_tokens, 0)} / ${numeric(usage.output_tokens ?? usage.completion_tokens, 0)}`);
+      const timings = responseTimings(data);
+      setText(serverMetric, timings.server === null ? "—" : `${numeric(timings.server)} ms`);
+      for (const { label, value } of timings.parts) {
+        const part = node("div", "pg-timing-part");
+        part.append(node("dt", "", label), node("dd", "", `${numeric(value)} ms`));
+        timingBreakdown.append(part);
+      }
+      timingDetails.hidden = !timings.parts.length;
+      lastResponse = { data, ok: response.ok, status: response.status };
       summarize(data, response.ok, response.status);
-      if (!response.ok) tell(`请求失败：HTTP ${response.status}，错误已保留在响应中。`, "error");
+      if (!response.ok) tell(m("pg.httpError", { status: response.status }), "error");
     } catch (problem) {
+      run.finished ??= performance.now();
       if (disposed || active !== run) return;
+      lastLog = null;
+      record.log = null;
+      renderLog();
       const cancelled = run.cancelled || problem.name === "AbortError";
-      const message = cancelled ? "已停止等待。服务可能仍在推理；这不代表服务端任务已取消。" : `网络请求失败：${problem.message || "未收到服务响应"}`;
-      record.status = cancelled ? "停止等待" : "网络错误";
-      responseBadge.textContent = record.status;
+      const message = cancelled ? m("pg.cancelled") : m("pg.networkFailed", { error: problem.message || m("pg.noServiceResponse") });
+      record.status = cancelled ? m("pg.cancel") : m("pg.networkError");
+      setText(responseBadge, record.status);
       responseBadge.className = cancelled ? "badge" : "badge error";
       responseSummary.className = "pg-response-summary";
-      responseSummary.textContent = message;
-      responsePreview.textContent = "未取得完整响应体。";
+      setText(responseSummary, message);
+      setText(responsePreview, m("pg.incompleteBody"));
       tell(message, cancelled ? "info" : "error");
     } finally {
       clearInterval(ticker);
       ticker = null;
       if (!disposed && active === run) {
-        timeMetric.textContent = `${numeric(performance.now() - run.started, 0)} ms`;
+        setText(timeMetric, run.started === null ? "—" : `${numeric((run.finished ?? performance.now()) - run.started, 1)} ms`);
         active = null;
         renderHistory();
         setBusy();
@@ -530,8 +671,8 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
       readers.add(reader);
       const finish = () => readers.delete(reader);
       reader.onload = () => { finish(); resolve(reader.result); };
-      reader.onerror = () => { finish(); reject(new Error(`无法读取 ${file.name}。`)); };
-      reader.onabort = () => { finish(); reject(new Error("附件读取已停止。")); };
+      reader.onerror = () => { finish(); reject(new Error(m("pg.fileReadFailed", { file: file.name }))); };
+      reader.onabort = () => { finish(); reject(new Error(m("pg.readAborted"))); };
       reader.readAsDataURL(file);
     });
   }
@@ -548,9 +689,62 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
         if (dimensions.size > 16) dimensions.delete(dimensions.keys().next().value);
         resolve(size);
       };
-      image.onerror = () => { probes.delete(image); reject(new Error("图片无法解码，请使用有效的 PNG、JPEG 或 WebP。")); };
+      image.onerror = () => { probes.delete(image); reject(new Error(m("pg.imageDecode"))); };
       image.src = url;
     });
+  }
+
+  async function validateMedia(payload, path) {
+    const entries = mediaEntries(payload, path);
+    if (entries.length > 8) throw new Error(m("pg.maxImages"));
+    let bytes = 0, pixels = 0;
+    for (const entry of entries) {
+      const amount = inlineImageBytes(entry.url);
+      if (amount === null) throw new Error(m("pg.invalidImage", { label: entry.label }));
+      if (amount > 2 * MIB) throw new Error(m("pg.largeImage", { label: entry.label }));
+      bytes += amount;
+      if (bytes > 8 * MIB) throw new Error(m("pg.maxImageBytes"));
+      const size = await imageDimensions(entry.url);
+      const count = size.width * size.height;
+      if (!count || count > 4000000) throw new Error(m("pg.manyPixels", { label: entry.label }));
+      pixels += count;
+      if (pixels > 8000000) throw new Error(m("pg.maxImagePixels"));
+    }
+    for (const content of contentArrays(payload, path)) {
+      for (const item of content) {
+        if (item?.type !== "video" || !Array.isArray(item.frames)) continue;
+        const rate = item.fps === undefined ? 1 : item.fps;
+        if (!Number.isFinite(rate) || rate <= 0 || rate > 60) throw new Error(m("pg.videoFps"));
+        const sizes = await Promise.all(item.frames.map(imageDimensions));
+        if (sizes.some((size) => size.width !== sizes[0].width || size.height !== sizes[0].height)) throw new Error(m("pg.frameDimensions"));
+      }
+    }
+  }
+
+  async function uploadChoiceImage(file, mutate, expected) {
+    if (active || uploading || disposed) return;
+    uploading = true;
+    clearError();
+    setBusy();
+    try {
+      const request = snapshot();
+      if (request.endpoint !== "/v1/systemone" || JSON.stringify(request.payload) !== expected) throw new Error(m("pg.staleImage"));
+      if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) throw new Error(m("pg.imageType"));
+      if (!file.size || file.size > 2 * MIB) throw new Error(m("pg.imageSize"));
+      const url = await readFile(file);
+      if (disposed) return;
+      mutate(request.payload, url);
+      await validateMedia(request.payload, request.endpoint);
+      if (disposed) return;
+      const updated = JSON.stringify(request.payload, null, 2);
+      if (new TextEncoder().encode(updated).byteLength > 12 * MIB) throw new Error(m("pg.requestSize"));
+      mediaNames.set(url, file.name);
+      if (mediaNames.size > 16) mediaNames.delete(mediaNames.keys().next().value);
+      editor.value = updated;
+      resetResponse(m("pg.imageUpdated"));
+      refreshEditor();
+    } catch (problem) { if (!disposed) error(problem.message); }
+    finally { uploading = false; if (!disposed) setBusy(); }
   }
 
   async function addFiles(files, asVideo) {
@@ -560,26 +754,26 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
     setBusy();
     try {
       const request = snapshot();
-      if (request.method !== "POST") throw new Error("GET 接口不接受媒体，请先选择决策或原生生成接口。");
+      if (request.method !== "POST") throw new Error(m("pg.getMedia"));
       const existing = mediaEntries(request.payload, request.endpoint);
-      if (existing.length + files.length > 8) throw new Error("一个请求的图片与视频帧合计最多 8 张；请先移除部分媒体。");
+      if (existing.length + files.length > 8) throw new Error(m("pg.maxMedia"));
       let totalBytes = 0;
       for (const item of existing) {
         const bytes = inlineImageBytes(item.url);
-        if (bytes === null) throw new Error("现有附件不是有效的内嵌 PNG/JPEG/WebP data URL，请先修正 JSON。");
-        if (bytes > 2 * MIB) throw new Error("现有图片超过每张 2 MiB 的限制。");
+        if (bytes === null) throw new Error(m("pg.invalidExisting"));
+        if (bytes > 2 * MIB) throw new Error(m("pg.largeExisting"));
         totalBytes += bytes;
       }
       const rate = Number(fps.value);
-      if (asVideo && (!Number.isFinite(rate) || rate <= 0 || rate > 60)) throw new Error("fps 须大于 0 且不超过 60。");
+      if (asVideo && (!Number.isFinite(rate) || rate <= 0 || rate > 60)) throw new Error(m("pg.validFps"));
       const ordered = [...files];
       if (asVideo) ordered.sort((a, b) => a.name.localeCompare(b.name, "zh-CN", { numeric: true }));
       for (const file of ordered) {
-        if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) throw new Error(`${file.name}：只接受 PNG、JPEG 或 WebP 图片。`);
-        if (!file.size || file.size > 2 * MIB) throw new Error(`${file.name}：图片须非空且不超过 2 MiB。`);
+        if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) throw new Error(m("pg.fileType", { file: file.name }));
+        if (!file.size || file.size > 2 * MIB) throw new Error(m("pg.fileSize", { file: file.name }));
         totalBytes += file.size;
       }
-      if (totalBytes > 8 * MIB) throw new Error("全部图片与帧的原始文件大小合计不能超过 8 MiB。");
+      if (totalBytes > 8 * MIB) throw new Error(m("pg.allImageBytes"));
       const urls = [];
       for (const file of ordered) {
         const url = await readFile(file);
@@ -594,39 +788,56 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
         const size = await imageDimensions(url);
         if (disposed) return;
         const pixels = size.width * size.height;
-        if (!pixels || pixels > 4000000) throw new Error("每张图片最多 400 万像素，请先缩小图片。");
+        if (!pixels || pixels > 4000000) throw new Error(m("pg.imagePixels"));
         totalPixels += pixels;
         sizes.push(size);
       }
-      if (totalPixels > 8000000) throw new Error("请求内所有图片与帧合计最多 800 万像素。");
+      if (totalPixels > 8000000) throw new Error(m("pg.allPixels"));
       const newSizes = sizes.slice(existing.length);
-      if (asVideo && newSizes.some((size) => size.width !== newSizes[0].width || size.height !== newSizes[0].height)) throw new Error("同一视频的所有采样帧须有相同宽度和高度。");
+      if (asVideo && newSizes.some((size) => size.width !== newSizes[0].width || size.height !== newSizes[0].height)) throw new Error(m("pg.frameDimensions"));
       const content = mediaTarget(request.payload, request.endpoint);
       if (asVideo) content.push({ type: "video", frames: urls, fps: rate });
       else content.push(...urls.map((url) => ({ type: "image_url", image_url: { url } })));
       const updated = JSON.stringify(request.payload, null, 2);
-      if (new TextEncoder().encode(updated).byteLength > 12 * MIB) throw new Error("加入附件后请求超过 12 MiB，请减少图片或文字。");
+      if (new TextEncoder().encode(updated).byteLength > 12 * MIB) throw new Error(m("pg.largeMediaRequest"));
       editor.value = updated;
       editorDetails.open = updated.length < 120000;
-      resetResponse("附件已加入当前请求，尚未发送。");
+      resetResponse(m("pg.mediaAdded"));
       refreshEditor();
-      tell(`已加入 ${urls.length} ${asVideo ? "帧" : "张图片"}；请检查预览后发送。`);
+      tell(m("pg.addedFiles", { count: urls.length, kind: asVideo ? m("pg.frames") : m("pg.images") }));
     } catch (problem) { if (!disposed) error(problem.message); }
     finally { uploading = false; if (!disposed) setBusy(); }
   }
 
+  choiceForm = mountChoiceForm(choiceFormContainer, {
+    read: () => snapshot().payload,
+    write(payload, syncForm) {
+      editor.value = JSON.stringify(payload, null, 2);
+      clearError();
+      resetResponse(m("pg.requestEdited"));
+      refreshEditor({ syncForm });
+    },
+    upload: uploadChoiceImage,
+    onError: error,
+  });
+  on(scenePicker, "click", (event) => { const card = event.target.closest("button[data-scene]"); if (card) applyPreset(card.dataset.scene); });
   on(preset, "change", () => applyPreset(preset.value));
-  on(endpoint, "change", () => applyPreset({ "/v1/systemone": "decisions", "/v1/chat/completions": "text", "/health": "health", "/v1/models": "models" }[endpoint.value]));
+  on(endpoint, "change", () => applyPreset({ "/v1/systemone": "choice_text", "/v1/chat/completions": "text", "/health": "health", "/v1/models": "models" }[endpoint.value]));
   on(healthButton, "click", () => { applyPreset("health"); void send(); });
   on(modelsButton, "click", () => { applyPreset("models"); void send(); });
   on(sendButton, "click", () => { void send(); });
   on(cancelButton, "click", () => { if (active) { active.cancelled = true; active.controller.abort(); } });
   on(editor, "input", () => {
     preset.value = "";
-    presetNote.textContent = "自定义请求。发送前会检查 JSON，接口字段由服务端校验。";
+    setText(presetNote, m("pg.customNote"));
     clearError();
     clearTimeout(editorTimer);
-    editorTimer = setTimeout(refreshEditor, 250);
+    editorTimer = setTimeout(() => {
+      try {
+        if (activeScene && !editableChoice(parsePayload(editor.value))) { activeScene = null; setBusy(); }
+      } catch { /* Keep the selected scenario while incomplete JSON is being edited. */ }
+      refreshEditor();
+    }, 250);
   });
   on(editor, "keydown", (event) => {
     if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
@@ -636,15 +847,15 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
   });
   on(formatButton, "click", () => {
     try { editor.value = JSON.stringify(parsePayload(editor.value), null, 2); clearError(); refreshEditor(); }
-    catch (problem) { error(`无法格式化：${problem.message}`); }
+    catch (problem) { error(m("pg.formatFailed", { error: problem.message })); }
   });
-  on(copyRequestButton, "click", () => { try { void copy(snapshot().body, "请求 JSON"); } catch (problem) { error(problem.message); } });
-  on(copyResponseButton, "click", () => { if (fullResponse) void copy(fullResponse, "完整响应"); });
-  on(copyCodeButton, "click", () => { try { void copy(requestCode(snapshot(), language), language === "curl" ? "curl" : "Python 示例"); } catch (problem) { error(problem.message); } });
+  on(copyRequestButton, "click", () => { try { void copy(snapshot().body, m("pg.requestJSON")); } catch (problem) { error(problem.message); } });
+  on(copyResponseButton, "click", () => { if (fullResponse) void copy(fullResponse, m("pg.fullResponse")); });
+  on(copyCodeButton, "click", () => { try { void copy(requestCode(snapshot(), language), language === "curl" ? "curl" : m("pg.pythonExample")); } catch (problem) { error(problem.message); } });
   on(curlTab, "click", () => { language = "curl"; refreshCode(); });
   on(pythonTab, "click", () => { language = "python"; refreshCode(); });
   on(examples, "toggle", refreshCode);
-  on(rawDetails, "toggle", () => { rawPre.textContent = rawDetails.open ? fullResponse : ""; });
+  on(rawDetails, "toggle", () => { setText(rawPre, rawDetails.open ? fullResponse : ""); });
   on(imageButton, "click", () => imageInput.click());
   on(videoButton, "click", () => videoInput.click());
   on(imageInput, "change", () => { const files = [...imageInput.files]; imageInput.value = ""; void addFiles(files, false); });
@@ -660,7 +871,7 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
       editor.value = JSON.stringify(request.payload, null, 2);
       editorDetails.open = true;
       clearError();
-      resetResponse("已移除请求中的媒体，尚未发送。");
+      resetResponse(m("pg.mediaRemoved"));
       refreshEditor();
     } catch (problem) { error(problem.message); }
   });
@@ -670,20 +881,41 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
     const entry = history.find((item) => String(item.id) === target.dataset.historyId);
     if (!entry) return;
     endpoint.value = entry.endpoint;
+    activeScene = entry.scene || null;
     preset.value = "";
-    presetNote.textContent = "已恢复历史请求；只有再次发送才会调用服务。";
+    setText(presetNote, m("pg.historyNote"));
     editor.value = entry.body;
-    editorDetails.open = entry.body.length < 120000;
+    editorDetails.open = !activeScene && entry.body.length < 120000;
     clearError();
-    resetResponse("历史请求已恢复，尚未重新发送。");
+    resetResponse(m("pg.historyRestored"));
     refreshEditor();
   });
-  applyPreset("decisions");
+  const stopLocale = onLocaleChange(() => {
+    for (const [key, value] of Object.entries(CHOICE_SCENES)) {
+      const card = scenePicker.querySelector(`[data-scene="${key}"]`);
+      setText(card.querySelector("strong"), value.label);
+      setText(card.querySelector(".pg-scene-description"), value.description);
+      setText(preset.querySelector(`option[value="${key}"]`), value.label);
+      if (preset.value === key) setText(presetNote, value.note);
+    }
+    choiceForm?.refreshLocale();
+    refreshEditor({ syncForm: false });
+    renderHistory();
+    renderLog();
+    if (lastResponse) {
+      summarize(lastResponse.data, lastResponse.ok, lastResponse.status);
+      if (lastResponse.data !== null) setText(responsePreview, compactPreview(lastResponse.data));
+    }
+    setBusy();
+  });
+  applyPreset("choice_text");
   renderHistory();
 
   return () => {
     disposed = true;
+    stopLocale();
     listeners.abort();
+    choiceForm.destroy();
     active?.controller.abort();
     clearInterval(ticker);
     clearTimeout(editorTimer);
@@ -695,6 +927,8 @@ export function mountPlayground(container, { notify = () => {} } = {}) {
     mediaNames.clear();
     history.length = 0;
     fullResponse = "";
+    lastResponse = null;
+    lastLog = null;
     root.remove();
   };
 }

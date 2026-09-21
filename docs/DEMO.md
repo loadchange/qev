@@ -1,32 +1,48 @@
-# Qev 终端贪吃蛇与接口实验室
+# Qev terminal Snake and API lab
 
-贪吃蛇首选终端运行；网页保留游戏可视化和 API playground。终端可直接加载一个本地模型，也可连接已有服务。两种界面共用游戏规则与 `GameStore` 决策链路，每一步方向选择都执行真实推理。网页接口测试覆盖结构化决策及原生生成；健康检查和模型列表只读取服务信息。
+**English** | [简体中文](DEMO.zh-CN.md)
 
-## 终端运行
+The terminal is the primary Snake interface; the web app also provides game visualization and an API playground. The terminal can load a local model or connect to an existing service. Both interfaces share the game rules and `GameStore` decision path, with real inference for every direction choice. The web playground covers structured decisions and native generation; health and model-list requests only read service information.
 
-从仓库根目录启动：
+## Run in the terminal
+
+A fresh clone includes only code. First install the MLX dependencies and download the model (Apple Silicon, about 3.48 GB):
+
+```bash
+uv sync --python 3.12 --extra mlx --extra dev
+uv run hf download twainsk/qev-0.8b-mlx --local-dir models/qev-snake-0.8b-mlx
+```
+
+Start from the repository root:
 
 ```bash
 .venv/bin/qev snake
 ```
 
-默认优先加载存在的 `models/qev-snake-0.8b-mlx`，否则加载 `models/qev-0.8b-mlx`。贪吃蛇专项训练及新权重已完成，评测条件与成绩见 [专项模型说明](SNAKE_MODEL.md)。显式 `--model` 始终优先，例如固定使用历史模型：
+The terminal prefers `models/qev-snake-0.8b-mlx` when present, otherwise `models/qev-0.8b-mlx`. Snake-specific training and the new weights are complete; see the [Snake model report](SNAKE_MODEL.md) for evaluation conditions and results. An explicit `--model` always takes precedence. For example, to use the historical model:
 
 ```bash
 .venv/bin/qev snake --model models/qev-0.8b-mlx --backend mlx \
   --seed 7 --size 12 --max-steps 500 --observation spatial
 ```
 
-| 键位 | 行为 |
+| Key | Behavior |
 | --- | --- |
-| 空格 | 暂停或继续安排下一次模型决策。 |
-| `N` | 暂停时请求并执行一步。 |
-| `+` / `-` | 增减每秒步数上限，实际速度仍受推理耗时限制。 |
-| `Q` / Ctrl-C | 退出并释放本次创建的游戏会话；Ctrl-C 返回退出码 130。 |
+| Space | Pause or resume scheduling the next model decision. |
+| `N` | Request and execute one step while paused. |
+| `+` / `-` | Increase or decrease the step-rate limit; actual speed is still limited by inference time. |
+| `Q` / Ctrl-C | Exit and release the game session created by this run; Ctrl-C returns exit code 130. |
 
-终端显示当前棋盘、得分、步数、真实动作和候选概率，以及推理毫秒数、输入 token 数。默认使用备用屏幕并在退出时恢复光标和键盘模式；`--no-alt-screen` 保留末帧，`--no-color` 或环境变量 `NO_COLOR` 关闭颜色。按键在两次模型调用之间处理，已开始的推理可能仍需完成。
+The terminal shows the board, score, step count, real action, candidate probabilities, inference time in milliseconds, and input token count. It uses the alternate screen by default and restores the cursor and keyboard mode on exit. `--no-alt-screen` keeps the final frame; `--no-color` or the `NO_COLOR` environment variable disables color. Keys are handled between model calls, so an inference already in progress may still need to finish.
 
-`--fps 0` 取消步间限速，`--episodes` 连续运行 1–100 局，每局种子递增。非 TTY 输出自动启用 headless，也可显式指定；headless 向标准输出打印 JSON 汇总：
+The terminal uses a dark arcade dashboard with a gradient snake body, directional head, amber food, a large score, and a separate probability panel. It adapts to window width and height, showing full panels in larger windows and a compact layout in smaller ones. The probability panel shows the most recently executed decision; the board shows the state after that action. Colors and layout do not affect inference, action selection, or report contents.
+
+![Qev terminal Snake interface](assets/snake-terminal.png)
+
+This image redraws the repository's [historical terminal record](results/snake_training/terminal_controls.json) with the current renderer. It is not a result from a new model run.
+See the [80×24 compact layout](assets/snake-terminal-compact.png) for a narrow window.
+
+`--fps 0` removes the delay between steps. `--episodes` runs 1–100 games in sequence, incrementing the seed for each game. Non-TTY output automatically enables headless mode, which can also be selected explicitly. Headless mode prints a JSON summary to standard output:
 
 ```bash
 .venv/bin/qev snake --model models/qev-0.8b-mlx --observation spatial \
@@ -37,103 +53,155 @@
   --report runs/snake-local.jsonl
 ```
 
-上述两次运行固定同一个 checkpoint、种子范围与规则，比较 `spatial` 和 `local` 观测的影响。比较训练效果时应固定同一观测模式再更换 checkpoint，分别报告模型变化与环境辅助变化。相同种子保证初始棋盘一致；后续食物也取决于动作序列。
+These runs hold the checkpoint, seed range, and rules fixed to compare `spatial` and `local` observations. To compare training effects, keep the observation mode fixed and change the checkpoint; report model changes separately from changes in environment assistance. Identical seeds produce identical initial boards, but later food placement also depends on the action sequence.
 
-报告为逐条刷新到磁盘的 JSONL，包含启动设置、模型来源、每局初始状态、每步原始请求/响应/概率/执行动作、棋盘快照及结束汇总。目标文件必须不存在；中途退出后已写记录仍可读取。模型异常返回非零退出码；正常碰撞、饥饿或达到步数上限属于有效游戏结果。结果中的 `state_confirmed=false` 表示请求失败后也无法重新读取状态，该局末次快照可能落后于服务端。
+Reports are JSONL records flushed to disk individually. They include startup settings, model source, each game's initial state, every step's original request/response/probabilities/executed action, board snapshots, and final summaries. The destination must not already exist. Records written before an interruption remain readable. Model errors return a nonzero exit code; ordinary collisions, starvation, and reaching the step limit are valid game outcomes. `state_confirmed=false` means the state could not be read again after a failed request, so the final local snapshot may lag behind the server.
 
-如已有服务，终端可直接复用它，避免另外加载模型：
+If a service is already running, reuse it from the terminal to avoid loading another model:
 
 ```bash
 .venv/bin/qev snake --base-url http://127.0.0.1:8008 \
   --seed 7 --observation spatial --report runs/snake-http.jsonl
 ```
 
-`--base-url` 与 `--model` 互斥，HTTP 模式不接受本地 `--backend` / `--device` 选择。请求超时默认 120 秒，可用 `--request-timeout` 修改；动作 POST 从不自动重试。响应丢失或中断后只尝试读取一次当前状态，并清理本次创建的会话，避免把同一步执行两次。
+`--base-url` and `--model` are mutually exclusive. HTTP mode does not accept local `--backend` / `--device` selection. Requests time out after 120 seconds by default; change this with `--request-timeout`. Action POSTs are never automatically retried. After a lost response or interruption, the client only tries to read the current state once and cleans up the session it created, avoiding execution of the same step twice.
 
-## 网页服务与地址
+## Web service and addresses
 
-在仓库根目录使用已准备好的完整 MLX checkpoint：
+From the repository root, use a prepared complete MLX checkpoint:
 
 ```bash
 .venv/bin/python -m qev.cli serve \
-  --model models/qev-0.8b-mlx --backend mlx \
+  --model models/qev-snake-0.8b-mlx --backend mlx \
   --host 127.0.0.1 --port 8008
 ```
 
-启动时加载一次模型，等待服务就绪后访问：
+The model loads once at startup. Wait for the service to be ready, then visit:
 
-- 贪吃蛇：<http://127.0.0.1:8008/snake>
-- 接口测试：<http://127.0.0.1:8008/playground>
-- 交互式 API 文档：<http://127.0.0.1:8008/docs>
-- 健康检查：<http://127.0.0.1:8008/health>
+- Snake: <http://127.0.0.1:8008/snake>
+- API playground: <http://127.0.0.1:8008/playground>
+- Interactive API documentation: <http://127.0.0.1:8008/docs>
+- Health check: <http://127.0.0.1:8008/health>
 
-首页 `/` 同样打开模型实验室。网页没有独立前端开发服务器或 CDN 依赖；模型和接口仍由这一个 Python 进程提供。环境准备与模型产物说明参见 [README](../README.md)。
+The root `/` also opens the model lab. There is no separate frontend development server or CDN dependency: one Python process serves the model and interfaces. See the [README](../README.md) for environment setup and model artifacts.
 
-## 贪吃蛇如何决策
+On the first visit, the page selects English or Simplified Chinese from the browser language. A manual language switch is available, and the selected language is saved in the current browser for refreshes and future visits. Switching language updates interface text without translating the background, question, or candidates you edited, or changing raw request/response fields.
 
-游戏引擎维护棋盘、蛇身、食物和规则。每步把简短英文观测与三个非反向动作交给 `Agent.predict`，使用 Qev 的 `choice` 决策头。状态包含尺寸、头部与食物坐标、朝向、长度和未进食步数；每个候选包含下一格、是否撞墙或身体、能否吃到食物、曼哈顿距离及其变化。距离变化为负表示更靠近食物。
+The MLX service uses one persistent inference thread for startup warmup, structured decisions, native generation, and Snake inference. Current MLX compiler caches are local to the calling thread. The previous arrangement warmed up on the main thread and ran HTTP inference in a worker pool, where a worker could still compile on its first call. A fixed thread lets later requests reuse the warmed compiler cache. Model calls were already serialized by a lock, so this does not reduce existing model parallelism.
 
-默认 `spatial` 观测再加入四个**引擎计算的环境特征**：假设候选合法执行一步后，固定新蛇身，通过 BFS 计算头部可达空格与头部格的总数 `reachable_space`、尾部作为终点是否可达 `tail_reachable`、食物最短路径距离 `food_path_distance`，并统计目标格在最近 32 个头部位置中的访问次数 `recent_visits`。吃到当前食物时路径距离为 0，静态不可达时为 `null`。这些特征不查看未来食物随机数，也不证明身体继续移动后的长期安全。
+The service warms up three decision paths by default: text only, background images, and candidate images. This adds initialization before readiness, with actual timing in startup logs. `--no-warmup` independently disables warmup.
 
-终端明确显示“静态BFS环境特征·无动作接管”。这包含静态连通性与路径搜索辅助，不能描述成模型仅凭坐标自己学会了寻路；引擎不提供完整动作路线或“最佳动作”标签，不使用 Hamiltonian 循环接管。`--observation local` 仅保留历史的局部碰撞与曼哈顿距离特征。两种模式均只排除规则不允许的立即反向动作；可能撞墙或身体的候选仍然可选。进入本步会移走的尾巴格是合法动作。
+MLX GPU services also enable automatic memory management by default. For the service lifetime, they request bounded model memory residency, cap unused allocator buffers at 256 MiB while preserving any lower existing limit, and clear unused allocator buffers remaining after model loading. Active model weights and precision are unchanged, and answers are not cached. Startup logs show active and cached memory before and after adjustment. Residency is subject to system limits and the configured budget; original cache and residency settings are restored on exit. `--no-wired-memory` disables this group of automatic memory settings, independently of warmup.
 
-Qev 返回原始候选概率，服务直接执行最大概率对应的方向。模型首选、实际执行和原始请求/响应都保留在记录中，**没有安全接管或动作替换**。模型输出异常、概率无效或状态截断时，本局以 `model_error` 结束，不编造后备动作。
+Initial compilation, visual processing initialization, and accessing the model again under memory pressure can all make a request slower than consecutive calls. A delay of several seconds alone does not establish a memory problem. Apple Silicon uses unified memory, and swapping or other processes' memory use can affect latency. When retesting, keep the model, startup options, and inputs fixed, record memory conditions and service timing phases, and avoid running another copy of the model in parallel.
 
-历史 v0.2 的 `qev-0.8b` / `qev-0.8b-mlx` 未包含贪吃蛇训练。当前正在进行专项续训：由显式、确定性的启发式教师读取同一组可见特征，生成监督动作标签，并混入原任务数据回放；这属于模仿训练，不是最优策略证明，教师不会参与运行时动作选择。最终模型与游戏指标将在完成后另行记录。
+## How Snake makes decisions
 
-终端/网页棋盘只作可视化，没有作为图像输入模型；不能据此证明模型从原始棋盘学会长期规划。概率条表示候选选择概率，不是存活率。历史模型的温度来自通用文本任务，新 checkpoint 的校准范围需以对应训练报告为准。
+The game engine maintains the board, snake, food, and rules. Each step sends a short English observation and three non-reversing actions to `Agent.predict`, using Qev's `choice` head. State includes board size, head and food coordinates, heading, length, and steps since eating. Each candidate includes its next cell, whether it hits a wall or the body, whether it eats food, and Manhattan distance and its change. A negative distance change means moving closer to food.
 
-默认棋盘 12×12，初始长度 3，每局最多 500 步。撞墙、撞身、填满棋盘、达到步数上限或连续 `2 × size²` 步未进食都会结束本局。得分是吃到的食物数，达到步数上限不代表通关。
+The default `spatial` observation adds four **engine-computed environment features**. Assuming one legal candidate step and holding the resulting body fixed, BFS computes `reachable_space` (reachable empty cells plus the head cell), `tail_reachable` (whether the tail can be reached as the destination), and `food_path_distance` (the shortest path to food). `recent_visits` counts visits to the destination among the most recent 32 head positions. Food path distance is 0 when eating the current food and `null` when statically unreachable. These features do not inspect future food randomness or establish long-term safety as the body continues moving.
 
-## 网页操作与游戏 API
+The terminal explicitly labels these as static BFS environment features with no action override. They provide static connectivity and path-search assistance, so this cannot be described as the model learning pathfinding from coordinates alone. The engine supplies neither a complete action route nor a “best action” label, and does not take over with a Hamiltonian cycle. `--observation local` retains only the historical local collision and Manhattan-distance features. Both modes exclude only the immediate reverse action prohibited by the rules; candidates that could hit walls or the body remain selectable. Entering the tail cell that moves away on this step is legal.
 
-| 控件 | 行为 |
+Qev returns raw candidate probabilities, and the service directly executes the direction with the highest probability. The model's preferred action, executed action, and original request/response are all recorded. **There is no safety override or action substitution.** A model error, invalid probabilities, or a truncated observation ends the game with `model_error`; no fallback action is invented.
+
+The historical v0.2 `qev-0.8b` / `qev-0.8b-mlx` models were not trained on Snake. Current Snake-specific continued training is complete: an explicit deterministic heuristic teacher reads the same visible features to generate supervised action labels, mixed with replay of the original tasks. This is imitation training; the teacher does not select actions at runtime. See the [Snake model report](SNAKE_MODEL.md) for models and game metrics under matched conditions.
+
+The terminal/web board is only a visualization and is not fed to the model as an image. It does not show that the model learned long-term planning from a raw board. Probability bars show candidate selection probabilities, not survival probabilities. The historical model's temperature comes from general text tasks; consult the relevant training report for a new checkpoint's calibration scope.
+
+Defaults are a 12×12 board, an initial length of 3, and at most 500 steps per game. A wall collision, body collision, full board, step limit, or `2 × size²` consecutive steps without food ends the game. The score is the number of food items eaten; reaching the step limit is not completing the board.
+
+## Web controls and game API
+
+| Control | Behavior |
 | --- | --- |
-| 开始自主运行 / 暂停运行 | 连续逐步请求模型，或停止安排下一步。已发送的当前一步仍可能完成。 |
-| 单步决策 | 暂停时只请求并执行一步。 |
-| 重开本局 | 删除原会话，使用当前种子与尺寸创建新会话。 |
-| 随机种子 | 重开后生效；相同种子与尺寸重现初始棋盘。后续食物还取决于执行的动作序列。 |
-| 棋盘尺寸 | 网页提供 8×8、12×12、16×16，重开后生效。 |
-| 运行速度 | 只控制步间节奏；每步等待真实推理，不预生成或跳过模型调用。 |
-| 导出本局 JSON | 下载本局完整服务端历史，包括实际请求、响应、概率、执行动作与计时。 |
+| Start / Pause | Request model steps continuously, or stop scheduling the next step. A request already sent may still complete. |
+| Single step | Request and execute one step while paused. |
+| Restart game | Delete the old session and create a new one with the current seed and size. |
+| Random seed | Takes effect after restart. The same seed and size reproduce the initial board; later food also depends on the executed actions. |
+| Board size | The web UI offers 8×8, 12×12, and 16×16; changes take effect after restart. |
+| Run speed | Controls only the pace between steps. Each step waits for real inference; calls are not pregenerated or skipped. |
+| Export game JSON | Download the complete server history, including actual requests, responses, probabilities, executed actions, and timing. |
 
-在非输入控件内，空格开始/暂停，右方向键在暂停时单步。切换到接口测试页或隐藏浏览器标签页会暂停贪吃蛇。页面显示最近 30 步，导出保留本局全部记录；重开前可先导出旧局。
+Outside input controls, Space starts/pauses and the right arrow steps once while paused. Switching to the playground or hiding the browser tab pauses Snake. The page shows the latest 30 steps; exports retain all records for the game. Export the old game before restarting if you need to keep it.
 
-请求超时时，网页会读取服务端当前状态，不自动重发同一步。服务端以 `expected_step` 拒绝陈旧重试，返回 HTTP 409，避免重复执行。会话默认最多同时 8 个，空闲 30 分钟到期；关闭页面会尝试释放本局，服务重启会清空会话。
+After a request timeout, the page reads the current server state instead of resending the same step. The server rejects stale retries through `expected_step` with HTTP 409, preventing duplicate execution. By default there can be at most 8 sessions, which expire after 30 idle minutes. Closing the page attempts to release its game, and restarting the service clears sessions.
 
-“模型耗时”是服务端 `Agent.predict` 的墙钟时间，包含编码和结果处理。速度选择是上限，实际每秒步数仍受模型计算时间影响。结构化决策的 `output_tokens=0` 表示没有自回归生成文本，仍然执行了模型前向计算。
+“Model time” is the server-side wall-clock duration of `Agent.predict`, including encoding and result processing. Selected speed is an upper bound; actual steps per second are still limited by model computation. Structured decisions return `output_tokens=0` because they do not generate autoregressive text, but they still run a model forward pass.
 
-游戏 API 使用以下协议；路径前缀均为 `/api/snake`：
+The game API uses the following protocol, with the `/api/snake` prefix:
 
-| 请求 | 内容与结果 |
+| Request | Input and result |
 | --- | --- |
-| `POST /games` | JSON 为 `{"seed":7,"size":12,"max_steps":500,"observation":"spatial"}`；`observation` 可选 `spatial`（默认）或 `local`；返回 201 和含 `id` 的初始状态。 |
-| `GET /games/{id}` | 返回当前状态及 `last_decision`。 |
-| `POST /games/{id}/step` | JSON 为 `{"expected_step":0}`，数值须对应当前步数；返回执行后的状态与原始决策记录。终局使用当前步数调用时只返回原状态。 |
-| `GET /games/{id}?history=true` | 返回当前状态和完整 `history`，供导出使用。 |
-| `DELETE /games/{id}` | 删除会话，返回 204。重开通过删除后再次创建实现。 |
+| `POST /games` | JSON: `{"seed":7,"size":12,"max_steps":500,"observation":"spatial"}`. `observation` is `spatial` (default) or `local`. Returns 201 and initial state with an `id`. |
+| `GET /games/{id}` | Returns current state and `last_decision`. |
+| `POST /games/{id}/step` | JSON: `{"expected_step":0}`, matching the current step. Returns the resulting state and original decision record. For a finished game, using the current step only returns its unchanged state. |
+| `GET /games/{id}?history=true` | Returns current state and complete `history` for export. |
+| `DELETE /games/{id}` | Deletes the session and returns 204. Restarting deletes and then creates a session. |
 
-API 允许有符号 32 位整数种子、6–20 的棋盘尺寸和 1–2000 的单局步数上限。未知或过期会话返回 404；同局有请求进行中或 `expected_step` 过期返回 409；会话容量已满返回 429；无效请求参数返回 422。
+The API accepts signed 32-bit seeds, board sizes from 6 to 20, and per-game step limits from 1 to 2000. Unknown or expired sessions return 404; another operation in progress for the same game or a stale `expected_step` returns 409; full session capacity returns 429; invalid parameters return 422.
 
 ## API playground
 
-接口测试页可选择结构化决策、原生生成、服务状态和模型列表。预设覆盖 `choice + noul + score`、原生文字生成、原生图片理解和原生视频帧理解。JSON 编辑器中的完整请求可修改、格式化或复制；发送后显示真实 HTTP 状态、往返耗时、token 用量和响应。请求预览另提供可复制的 curl 与 Python `httpx` 示例。
+Open <http://127.0.0.1:8008/playground>, select a scenario, edit the background, question, and options, then send a real model request. All three scenarios use `choice`:
 
-- `/v1/systemone` 接收 `state` 与 `questions`，返回候选概率和类型化结果。
-- `/v1/chat/completions` 使用原生 Qwen 文字、图像、视频生成路径，并关闭决策 LoRA。
-- `/health` 和 `/v1/models` 是只读 GET 请求。
+| Scenario | Input | Image location in the request |
+| --- | --- | --- |
+| Text-only choice | Text background, question, and named candidates. | No images. |
+| Background image | Inspect a background image and choose from text candidates. | A `state` content array, optionally wrapped as `state.content`. |
+| Images in every option | Text background and question, with an image and description for each candidate. | `questions.<question>.criteria.<option>.content`. |
 
-图片上传支持多选 PNG、JPEG、WebP。视频输入由**多张采样帧图片**组成，按自然文件名排序；所有帧需具有相同尺寸，帧率默认 2，允许 `0 < fps ≤ 60`。此处不上传 MP4 文件，也不由服务端抓取网络视频。图片/帧会追加到当前原生请求的最后一条用户消息，或结构化决策的 `state`；发送前可预览、移除，只有点击发送才提交给服务。
+Image scenarios include built-in geometric images that are ready to send. You can also upload, paste, replace, or remove PNG, JPEG, or WebP images in the background or corresponding option. The background area and each option have separate paste targets: select the target area, then press Ctrl/Cmd+V. A clipboard button is also available when the browser supports clipboard reading. Pasted images use the same media budgets as uploads and are submitted only when you send the request. Candidate images participate in visual encoding inside their corresponding candidates. All three scenarios call `POST /v1/systemone`, returning `answers.<question>.choice`, `probabilities`, and `confidence`, without generating answer text: `usage.output_tokens=0`.
 
-单张图片最多 2 MiB，请求内图片总计最多 8 MiB；图片与视频帧合计最多 8 张。单张最多 400 万像素，总计最多 800 万像素。附件转换为内联 data URL，服务不会打开请求里的本地路径或下载远程 URL。大段 base64 在预览中折叠，复制和发送仍使用完整数据。
+“Advanced JSON” stays synchronized with the form and lets you edit, format, or copy the complete request. After sending, the page shows the real HTTP status, round-trip time, token usage, and response. The request preview also provides copyable curl and Python `httpx` examples. “More examples” retains `choice + noul + score`, native text/image/video generation, service status, and model listing. See the [image decision examples](API.md#image-decisions) for the complete background/candidate image protocol.
 
-最近 5 次请求仅保留在当前页面内存，可恢复到编辑器，但不会自动重新发送。“停止等待”中止浏览器等待，服务端可能仍在完成已开始的推理。响应也可展开或复制完整原文。
+- `/v1/systemone` accepts `state` and `questions`, returning candidate probabilities and typed results.
+- `/v1/chat/completions` uses native Qwen text, image, and video generation with decision LoRA disabled.
+- `/health` and `/v1/models` are read-only GET endpoints.
 
-多模态结构化决策链路可运行，但本轮指针头只接受过文本监督，图像/视频决策准确率尚未验证。原生多模态生成继承完整 Qwen 基座，详情见 [模型说明](MODEL_CARD.md) 和 [API 协议](API.md)。
+Media upload in “More examples” still supports multiple images and sampled video frames. Video consists of **multiple sampled-frame images**, sorted naturally by filename. All frames must have identical dimensions. The default frame rate is 2, with `0 < fps ≤ 60`. This does not upload MP4 files or ask the server to fetch online video. This upload area appends images/frames to the last user message of a native request, or to `state` in structured decisions. Candidate images are uploaded within their corresponding options. Preview and remove attachments before sending; only clicking Send submits them to the service.
 
-## 实际 HTTP 验收
+Each image allows at most 2 MiB, with at most 8 MiB total per request. Background images/video frames and candidate images across all questions share a limit of 8 images. Each image allows at most 4 million pixels, with at most 8 million pixels total. Attachments become inline data URLs; the service does not open local paths or download remote URLs from requests. Long base64 strings are collapsed in the preview, but copying and sending use the complete data.
 
-先按上文启动服务，再在另一个终端运行：
+The page keeps its most recent 5 requests in browser memory for restoring to the editor, without resending them automatically. Separately, `qev serve` saves requests to the two model POST endpoints and their completed responses under `runs/request-logs` by default, including full inline image data and extracted media files. Use `--request-log-dir PATH` to choose another directory or `--no-request-log` to disable server logging. The response headers `X-Qev-Request-Id` and `X-Qev-Log-Status` identify a record and report whether writing succeeded; files are available locally, not through the webpage. See [local request logs](API.md#local-request-logs) for the layout and exception behavior.
+
+“Stop waiting” cancels the browser's wait; the server may still finish inference already started and write its log. The complete raw response can also be expanded or copied.
+
+Candidate images are an inference input protocol. Existing training data and pointer-head supervision remain textual, and decision accuracy for background/candidate images has not been validated. Media questions use `T=1` without the text calibration temperature. Native multimodal generation retains the complete Qwen foundation; see the [model card](MODEL_CARD.md) and [API protocol](API.md).
+
+Frontend request construction, language selection, and clipboard routing use Node.js's built-in test runner without installing frontend dependencies: `node --test tests/test_*.mjs`. Once the service is running, recheck the three choice scenarios, native generation, and error handling:
+
+```bash
+uv run python scripts/validate_service.py \
+  --checkpoint models/qev-snake-0.8b-mlx --backend mlx \
+  --base-url http://127.0.0.1:8008 --output runs/choice-validation.json
+```
+
+The page distinguishes HTTP round-trip time from server decision time. In the response, `qev.timings_ms` reports `decode`, `queue`, `encode`, `inference`, and `total`: request validation/media decoding; waiting for the dedicated inference thread and model lock; input encoding; model forward/probability processing; and total server decision time. `total` includes thread queueing. Initial compilation and other compute initialization appear in `inference`. HTTP time also includes endpoint handling, serialization, local log writing when enabled, and transport, so the difference is not pure network latency.
+
+Retest three fixed small examples against an existing service without loading another model:
+
+```bash
+uv run python scripts/benchmark_http.py --base-url http://127.0.0.1:8008 \
+  --repeats 5 --label 'qev-snake-0.8b-mlx, default startup options' \
+  --output runs/http-latency.json
+```
+
+The script separately saves each scenario's first observation and at least 3 subsequent rounds. It reports original responses, HTTP/service timing phases, and the median and P95 of subsequent samples. P95 uses the nearest-rank method and equals the maximum with fewer than 20 samples. The service may already have warmed up or handled requests, so the first observation cannot automatically be called a cold start. To compare with warmup disabled, restart the service and use a new report file. `--interval 10` waits 10 seconds between rounds. Consecutive latency for fixed examples describes only those conditions; it is neither a general performance claim nor evidence of cached answers. The returned model alias does not identify the weight files; record the model path, startup options, and memory conditions in `--label`.
+
+On an Apple M2 Pro with 16 GiB memory and FP32 `qev-snake-0.8b-mlx`, with default memory management, the persistent inference thread, and warmup enabled, **the three actual page presets** produced the following HTTP times in milliseconds, measured in rounds. These inputs differ from the benchmark script's built-in examples. Input summaries and raw timing are saved in the [measurement summary](results/choice_latency.json).
+
+| Scenario | First observation | Median of next 5 calls | P95 / maximum of next 5 calls |
+| --- | ---: | ---: | ---: |
+| Text-only choice | 1467.41 | 38.78 | 39.99 |
+| Background image | 113.44 | 79.03 | 80.15 |
+| An image in each of three options | 176.28 | 168.72 | 169.38 |
+
+Choices matched the existing baseline, with candidate probability differences below `1e-6`. For consecutive requests, the difference between HTTP and total service time was typically 1–3 ms. **First requests after an idle period still took about 1.5–2.6 seconds.** One text request recorded `inference=2593.26 ms` and `queue=0.16 ms`, followed by an immediate repeat at 58 ms. The slow requests are not fully explained. These observations are not controlled causal comparisons of individual optimizations and do not guarantee that requests after idle periods will achieve the consecutive-call latency in the table.
+
+## Real HTTP validation
+
+Start the service as above, then run this from another terminal:
 
 ```bash
 .venv/bin/python scripts/validate_demo.py \
@@ -142,30 +210,30 @@ API 允许有符号 32 位整数种子、6–20 的棋盘尺寸和 1–2000 的�
   --output runs/demo-validation-current.json
 ```
 
-脚本只连接已有服务，不启动第二个服务器或加载另一份模型。它检查首页及静态模块资源，以及新建、读取、逐步执行、完整历史、同种子重开、会话隔离、重复 step 返回 409、删除后的操作返回 404。创建的验收会话在结束时清理。
+The script connects only to the existing service; it does not start another server or load another model. It checks the home page and static modules, game creation and reading, step execution, complete history, restart with the same seed, session isolation, HTTP 409 for duplicate steps, and HTTP 404 after deletion. Validation sessions are cleaned up afterward.
 
-三个种子的真实游戏逐步跑至终止，每步核对动作前环境特征与请求一致，返回概率有限且归一化，`argmax == choice == proposed == executed`，无状态截断、无接管，身体/步数/得分更新正确且导出历史一致。报告保留完整原始模型响应、每局得分/步数/终止原因，以及推理和 HTTP 延迟分布。
+Real games for three seeds run step by step until termination. Every step checks that pre-action environment features match the request, probabilities are finite and normalized, `argmax == choice == proposed == executed`, no state truncation or override occurred, body/step/score updates are correct, and exported history matches. Reports retain complete original model responses, each game's score/steps/termination reason, and inference/HTTP latency distributions.
 
-以下保存的是 **v0.2 历史模型、旧版局部观测**在 2026-09-21（新加坡时间）的真实 MLX HTTP 验收，**7 项检查全部通过**；它不代表当前 `spatial` 观测或新专项模型的结果。12×12 棋盘的三个种子共执行 96 步，记录如下：
+The saved results below are the real MLX HTTP validation of the **historical v0.2 model with the older local observations**, run on 2026-09-21 (Singapore time). **All 7 checks passed.** They do not describe current `spatial` observations or the new Snake-specific model. Three seeds on a 12×12 board executed 96 steps in total:
 
-| 种子 | 实际步数 | 得分（食物数） | 终止原因 |
+| Seed | Executed steps | Score (food eaten) | Termination reason |
 | --- | --- | --- | --- |
-| 7 | 32 | 0 | `max_steps`：达到测试步数上限 |
-| 11 | 32 | 2 | `max_steps`：达到测试步数上限 |
-| 42 | 32 | 0 | `max_steps`：达到测试步数上限 |
+| 7 | 32 | 0 | `max_steps`: test step limit reached |
+| 11 | 32 | 2 | `max_steps`: test step limit reached |
+| 42 | 32 | 0 | `max_steps`: test step limit reached |
 
-三局均未填满棋盘。96 次游戏决策的推理耗时中位数为 147.81 ms，P95 为 162.41 ms；这是该次真实运行的记录。完整证据保留在下方报告中，接口验收通过不代表模型已掌握稳定吃食或长期路线规划。
+None of the three games filled the board. Across 96 game decisions, median inference time was 147.81 ms and P95 was 162.41 ms; these are records from that actual run. Complete evidence is retained in the report below. Passing API validation does not establish reliable food collection or long-term route planning.
 
-**有效的撞墙、撞身或跑满步数都是可记录的游戏结果，不决定接口验收是否通过。** 模型异常、无效概率、截断、动作替换或审计不一致会使验收失败并返回非零退出码。报告写入 [demo_validation.json](results/demo_validation.json)；它是运行与决策链路验收，不是贪吃蛇策略质量排行榜。
+**Valid wall collisions, body collisions, and games that reach the step limit are all recordable outcomes and do not determine whether API validation passes.** Model errors, invalid probabilities, truncation, action substitution, or inconsistent audit records cause validation to fail with a nonzero exit code. The report is saved in [demo_validation.json](results/demo_validation.json). It validates the execution and decision path, not a Snake policy quality leaderboard.
 
-## 历史浏览器验收与界面
+## Historical browser validation and screenshots
 
-以下为 v0.2 网页版本的留档，不是终端或新版空间特征的验收结果。已在 Chrome 中连接真实 MLX 服务，验证开始、暂停、单步、修改种子/尺寸后重开、切换页面暂停和 JSON 下载；下载内容与服务端完整历史一致。接口页实际发送了 Choice/Noul/Score、文字、图片和四帧视频请求，也验证了历史恢复、复制、无效 JSON、HTTP 404 和停止等待提示。原生生成响应均显示决策适配器关闭。
+The following is an archive of the v0.2 web interface, not validation of the terminal or newer spatial features. Chrome was connected to the real MLX service to verify start, pause, single-step, restart after seed/size changes, pause on page navigation, and JSON download. Downloads matched the complete server history. The playground sent real Choice/Noul/Score, text, image, and four-frame video requests, and checked history restoration, copying, invalid JSON, HTTP 404, and the stop-waiting message. Native generation responses reported the decision adapter as disabled.
 
-桌面 1440×1000 与手机 390×844 均无横向溢出。最终可访问性自动检查未发现 WCAG 2 A/AA 违规；装饰符号和渐变背景的对比度仍有工具无法判断的项，这不等于全面可访问性认证。详细响应、尺寸记录、检查结果及最终静态资源哈希保存在 [demo_browser_validation.json](results/demo_browser_validation.json)。前一份 HTTP 游戏报告中的资源哈希早于最后的界面微调，以浏览器报告的最终资源记录为准。
+Neither desktop 1440×1000 nor mobile 390×844 had horizontal overflow. The final automated accessibility check found no WCAG 2 A/AA violations; some contrast checks on decorative symbols and gradient backgrounds remained indeterminate, so this is not comprehensive accessibility certification. Detailed responses, viewport records, check results, and final static asset hashes are saved in [demo_browser_validation.json](results/demo_browser_validation.json). Resource hashes in the preceding HTTP game report predate the final interface adjustments; use the browser report's final resource records.
 
-图片测试正确描述了红色正方形。视频帧请求成功，但回答虚构了第二个白色移动圆，因此这里仅确认多模态调用链路正常，不将它视为视觉准确率验收。
+The image test correctly described a red square. The video-frame request succeeded, but its answer hallucinated a second moving white circle. This confirms only that the multimodal call path worked, not that visual accuracy passed validation.
 
-![真实模型单步决策后的贪吃蛇页面](assets/demo-snake.png)
+![Snake page after a real model decision](assets/demo-snake.png)
 
-![真实结构化决策响应的接口测试页面](assets/demo-playground.png)
+![API playground showing a real structured decision response](assets/demo-playground.png)

@@ -5,6 +5,7 @@ import copy
 import io
 import json
 import os
+import re
 import select
 import sys
 from types import SimpleNamespace
@@ -13,6 +14,8 @@ from urllib.error import URLError
 import pytest
 
 from qev import cli, snake_cli
+from qev.snake import SnakeGame
+from qev.snake_terminal import cell_width
 
 
 class StubAgent:
@@ -194,6 +197,60 @@ def test_renderer_shows_real_snapshot_probabilities_and_feature_disclosure(obser
     assert "\033[" in snake_cli.render_frame(game, color=True)
 
 
+@pytest.mark.parametrize("columns,rows,size", [
+    (120, 44, 12), (80, 24, 12), (60, 24, 20), (80, 24, 20),
+    (40, 24, 12), (20, 24, 12), (12, 10, 20),
+])
+def test_renderer_fits_terminal_cells_without_mutating_snapshot(columns, rows, size):
+    game = SnakeGame(size=size).snapshot()
+    original = copy.deepcopy(game)
+    plain = snake_cli.render_frame(game, columns=columns, rows=rows)
+    colored = snake_cli.render_frame(game, columns=columns, rows=rows, color=True)
+    stripped = re.sub(r"\x1b\[[0-9;]*m", "", colored)
+    assert stripped == plain
+    assert len(plain.splitlines()) <= rows
+    assert all(cell_width(line) == columns - 1 for line in plain.splitlines())
+    assert game == original
+    if columns >= size + 5 and rows >= size + 4:
+        assert "◆" in plain  # Food remains visible even in the narrow-board layout.
+        # The inner board must retain both complete horizontal boundaries;
+        # merely seeing its food would not detect a cropped bottom row.
+        horizontal_borders = [line for line in plain.splitlines() if "╭" in line or "╰" in line]
+        assert len(horizontal_borders) == 4
+
+
+def test_renderer_reports_actual_usage_and_sanitizes_server_error_text():
+    game = SnakeGame().snapshot()
+    game.update(status="finished", terminal_reason="model_error", last_decision={
+        "response": {"usage": {"input_tokens": 321, "output_tokens": 7}},
+        "error": {"message": "失败\x1b]0;title\x07\x1b[2J e\u0301\u202e\nnext\tline"},
+    })
+    plain = snake_cli.render_frame(game, columns=80, rows=24)
+    assert "MODEL ERROR" in plain and "LIVE · MODEL CONTROL" not in plain
+    assert "INPUT 321 tokens / OUTPUT 7" in plain
+    assert "失败 e\u0301 next line" in plain
+    assert all(char not in plain for char in ("\033", "\x07", "\t", "\u202e"))
+    assert all(cell_width(line) == 79 for line in plain.splitlines())
+
+
+@pytest.mark.parametrize("columns,rows", [(40, 24), (20, 12)])
+def test_narrow_terminal_retains_quit_hint(columns, rows):
+    frame = snake_cli.render_frame(SnakeGame().snapshot(), columns=columns, rows=rows)
+    assert "Q" in frame.splitlines()[-2] or "Q" in frame.splitlines()[-1]
+
+
+def test_full_height_ansi_frame_overwrites_without_scrolling(monkeypatch):
+    monkeypatch.setenv("TERM", "xterm-256color")
+    monkeypatch.setattr(snake_cli.shutil, "get_terminal_size", lambda: os.terminal_size((80, 24)))
+    stream = io.StringIO()
+    display = snake_cli.Terminal(stream, enabled=True, color=False, alternate=True)
+    display.draw(SnakeGame().snapshot())
+    output = stream.getvalue()
+    assert output.startswith("\033[H") and "\033[H\033[J" not in output
+    assert output.endswith("\033[K\033[J")
+    assert output.count("\r\n") == 23
+
+
 def test_terminal_restores_cursor_and_alternate_screen_after_exception(monkeypatch):
     monkeypatch.setenv("TERM", "xterm-256color")
     stream = io.StringIO()
@@ -259,18 +316,53 @@ def test_default_checkpoint_preference_and_explicit_override(tmp_path, monkeypat
         return StubAgent()
 
     monkeypatch.setitem(sys.modules, "qev.inference", SimpleNamespace(Agent=agent))
+    legacy = tmp_path / "models/qev-0.8b-mlx"
+    legacy.mkdir(parents=True)
+    (legacy / "qev_config.json").write_text("{}")
     snake_cli.make_driver(arguments())
-    (tmp_path / "models/qev-snake-0.8b-mlx").mkdir(parents=True)
+    preferred = tmp_path / "models/qev-snake-0.8b-mlx"
+    preferred.mkdir()
+    snake_cli.make_driver(arguments())  # An incomplete download must not hide a usable checkpoint.
+    (preferred / "qev_config.json").write_text("{}")
     snake_cli.make_driver(arguments())
+    explicit = tmp_path / "models/original-comparison"
+    explicit.mkdir()
+    (explicit / "qev_config.json").write_text("{}")
     snake_cli.make_driver(arguments("--model", "models/original-comparison"))
-    assert loaded == ["models/qev-0.8b-mlx", "models/qev-snake-0.8b-mlx", "models/original-comparison"]
+    assert loaded == ["models/qev-0.8b-mlx", "models/qev-0.8b-mlx",
+                      "models/qev-snake-0.8b-mlx", "models/original-comparison"]
 
 
-def test_http_and_cli_dispatch_do_not_construct_an_agent(monkeypatch):
-    def forbidden_agent(*_, **__):
-        pytest.fail("HTTP/help must not load local weights")
+def test_missing_default_checkpoint_explains_download_before_importing_agent(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setitem(sys.modules, "qev.inference", None)
+    with pytest.raises(FileNotFoundError) as failure:
+        snake_cli.make_driver(arguments())
+    message = str(failure.value)
+    assert "models/qev-snake-0.8b-mlx/qev_config.json" in message
+    assert "uv run hf download twainsk/qev-0.8b-mlx --local-dir models/qev-snake-0.8b-mlx" in message
+    assert not (tmp_path / "models").exists()
 
-    monkeypatch.setitem(sys.modules, "qev.inference", SimpleNamespace(Agent=forbidden_agent))
+
+@pytest.mark.parametrize("backend,repository", [("auto", "twainsk/qev-0.8b-mlx"),
+                                                ("torch", "twainsk/qev-0.8b")])
+def test_missing_explicit_checkpoint_does_not_use_available_default(tmp_path, monkeypatch, backend, repository):
+    monkeypatch.chdir(tmp_path)
+    preferred = tmp_path / "models/qev-snake-0.8b-mlx"
+    preferred.mkdir(parents=True)
+    (preferred / "qev_config.json").write_text("{}")
+    monkeypatch.setitem(sys.modules, "qev.inference", None)
+    with pytest.raises(FileNotFoundError) as failure:
+        snake_cli.make_driver(arguments("--model", "models/chosen checkpoint", "--backend", backend))
+    message = str(failure.value)
+    assert "models/chosen checkpoint/qev_config.json" in message
+    assert f"uv run hf download {repository} --local-dir 'models/chosen checkpoint'" in message
+    assert not (tmp_path / "models/chosen checkpoint").exists()
+
+
+def test_http_and_cli_dispatch_do_not_construct_an_agent(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setitem(sys.modules, "qev.inference", None)
     assert isinstance(snake_cli.make_driver(arguments("--base-url", "http://localhost:8008")), snake_cli.HTTPDriver)
     monkeypatch.setattr(snake_cli, "run", lambda args: 17 if args.observation == "local" else 0)
     assert cli.main(["snake", "--observation", "local"]) == 17

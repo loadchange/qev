@@ -1,0 +1,378 @@
+{
+  "format": "qev-choice-latency-summary-v1",
+  "created_utc": "2026-09-21T07:08:06.666022+00:00",
+  "sources": {
+    "measurements": {
+      "filename": "choice-latency-final.json",
+      "sha256": "c9cdcdad0c9d5749f9270d998d03ff1f8cbc39cf0bcb1875e2492efad7fbd132",
+      "file_mtime_utc": "2026-09-21T07:02:30.119286+00:00"
+    },
+    "browser_inputs": {
+      "filename": "choice-browser-validation.json",
+      "sha256": "ca972dd35c9dd6579289edf0a6ddfcf3ce5405481e3c724d2045ab4f60e1d017",
+      "file_mtime_utc": "2026-09-21T05:52:23.924512+00:00"
+    },
+    "baseline_responses": {
+      "filename": "choice-browser-presets.json",
+      "sha256": "2b2258bcafa41f195fec10d1d251d27389c59fb3f1a763e6e56a6fdd72f8ddb4",
+      "file_mtime_utc": "2026-09-21T05:48:44.856575+00:00"
+    },
+    "idle_browser_probe": {
+      "filename": "live.json",
+      "sha256": "966fdf3a5889a28e2aa79b29dd86d24608aba56f1be103119b2ce79be4140c4f",
+      "file_mtime_utc": "2026-09-21T07:04:45.786264+00:00"
+    }
+  },
+  "timestamp_note": "Source reports do not record measurement timestamps; file_mtime_utc is source-file metadata, not a reconstructed run start.",
+  "conditions": {
+    "hardware": "Apple M2 Pro",
+    "unified_memory_gib": 16,
+    "backend": "mlx",
+    "dtype": "float32",
+    "checkpoint": "models/qev-snake-0.8b-mlx",
+    "qev_config_sha256": "72608203d8498b14ecc8975980fcf0aef52c11e695238f9af597a7ec75296697",
+    "base_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "startup_warmup": true,
+    "automatic_memory_management": true,
+    "persistent_inference_thread": true,
+    "condition_source": "Operator-confirmed server configuration; hardware and flags are not inferred from HTTP aliases.",
+    "requests": "Three actual browser Choice presets, serial rounds; first observation followed by five rounds. These differ from benchmark_http.py built-in fixtures."
+  },
+  "request_hash_method": "SHA-256 of UTF-8 JSON with ensure_ascii=False, sort_keys=True and separators=(comma,colon), including inline image data; no base64 is copied into this summary.",
+  "scenarios": {
+    "choice_text": {
+      "request_sha256": "547ee8862a16392a26c7ad4d2d60f4824f85893c1c9d21e14a8e0e43fb050f73",
+      "input_tokens": 53,
+      "first_observed": {
+        "round": 0,
+        "http_ms": 1467.4072919879109,
+        "server_timings_ms": {
+          "decode": 0.39,
+          "queue": 0.16,
+          "encode": 29.45,
+          "inference": 1424.58,
+          "total": 1455.0
+        }
+      },
+      "subsequent_samples": [
+        {
+          "round": 1,
+          "http_ms": 39.992625010199845,
+          "server_timings_ms": {
+            "decode": 0.03,
+            "queue": 0.02,
+            "encode": 0.6,
+            "inference": 36.9,
+            "total": 37.62
+          }
+        },
+        {
+          "round": 2,
+          "http_ms": 38.783208001405,
+          "server_timings_ms": {
+            "decode": 0.04,
+            "queue": 0.04,
+            "encode": 0.46,
+            "inference": 36.75,
+            "total": 37.35
+          }
+        },
+        {
+          "round": 3,
+          "http_ms": 38.73929099063389,
+          "server_timings_ms": {
+            "decode": 0.03,
+            "queue": 0.02,
+            "encode": 0.36,
+            "inference": 36.67,
+            "total": 37.14
+          }
+        },
+        {
+          "round": 4,
+          "http_ms": 39.98687502462417,
+          "server_timings_ms": {
+            "decode": 0.03,
+            "queue": 0.02,
+            "encode": 0.38,
+            "inference": 37.97,
+            "total": 38.47
+          }
+        },
+        {
+          "round": 5,
+          "http_ms": 38.375208008801565,
+          "server_timings_ms": {
+            "decode": 0.03,
+            "queue": 0.02,
+            "encode": 0.33,
+            "inference": 36.48,
+            "total": 36.93
+          }
+        }
+      ],
+      "subsequent_summary": {
+        "n": 5,
+        "http_median_ms": 38.783208001405,
+        "http_p95_ms": 39.992625010199845,
+        "http_max_ms": 39.992625010199845,
+        "http_minus_server_total_median_ms": 1.51687502462417
+      },
+      "baseline_comparison": {
+        "choices_identical": true,
+        "max_probability_absolute_difference": 0.0,
+        "tolerance": 1e-06
+      }
+    },
+    "choice_context_image": {
+      "request_sha256": "b4ae03475579da30c360ec814d33e3503c3c2360a5a280e953fc9416af5558ea",
+      "input_tokens": 110,
+      "first_observed": {
+        "round": 0,
+        "http_ms": 113.43695898540318,
+        "server_timings_ms": {
+          "decode": 2.15,
+          "queue": 0.06,
+          "encode": 25.64,
+          "inference": 82.47,
+          "total": 110.51
+        }
+      },
+      "subsequent_samples": [
+        {
+          "round": 1,
+          "http_ms": 80.14741700026207,
+          "server_timings_ms": {
+            "decode": 0.2,
+            "queue": 0.02,
+            "encode": 2.15,
+            "inference": 76.0,
+            "total": 78.48
+          }
+        },
+        {
+          "round": 2,
+          "http_ms": 78.1071660167072,
+          "server_timings_ms": {
+            "decode": 0.19,
+            "queue": 0.02,
+            "encode": 1.94,
+            "inference": 74.36,
+            "total": 76.61
+          }
+        },
+        {
+          "round": 3,
+          "http_ms": 79.2449580039829,
+          "server_timings_ms": {
+            "decode": 0.2,
+            "queue": 0.02,
+            "encode": 2.14,
+            "inference": 75.31,
+            "total": 77.77
+          }
+        },
+        {
+          "round": 4,
+          "http_ms": 79.03441699454561,
+          "server_timings_ms": {
+            "decode": 0.19,
+            "queue": 0.02,
+            "encode": 1.98,
+            "inference": 75.27,
+            "total": 77.55
+          }
+        },
+        {
+          "round": 5,
+          "http_ms": 78.99666699813679,
+          "server_timings_ms": {
+            "decode": 0.19,
+            "queue": 0.02,
+            "encode": 2.01,
+            "inference": 75.2,
+            "total": 77.53
+          }
+        }
+      ],
+      "subsequent_summary": {
+        "n": 5,
+        "http_median_ms": 79.03441699454561,
+        "http_p95_ms": 80.14741700026207,
+        "http_max_ms": 80.14741700026207,
+        "http_minus_server_total_median_ms": 1.4844169945456116
+      },
+      "baseline_comparison": {
+        "choices_identical": true,
+        "max_probability_absolute_difference": 0.0,
+        "tolerance": 1e-06
+      }
+    },
+    "choice_option_images": {
+      "request_sha256": "0c1fda0873712e37b81caf01af5b4ba8b1b42b74f0e9032aaa84d86e6ff0a541",
+      "input_tokens": 263,
+      "first_observed": {
+        "round": 0,
+        "http_ms": 176.2789159838576,
+        "server_timings_ms": {
+          "decode": 0.52,
+          "queue": 0.03,
+          "encode": 7.28,
+          "inference": 166.56,
+          "total": 174.51
+        }
+      },
+      "subsequent_samples": [
+        {
+          "round": 1,
+          "http_ms": 169.3781669891905,
+          "server_timings_ms": {
+            "decode": 0.38,
+            "queue": 0.02,
+            "encode": 3.96,
+            "inference": 163.23,
+            "total": 167.73
+          }
+        },
+        {
+          "round": 2,
+          "http_ms": 168.71649998938665,
+          "server_timings_ms": {
+            "decode": 0.43,
+            "queue": 0.02,
+            "encode": 3.73,
+            "inference": 162.86,
+            "total": 167.15
+          }
+        },
+        {
+          "round": 3,
+          "http_ms": 168.29224998946302,
+          "server_timings_ms": {
+            "decode": 0.4,
+            "queue": 0.02,
+            "encode": 3.69,
+            "inference": 162.41,
+            "total": 166.63
+          }
+        },
+        {
+          "round": 4,
+          "http_ms": 169.04283300391398,
+          "server_timings_ms": {
+            "decode": 0.39,
+            "queue": 0.02,
+            "encode": 3.47,
+            "inference": 163.59,
+            "total": 167.58
+          }
+        },
+        {
+          "round": 5,
+          "http_ms": 168.19566700723954,
+          "server_timings_ms": {
+            "decode": 0.41,
+            "queue": 0.02,
+            "encode": 3.79,
+            "inference": 162.3,
+            "total": 166.62
+          }
+        }
+      ],
+      "subsequent_summary": {
+        "n": 5,
+        "http_median_ms": 168.71649998938665,
+        "http_p95_ms": 169.3781669891905,
+        "http_max_ms": 169.3781669891905,
+        "http_minus_server_total_median_ms": 1.575667007239531
+      },
+      "baseline_comparison": {
+        "choices_identical": true,
+        "max_probability_absolute_difference": 0.0,
+        "tolerance": 1e-06
+      }
+    }
+  },
+  "scope": [
+    "Fixed inputs and one machine only; no controlled causal comparison of individual optimizations.",
+    "First observed requests are not guaranteed process-cold or model-cold.",
+    "Five-sample nearest-rank P95 equals the maximum.",
+    "HTTP minus server total includes handling and serialization, not only network time.",
+    "Idle-first latency remains variable and its cause is not fully determined; these results do not guarantee millisecond responses after idle."
+  ],
+  "idle_browser_probe": [
+    {
+      "scene": "choice_text",
+      "sample": "idle-first",
+      "http_ms": 2602.8,
+      "timings_ms": {
+        "decode": 0.2,
+        "queue": 0.16,
+        "encode": 4.02,
+        "inference": 2593.26,
+        "total": 2597.86
+      }
+    },
+    {
+      "scene": "choice_text",
+      "sample": "repeat",
+      "http_ms": 58.0,
+      "timings_ms": {
+        "decode": 0.17,
+        "queue": 0.09,
+        "encode": 1.46,
+        "inference": 52.39,
+        "total": 54.21
+      }
+    },
+    {
+      "scene": "choice_context_image",
+      "sample": "first-in-scene",
+      "http_ms": 145.7,
+      "timings_ms": {
+        "decode": 2.7,
+        "queue": 0.03,
+        "encode": 29.47,
+        "inference": 109.37,
+        "total": 141.7
+      }
+    },
+    {
+      "scene": "choice_context_image",
+      "sample": "repeat",
+      "http_ms": 81.9,
+      "timings_ms": {
+        "decode": 0.36,
+        "queue": 0.03,
+        "encode": 2.76,
+        "inference": 76.57,
+        "total": 79.81
+      }
+    },
+    {
+      "scene": "choice_option_images",
+      "sample": "first-in-scene",
+      "http_ms": 195.9,
+      "timings_ms": {
+        "decode": 0.45,
+        "queue": 0.02,
+        "encode": 7.78,
+        "inference": 184.46,
+        "total": 192.86
+      }
+    },
+    {
+      "scene": "choice_option_images",
+      "sample": "repeat",
+      "http_ms": 173.9,
+      "timings_ms": {
+        "decode": 0.58,
+        "queue": 0.04,
+        "encode": 4.58,
+        "inference": 165.43,
+        "total": 170.79
+      }
+    }
+  ],
+  "idle_browser_probe_note": "Separate browser observation, not included in the five-round table. Idle interval was not recorded."
+}

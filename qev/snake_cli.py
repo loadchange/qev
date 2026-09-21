@@ -7,6 +7,7 @@ import json
 import math
 import os
 import select
+import shlex
 import shutil
 import statistics
 import sys
@@ -20,6 +21,7 @@ from urllib.request import Request, urlopen
 
 from .snake import POLICY, GameStore
 from .snake_features import FEATURE_VERSION
+from .snake_terminal import render_frame
 
 
 def add_arguments(parser):
@@ -118,10 +120,21 @@ class HTTPDriver:
 def make_driver(args):
     if args.base_url:
         return HTTPDriver(args.base_url, args.request_timeout)
+
+    preferred, legacy = "models/qev-snake-0.8b-mlx", "models/qev-0.8b-mlx"
+    model = args.model or next((path for path in (preferred, legacy)
+                               if (Path(path) / "qev_config.json").is_file()), preferred)
+    config_path = Path(model).expanduser() / "qev_config.json"
+    if not config_path.is_file():
+        repository = "twainsk/qev-0.8b" if args.backend == "torch" else "twainsk/qev-0.8b-mlx"
+        raise FileNotFoundError(
+            f"Qev checkpoint is missing: {config_path}\n"
+            f"Download a checkpoint to {model}:\n"
+            f"  uv run hf download {repository} --local-dir {shlex.quote(str(model))}\n"
+            "Or use --model with an existing Qev checkpoint directory."
+        )
     from .inference import Agent
 
-    model = args.model or ("models/qev-snake-0.8b-mlx" if Path("models/qev-snake-0.8b-mlx").is_dir()
-                           else "models/qev-0.8b-mlx")
     print(f"Loading local Qev checkpoint: {model}", file=sys.stderr, flush=True)
     return LocalDriver(Agent(model, backend=args.backend, device=args.device), model)
 
@@ -152,65 +165,6 @@ class Keyboard(AbstractContextManager):
             termios.tcsetattr(self.fd, termios.TCSADRAIN, self.saved)
 
 
-def render_frame(game, *, episode=1, episodes=1, paused=False, fps=8, color=False, columns=80):
-    """Pure renderer: board and probabilities always come from an actual snapshot."""
-    def paint(text, code):
-        return f"\033[{code}m{text}\033[0m" if color else text
-
-    size, body = game["size"], [tuple(cell) for cell in game["body"]]
-    occupied = set(body)
-    food = tuple(game["food"]) if game["food"] is not None else None
-    border = "+" + "--" * size + "+"
-    board = [paint(border, "38;5;240")]
-    for y in range(size):
-        row = []
-        for x in range(size):
-            cell = (x, y)
-            if cell == body[0]:
-                row.append(paint("[]", "1;38;5;193"))
-            elif cell in occupied:
-                row.append(paint("##", "38;5;107"))
-            elif cell == food:
-                row.append(paint("()", "1;38;5;215"))
-            else:
-                row.append(paint(". ", "38;5;236"))
-        board.append(paint("|", "38;5;240") + "".join(row) + paint("|", "38;5;240"))
-    board.append(paint(border, "38;5;240"))
-    decision = game.get("last_decision") or {}
-    latency = decision.get("inference_ms")
-    tokens = (decision.get("response") or {}).get("usage", {}).get("input_tokens", "-")
-    panel = [f"EPISODE {episode}/{episodes}  SEED {game['seed']}",
-             f"SCORE {game['score']}   LENGTH {game['length']}",
-             f"STEP {game['step']}/{game['max_steps']}",
-             f"MOVE {decision.get('executed') or '-'}", "", "MODEL PROBABILITIES"]
-    probabilities = decision.get("probabilities", {})
-    for direction in ("UP", "DOWN", "LEFT", "RIGHT"):
-        value = probabilities.get(direction)
-        bar = "#" * round(12 * value) if value is not None else ""
-        panel.append(f"{direction:5} [{bar:12}] {value:6.1%}" if value is not None else f"{direction:5} {'--':>22}")
-    panel.extend(["", f"INFERENCE {latency:.1f} ms" if latency is not None else "INFERENCE --",
-                  f"INPUT {tokens} tokens / OUTPUT 0", "MODEL ARGMAX / OVERRIDE OFF"])
-    state = game["terminal_reason"] or ("paused" if paused else "running")
-    pace = "unpaced" if fps == 0 else f"at most {fps:g} steps/s"
-    lines = [paint("Qev / SNAKE", "1;38;5;193") + f"   {state.upper()}   {pace}",
-             "Text features -> real model choice -> unchanged action", ""]
-    if 2 * size + 6 + 34 <= columns:
-        for index in range(max(len(board), len(panel))):
-            left = board[index] if index < len(board) else " " * (2 * size + 2)
-            lines.append(left + "    " + (panel[index] if index < len(panel) else ""))
-    else:
-        lines.extend(board)
-        lines.extend(panel[:4] + panel[6:10] + panel[11:])
-    observation = game.get("policy", {}).get("observation", "local")
-    disclosure = ("SPATIAL / 静态BFS环境特征·无动作接管" if observation == "spatial"
-                  else "LOCAL / 碰撞与食物距离环境特征·无动作接管")
-    lines.extend(["", "Space pause/resume | N single step | +/- speed | Q or Ctrl-C quit",
-                  disclosure])
-    if decision.get("error"):
-        lines.append("MODEL ERROR: " + str(decision["error"]["message"]).replace("\033", "").replace("\n", " ")[:100])
-    return "\n".join(lines)
-
-
 class Terminal(AbstractContextManager):
     def __init__(self, stream, *, enabled, color, alternate):
         self.stream, self.enabled, self.color, self.alternate = stream, enabled, color, alternate
@@ -224,13 +178,21 @@ class Terminal(AbstractContextManager):
 
     def draw(self, game, **kwargs):
         if self.enabled:
-            frame = render_frame(game, color=self.color, columns=shutil.get_terminal_size().columns, **kwargs)
-            self.stream.write(("\033[H\033[J" if self.ansi else "") + frame + "\n")
+            size = shutil.get_terminal_size()
+            frame = render_frame(game, color=self.color, columns=size.columns, rows=size.lines, **kwargs)
+            if self.ansi:
+                # Overwrite in place without a final newline: a frame that fills
+                # the viewport must not scroll its own header off the screen.
+                self.stream.write("\033[H" + frame.replace("\n", "\033[K\r\n") + "\033[K\033[J")
+            else:
+                self.stream.write(frame + "\n")
             self.stream.flush()
 
     def __exit__(self, *_):
         if self.ansi:
             self.stream.write("\033[0m\033[?25h" + ("\033[?1049l" if self.alternate else ""))
+            if not self.alternate:
+                self.stream.write("\n")
             self.stream.flush()
 
 

@@ -1,31 +1,31 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <meta name="description" content="Qev 本地模型实验室：自主贪吃蛇、结构化决策与多模态接口测试。">
-  <title>Qev · 模型实验室</title>
+  <meta name="description" data-i18n-content="app.description" content="Qev local model lab: autonomous Snake, structured decisions and multimodal API experiments.">
+  <title>Qev · Model Lab</title>
   <link rel="icon" href="/assets/icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/assets/style.css">
   <script type="module" src="/assets/app.js"></script>
 </head>
 <body>
-  <a class="skip-link" href="#main">跳到内容</a>
+  <a class="skip-link" href="#main" data-i18n-text="app.skip">Skip to content</a>
   <header class="site-header">
-    <a class="brand" href="#snake" aria-label="Qev 首页"><span class="brand-mark">Q</span><span>Qev<span class="brand-sub">实验室</span></span></a>
-    <nav class="tabs" aria-label="实验页面">
-      <a href="#snake" data-tab="snake"><span aria-hidden="true">↳</span> 自主贪吃蛇</a>
-      <a href="#playground" data-tab="playground"><span aria-hidden="true">⌘</span> 接口测试</a>
+    <a class="brand" href="#snake" aria-label="Qev home" data-i18n-aria-label="app.home"><span class="brand-mark">Q</span><span>Qev<span class="brand-sub" data-i18n-text="app.lab">Lab</span></span></a>
+    <nav class="tabs" aria-label="Experiments" data-i18n-aria-label="app.pages">
+      <a href="#snake" data-tab="snake"><span aria-hidden="true">↳</span><span data-i18n-text="app.snake">Autonomous Snake</span></a>
+      <a href="#playground" data-tab="playground"><span aria-hidden="true">⌘</span><span data-i18n-text="app.playground">API Playground</span></a>
     </nav>
-    <div class="header-right"><span id="connection" class="connection" role="status"><i></i>连接中</span><a class="doc-link" href="/docs" target="_blank" rel="noopener">API 文档 ↗</a></div>
+    <div class="header-right"><span id="connection" class="connection" role="status"><i></i><span data-i18n-text="app.connecting">Connecting</span></span><select id="locale-switch" class="locale-switch" aria-label="Interface language" data-i18n-aria-label="app.language"><option value="en" lang="en">English</option><option value="zh-CN" lang="zh-CN">简体中文</option></select><a class="doc-link" href="/docs" target="_blank" rel="noopener" data-i18n-text="app.docs">API docs ↗</a></div>
   </header>
   <main id="main" tabindex="-1">
-    <section id="snake-view" aria-label="自主贪吃蛇"></section>
-    <section id="playground-view" aria-label="接口测试" hidden></section>
+    <section id="snake-view" aria-label="Autonomous Snake" data-i18n-aria-label="app.snake"></section>
+    <section id="playground-view" aria-label="API Playground" data-i18n-aria-label="app.playground" hidden></section>
   </main>
-  <footer class="site-footer"><span>Qev / Qwen3.5 · 0.8B</span><span>本地真实推理 <span class="footer-dot">·</span> 原生图文与视频能力保留</span><span id="backend-label">检查后端中</span></footer>
+  <footer class="site-footer"><span>Qev / Qwen3.5 · 0.8B</span><span data-i18n-text="app.footer">Real local inference · Native text, image and video capabilities retained</span><span id="backend-label" data-i18n-text="app.checking">Checking backend</span></footer>
   <div id="toast" role="status" aria-live="polite" hidden></div>
-  <noscript>请启用 JavaScript 使用实验页面。接口文档仍可从 /docs 访问。</noscript>
+  <noscript>Enable JavaScript to use the lab. API documentation is available at /docs. / 请启用 JavaScript 使用实验页面，接口文档仍可从 /docs 访问。</noscript>
 </body>
 </html>

@@ -157,6 +157,51 @@ def test_multimodal_decisions_keep_mrope_inputs_and_do_not_apply_text_temperatur
     assert answer["usage"]["input_tokens"] == 4
 
 
+def test_decision_timings_separate_queue_encoding_and_model_work(monkeypatch):
+    """A controlled clock checks phase boundaries without slow timing assertions."""
+    from qev import inference
+
+    now = [0.]
+    monkeypatch.setattr(inference, "time", SimpleNamespace(perf_counter=lambda: now[0]))
+
+    class WaitingLock:
+        def __enter__(self):
+            now[0] += .012
+
+        def __exit__(self, *args):
+            return False
+
+    class TimedModel(FakeModel):
+        def forward(self, **kwargs):
+            now[0] += .003
+            return super().forward(**kwargs)
+
+    def text_encoding(*args):
+        now[0] += .002
+        return {"ids": [1, 2, 3, 4], "option_positions": [1, 2], "decision_position": 3}
+
+    def media_encoding(*args, **kwargs):
+        now[0] += .007
+        return {"ids": [1, 2, 3, 4], "option_positions": [1, 2], "decision_position": 3,
+                "inputs": {"input_ids": torch.tensor([[1, 2, 3, 4]])}}
+
+    monkeypatch.setattr(inference, "encode_question", text_encoding)
+    monkeypatch.setattr("qev.tokenization.encode_multimodal_question", media_encoding)
+    agent = fake_agent()
+    agent.lock, agent.model = WaitingLock(), TimedModel()
+    agent.tokenizer = SimpleNamespace(pad_token_id=0)
+    result = agent.predict("Choose", {
+        "text": {"type": "noul"},
+        "image": {"type": "choice", "criteria": {
+            "a": {"content": [{"type": "image_url", "image_url": {"url": png_url()}}]}, "b": None,
+        }},
+    })
+    assert result["qev"]["timings_ms"] == {
+        "decode": 0., "queue": 12., "encode": 9., "inference": 6., "total": 27.,
+    }
+    assert result["latency_ms"] == 27.
+
+
 def test_real_processor_agent_and_mlx_runtime_multimodal_contract(tmp_path):
     """End-to-end CPU tiny VLM: real PNG/frames -> processor -> Agent -> MLX.
 

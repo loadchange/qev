@@ -11,8 +11,10 @@ import numpy as np
 
 from .api import (
     ChatCompletionRequest,
+    MediaBudget,
     SystemOneRequest,
     decode_chat_messages,
+    decode_question_options,
     decode_state,
     to_answers,
     to_record,
@@ -66,14 +68,20 @@ class Agent:
             raise NotImplementedError("This checkpoint does not include the original multimodal processor")
         return self.processor
 
-    def _predict_media(self, decoded, record):
+    def _predict_media(self, decoded, record, option_images=None, timings=None):
+        encode_started = time.perf_counter()
         from .tokenization import encode_multimodal_question
         processor = self._processor()
+        per_question_images = option_images if option_images is not None else [None] * len(record["questions"])
         encodings = [encode_multimodal_question(
             decoded.text, question, processor, images=decoded.images or None,
             videos=decoded.videos or None, video_fps=decoded.video_fps or None,
+            option_images=attached,
             max_length=self.config.get("multimodal_max_length", 8192), max_state=None,
-        ) for question in record["questions"]]
+        ) for question, attached in zip(record["questions"], per_question_images, strict=True)]
+        inference_started = time.perf_counter()
+        if timings is not None:
+            timings["encode"] += (inference_started - encode_started) * 1000
         if self.backend == "mlx":
             packed = []
             for encoding in encodings:
@@ -91,6 +99,8 @@ class Agent:
                     with inference_autocast(self.model):
                         logits = self.model(**inputs)[0].float().cpu().numpy()
                     ps.append(probabilities(logits[:len(encoding["option_positions"])], 1.0).tolist())
+        if timings is not None:
+            timings["inference"] += (time.perf_counter() - inference_started) * 1000
         # A temperature fitted on text classification is not validated for
         # images/videos, so these experimental decision outputs remain raw.
         return ps, encodings
@@ -106,39 +116,65 @@ class Agent:
         return set(eos if isinstance(eos, (list, tuple)) else [] if eos is None else [eos])
 
     def predict(self, state, questions, *, model=None):
+        start = time.perf_counter()
         request = SystemOneRequest(state=state, questions=questions, model=model or self.config.get("model_name", "qev-0.8b"))
         if len(request.questions) > 64:
             raise ValueError("At most 64 questions per request")
         rec, meta = to_record(request)
-        start = time.perf_counter()
-        decoded = decode_state(request.state)
+        budget = MediaBudget()
+        decoded = decode_state(request.state, budget)
+        decoded_options = [decode_question_options(question, budget) for question in request.questions.values()]
+        option_images = [[option.images for option in options] for options in decoded_options]
+        media_rows = [decoded.has_media or any(images) for images in option_images]
+        temperatures = [1.0 if has_media else self.temperature for has_media in media_rows]
+        encodings, ps = [None] * len(meta), [None] * len(meta)
+        queue_started = time.perf_counter()
+        timings = {"decode": (queue_started - start) * 1000, "queue": 0., "encode": 0., "inference": 0.}
         with self.lock:
-            if decoded.has_media:
-                ps, encodings = self._predict_media(decoded, rec)
-            else:
-                encodings = [encode_question(rec["state"], q, self.tokenizer,
-                    self.config.get("max_length", 1024), self.config.get("max_state", 384)) for q in rec["questions"]]
-            if not decoded.has_media and self.backend == "mlx":
-                logits = self.model.predict_logits(encodings)
-                ps = [probabilities(row, self.temperature).tolist() for row in logits]
-            elif not decoded.has_media:
+            timings["queue"] = (time.perf_counter() - queue_started) * 1000
+            media_indices = [i for i, has_media in enumerate(media_rows) if has_media]
+            if media_indices:
+                media_record = {**rec, "questions": [rec["questions"][i] for i in media_indices]}
+                media_ps, media_encodings = self._predict_media(
+                    decoded, media_record, [option_images[i] for i in media_indices], timings=timings,
+                )
+                for i, values, encoding in zip(media_indices, media_ps, media_encodings, strict=True):
+                    ps[i], encodings[i] = values, encoding
+            text_indices = [i for i, has_media in enumerate(media_rows) if not has_media]
+            encode_started = time.perf_counter()
+            text_encodings = [encode_question(rec["state"], rec["questions"][i], self.tokenizer,
+                self.config.get("max_length", 1024), self.config.get("max_state", 384)) for i in text_indices]
+            for i, encoding in zip(text_indices, text_encodings, strict=True):
+                encodings[i] = encoding
+            inference_started = time.perf_counter()
+            timings["encode"] += (inference_started - encode_started) * 1000
+            if text_indices and self.backend == "mlx":
+                logits = self.model.predict_logits(text_encodings)
+                for i, row in zip(text_indices, logits, strict=True):
+                    ps[i] = probabilities(row, self.temperature).tolist()
+            elif text_indices:
                 import torch
 
                 from .tokenization import collate_encodings
-                ps = []
                 with torch.inference_mode():
-                    for start_index in range(0, len(encodings), self.batch_size):
-                        chunk = encodings[start_index:start_index+self.batch_size]
+                    for start_index in range(0, len(text_encodings), self.batch_size):
+                        chunk = text_encodings[start_index:start_index+self.batch_size]
                         with inference_autocast(self.model):
                             logits = self.model(**collate_encodings(chunk, self.tokenizer.pad_token_id, self.device)).float().cpu().numpy()
-                        ps.extend(probabilities(z[:len(e['option_positions'])], self.temperature).tolist()
-                                  for z, e in zip(logits, chunk))
-        return {"model": request.model, "answers": to_answers(ps, meta),
+                        for i, z, encoding in zip(text_indices[start_index:start_index+self.batch_size], logits, chunk, strict=True):
+                            ps[i] = probabilities(z[:len(encoding['option_positions'])], self.temperature).tolist()
+            timings["inference"] += (time.perf_counter() - inference_started) * 1000
+        answers = to_answers(ps, meta)
+        timings["total"] = (time.perf_counter() - start) * 1000
+        timings = {key: round(value, 2) for key, value in timings.items()}
+        return {"model": request.model, "answers": answers,
                 "usage": {"input_tokens": sum(len(e["ids"]) for e in encodings), "output_tokens": 0},
-                "latency_ms": round((time.perf_counter() - start) * 1000, 2),
-                "qev": {"backend": self.backend, "temperature": 1.0 if decoded.has_media else self.temperature,
+                "latency_ms": timings["total"],
+                "qev": {"backend": self.backend, "temperature": temperatures[0] if len(set(temperatures)) == 1 else None,
+                        "timings_ms": timings,
+                        "question_temperatures": {m["id"]: t for m, t in zip(meta, temperatures, strict=True)},
                         "training_modalities": ["text"], "multimodal_decision_accuracy_validated": False,
-                        "input_modalities": ["text"] + (["image"] if decoded.images else []) + (["video"] if decoded.videos else []),
+                        "input_modalities": ["text"] + (["image"] if decoded.images or any(any(groups) for groups in option_images) else []) + (["video"] if decoded.videos else []),
                         "truncated_questions": [m["id"] for m, e in zip(meta, encodings) if e.get("state_truncated", False)]}}
 
     def chat_completions(self, request: ChatCompletionRequest | dict):

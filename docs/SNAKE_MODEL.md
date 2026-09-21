@@ -1,63 +1,65 @@
-# Qev 贪吃蛇专项模型
+[English](SNAKE_MODEL.md) | [简体中文](SNAKE_MODEL.zh-CN.md)
 
-`qev snake` 在终端加载真实 Qev 模型并逐步执行其最大概率动作。默认优先使用 `models/qev-snake-0.8b-mlx`；原 `models/qev-0.8b[-mlx]` 保留作对照。完整键位和参数见 [DEMO](DEMO.md)。
+# Qev Snake model
 
-## 为什么重做
+`qev snake` loads a real Qev model in the terminal and executes its highest-probability action at each step. It prefers `models/qev-snake-0.8b-mlx` by default; the original `models/qev-0.8b[-mlx]` remains available for comparison. See [DEMO](DEMO.md) for all controls and arguments.
 
-历史 v0.2 只接通了游戏接口：训练集没有 Snake 样本，输入仅含局部碰撞和曼哈顿距离，真实游戏会漏吃、绕圈和撞墙。新增终端界面之外，本次从既有 Qev adapter/head 继续监督训练，并增加明确可见的环境空间特征。
+## Why it was revised
 
-本地 Laya-MLX `fc1df62` 的 Snake 演示在 `laya_mlx/snake/policy.py` 中把规划器判定的 “Best progress toward food” 写进候选，默认安全 shield 还可以替换模型选择。因此它的演示分数不能直接与 Qev 的无接管模型分数比较。本次主要比较**相同 Qev 游戏环境、特征、种子和推理设置下的训练前后模型**，不宣称超过 Laya。
+Historical v0.2 connected the game interface but contained no Snake training samples. Inputs included only local collision facts and Manhattan distance, and real games missed food, looped and hit walls. In addition to the new terminal interface, this version continues supervised training from the existing Qev adapter/head and adds explicit, visible spatial features from the environment.
 
-## 输入、监督和执行
+The local Laya-MLX `fc1df62` Snake demo inserts the planner's “Best progress toward food” into candidates in `laya_mlx/snake/policy.py`; its default safety shield can also replace the model's choice. Its demo scores therefore cannot be directly compared with Qev scores without overrides. This evaluation primarily compares **Qev before and after training under the same game environment, features, seeds and inference settings**; it does not claim superiority over Laya.
 
-`spatial` 模式给出三个非反向方向，包括可能发生碰撞的方向。候选包含碰撞、距离变化、吃食物，以及静态 BFS 可达空间、尾部连通性、食物路径距离和最近 32 步的访问次数。BFS 由环境计算，模型不必从棋盘像素自行推导几何；游戏棋盘仍不是图像输入。
+## Inputs, supervision and execution
 
-明确的启发式教师只读取模型可见字段生成标签。它优先避碰、保留尾连通和空间，再结合食物路径和访问次数。训练时不输入 “最佳动作” 标记、教师方向、教师排名或隐藏棋盘元数据；运行时不调用教师、不剔除碰撞候选，也不替换模型动作。`local` 模式保留旧观察用于消融。
+`spatial` mode supplies three non-reversing directions, including directions that may collide. Candidates include collision, distance change, food consumption, static BFS reachable space, tail connectivity, food path distance and visit counts over the last 32 steps. The environment computes BFS, so the model need not infer geometry from board pixels; the game board is still not an image input.
 
-新增 Snake 训练 / 校准 / 开发样本数为 12,000 / 500 / 500。训练来自 251 个独立游戏种子，覆盖 6、8、12、16 四种尺寸，每局最多抽 48 个状态，行为含 10% 概率的合法随机偏离；候选顺序重排。原任务的 5,892 / 620 / 880 题全部按原分区回放。合并后共 17,892 / 1,120 / 1,380 题，逐题 token 审计无截断。游戏种子和规范化观察跨分区隔离；10000–10019 未参与训练轨迹。
+An explicit heuristic teacher reads only fields visible to the model to generate labels. It prioritizes avoiding collisions and preserving tail connectivity and space, then considers food paths and visits. Training input contains no “best action” marker, teacher direction, teacher ranking or hidden board metadata. Runtime neither calls the teacher, removes colliding candidates nor replaces model actions. `local` mode preserves the old observation for ablation.
 
-A100 40GB 上从原 adapter/head 继续两轮，batch 8、accumulation 2、学习率 3e-5，2238 次更新，优化约 1484.69 秒。原始完整 Qwen3.5 基座冻结；新的 calibration 分区拟合温度 `T=2.82842712474619`。来源、数据摘要、冻结校验和完整评估见 [记录目录](results/snake_training)。
+New Snake train / calibration / development counts are 12,000 / 500 / 500. Training uses 251 independent game seeds and sizes 6, 8, 12 and 16, sampling at most 48 states per episode, with 10% probability of a legal random deviation and shuffled candidate order. All 5,892 / 620 / 880 original questions are replayed in their existing splits. Combined totals are 17,892 / 1,120 / 1,380 questions, with no truncation in the per-question token audit. Game seeds and normalized observations are isolated across splits; 10000–10019 are excluded from training trajectories.
 
-## 同条件评估
+Training continues the original adapter/head for two epochs on an A100 40GB, with batch 8, accumulation 2 and learning rate 3e-5: 2238 updates and about 1484.69 optimization seconds. The complete original Qwen3.5 foundation stays frozen; the new calibration split fits temperature `T=2.82842712474619`. See the [records directory](results/snake_training) for provenance, data hashes, frozen checks and complete evaluation.
 
-同一 A100、CUDA BF16、同一开发集的训练前后结果：
+## Evaluation under matched conditions
 
-| 问题 | 数量 | 原模型 | 专项模型 |
+Before/after results on the same A100, CUDA BF16 and development set:
+
+| Measure | Count | Parent model | Specialized model |
 | --- | ---: | ---: | ---: |
-| 未见游戏种子的教师动作一致率 | 500 | 73.60% | 98.40% |
-| 原有通用分类及程序规则准确率 | 880 | 81.25% | 81.70% |
+| Teacher-action agreement on unseen game seeds | 500 | 73.60% | 98.40% |
+| Original general classification and programmatic rule accuracy | 880 | 81.25% | 81.70% |
 
-教师一致率不等于整局成功率。以下闭环使用相同 `spatial` 特征，500 步上限，直接执行模型 argmax，无安全接管；Torch 以 8 局为批量推进独立游戏。
+Teacher agreement is not whole-game success. The following closed-loop evaluation uses the same `spatial` features and a 500-step cap, executing model argmax directly without safety overrides. Torch advances independent games in batches of 8.
 
-| 棋盘 / 保留种子 | 原模型平均食物 | 专项模型平均食物 | 原模型碰撞局数 | 专项模型碰撞局数 |
+| Board / held-out seeds | Parent mean food | Specialized mean food | Parent collision games | Specialized collision games |
 | --- | ---: | ---: | ---: | ---: |
-| 8×8 / 10000–10019，共 20 局 | 3.10 | 42.90 | 20 | 0 |
-| 12×12 / 10000–10007，共 8 局 | 0.625 | 42.00 | 8 | 0 |
+| 8×8 / 10000–10019, 20 games | 3.10 | 42.90 | 20 | 0 |
+| 12×12 / 10000–10007, 8 games | 0.625 | 42.00 | 8 | 0 |
 
-新模型这 28 局全部走到 500 步上限，未填满棋盘。相同种子保证初始状态相同；动作不同会导致后续食物位置与轨迹不同。这里检验的是闭环行为，不是每步相同状态下的分类。批处理与单局、CUDA BF16 与 MLX FP32 的浮点差异可能改变选择与后续轨迹。
+All 28 new-model games reached the 500-step cap; none filled the board. Identical seeds guarantee identical initial states, but different actions lead to different later food positions and trajectories. This measures closed-loop behavior rather than classification on the same state at every step. Floating-point differences between batched and single-game inference, or CUDA BF16 and MLX FP32, can alter choices and subsequent trajectories.
 
-### 本机 MLX
+### Local MLX
 
-Apple M4、16 GiB 内存、MLX FP32，8×8、相同保留种子 10000–10004、逐局推理、每局 500 步上限：
+Apple M4, 16 GiB memory, MLX FP32, 8×8 board, the same held-out seeds 10000–10004, one game at a time and a 500-step limit per game:
 
-| 指标 | 原模型 | 专项模型 |
+| Measure | Parent model | Specialized model |
 | --- | ---: | ---: |
-| 平均吃到的食物 | 3.0 | 42.6 |
-| 各局食物数 | 4 / 1 / 5 / 1 / 4 | 37 / 45 / 44 / 38 / 49 |
-| 碰撞局数 | 5 / 5 | 0 / 5 |
-| 走到 500 步上限 | 0 / 5 | 5 / 5 |
+| Mean food collected | 3.0 | 42.6 |
+| Food by game | 4 / 1 / 5 / 1 / 4 | 37 / 45 / 44 / 38 / 49 |
+| Collision games | 5 / 5 | 0 / 5 |
+| Games reaching the 500-step cap | 0 / 5 | 5 / 5 |
 
-五个种子均有提高，新模型没有饥饿结束或填满棋盘。2500 次真实决策的延迟中位数为 223.84 ms、P95 为 240.21 ms，包含游戏和逐步记录的速度约 4.40 步/秒。原模型通过本机 HTTP 调用同一个 MLX Agent，新模型直接调用本机 MLX Agent；比较的是游戏行为，不据此比较传输延迟。协议核对了相同规则、输入、候选次序与特征源码。原始概率、选择与执行动作逐步留档，全部执行 argmax，无接管。见[原模型记录](results/snake_training/parent-mlx-spatial.json)和[专项模型记录](results/snake_training/trained-mlx-spatial.json)。
+All five seeds improved; the new model neither starved nor filled the board. Across 2500 real decisions, median latency was 223.84 ms and P95 was 240.21 ms; speed including game processing and step logging was about 4.40 steps/second. The parent called the same local MLX Agent over HTTP; the new model called the local MLX Agent directly. This compares gameplay and does not compare transport latency. Protocol checks verified identical rules, inputs, candidate order and feature source. Raw probabilities, choices and executed actions are recorded at every step; all executed argmax without overrides. See the [parent record](results/snake_training/parent-mlx-spatial.json) and [specialized model record](results/snake_training/trained-mlx-spatial.json).
 
-## 多模态保留与交付验证
+## Multimodal preservation and release validation
 
-训练始终冻结完整 Qwen3.5 基座。原生生成关闭决策 adapter，继续使用原始语言、视觉权重和生成头。在同一 A100 上顺序加载旧、新 checkpoint，文字、图片、视频三个固定样例的输出 token IDs 均完全一致；冻结参数的完整哈希也一致。见[原生能力对照](results/snake_training/snake-native.json)。这提供有限样例和权重保留证据，不是完整多模态准确率评测。
+The complete Qwen3.5 foundation remains frozen throughout training. Native generation disables the decision adapter and uses the original language/visual weights and generation head. Loading old and new checkpoints sequentially on the same A100 produced identical output token IDs for three fixed text, image and video examples; full frozen-parameter hashes also matched. See the [native comparison](results/snake_training/snake-native.json). This provides limited regression and weight-preservation evidence, not a comprehensive multimodal accuracy evaluation.
 
-MLX 导出复用了与旧版字节相同的完整多模态基座；372 个 adapter 张量逐个与新 Torch checkpoint 核对相等，指针头文件也一致，见[导出校验](results/snake_training/export_integrity.json)。本次没有重新执行 Torch CPU FP32 与 MLX FP32 的 logits 数值对照，导出配置如实保留 `parity_status: not_run`；不宣称 CUDA BF16 与 MLX FP32 概率完全一致。
+MLX export reused the complete multimodal foundation, byte-identical to the previous version. All 372 adapter tensors were checked individually against the new Torch checkpoint, and the pointer-head file also matched; see [export verification](results/snake_training/export_integrity.json). Torch CPU FP32 versus MLX FP32 logit parity was not rerun, and the export configuration accurately retains `parity_status: not_run`; identical CUDA BF16 and MLX FP32 probabilities are not claimed.
 
-新 MLX checkpoint 通过了 [19 项真实 HTTP / TypeSafe SDK 检查](results/snake_training/service_mlx.json)，覆盖文字、图片、视频、混合媒体决策、原生生成、适配器恢复及错误请求。终端暂停、单步、退出和光标恢复经过[真实 PTY 验证](results/snake_training/terminal_controls.json)；默认路径也实际加载新模型完成冒烟运行。148 项测试、构建与产物摘要见[交付检查](results/snake_training/release_checks.json)。新旧 checkpoint 分开保存，原文件未覆盖，Colab A100 会话已停止。
+The new MLX checkpoint passed [19 real HTTP / TypeSafe SDK checks](results/snake_training/service_mlx.json), covering text, image, video and mixed-media decisions, native generation, adapter restoration and invalid requests. Terminal pause, single-step, quit and cursor restoration passed [real PTY validation](results/snake_training/terminal_controls.json); the default path also loaded the new model in an actual smoke test. See [release checks](results/snake_training/release_checks.json) for 148 tests, build results and artifact hashes. Old and new checkpoints are stored separately without overwriting original files, and the Colab A100 session has stopped.
 
-## 复现
+## Reproduction
 
 ```bash
 uv run qev snake
@@ -70,4 +72,4 @@ uv run python scripts/benchmark_snake.py --model models/qev-snake-0.8b-mlx \
   --output runs/trained-snake.json --compare runs/parent-snake.json
 ```
 
-完整数据准备与训练命令见 [TRAINING](TRAINING.md)。基准会保存实际请求、原始概率与动作，检查协议一致后逐种子比较；原始轨迹体积较大，保存在本地 `runs/snake-training/`。这是一轮显式特征辅助的模仿学习，不能证明模型具备从原始像素学习游戏规则、最优规划或永不碰撞的能力。
+See [TRAINING](TRAINING.md) for complete data preparation and training commands. Benchmarks preserve actual requests, raw probabilities and actions, verify protocol consistency and compare each seed. Large raw trajectories remain locally in `runs/snake-training/`. This is imitation learning with explicit feature assistance; it does not demonstrate learning game rules from raw pixels, optimal planning or collision-free behavior in all situations.

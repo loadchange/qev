@@ -24,7 +24,30 @@ def digest(path):
         return hashlib.file_digest(stream, "sha256").hexdigest()
 
 
-def release_files(flavor):
+def prepare_model_cards(flavor, output):
+    """Stage both card languages with links relative to their Hub filenames."""
+    suffix = "-mlx" if flavor == "mlx" else ""
+    stem = f"qev-0.8b{suffix}"
+    source_navigation = f"[English]({stem}.md) | [简体中文]({stem}.zh-CN.md)"
+    release_navigation = "[English](README.md) | [简体中文](README.zh-CN.md)"
+    cards = {}
+    for language in ("", ".zh-CN"):
+        source = ROOT / "docs/huggingface" / f"{stem}{language}.md"
+        content = source.read_text()
+        if content.count(source_navigation) != 1:
+            raise ValueError(f"Expected one bilingual navigation in {source}")
+        cards[f"README{language}.md"] = content.replace(source_navigation, release_navigation)
+    output.mkdir(parents=True, exist_ok=True)
+    files = {}
+    for name, content in cards.items():
+        path = output / name
+        path.write_text(content)
+        ModelCard.load(path)
+        files[name] = path
+    return files
+
+
+def release_files(flavor, *, card_output=None):
     suffix = "-mlx" if flavor == "mlx" else ""
     source = ROOT / "models" / f"qev-snake-0.8b{suffix}"
     files = {"qev_config.json": source / "qev_config.json",
@@ -47,7 +70,6 @@ def release_files(flavor):
     for name in required:
         if name not in files:
             raise FileNotFoundError(source / name)
-    files["README.md"] = ROOT / "docs/huggingface" / f"qev-0.8b{suffix}.md"
     for name in ("LICENSE", "NOTICE"):
         files[name] = ROOT / name
     for name in REPORTS:
@@ -61,7 +83,9 @@ def release_files(flavor):
     assert config["native_generation"] == "adapter_disabled"
     assert config.get("runtime", "torch") == flavor
     assert config["base_revision"] == "2fc06364715b967f1860aea9cf38778875588b17"
-    ModelCard.load(files["README.md"])
+    if card_output is None:
+        card_output = ROOT / "runs/huggingface-publication" / f"qev-0.8b{suffix}"
+    files.update(prepare_model_cards(flavor, card_output))
     return files
 
 
@@ -82,7 +106,7 @@ def main():
     for flavor in ("torch", "mlx") if args.flavor == "both" else (args.flavor,):
         name = "qev-0.8b" + ("-mlx" if flavor == "mlx" else "")
         repo_id = f"{args.namespace}/{name}"
-        files = release_files(flavor)
+        files = release_files(flavor, card_output=args.output / name)
         manifest = {
             "format": "qev-hub-release-v1", "version": "0.3.0", "repo_id": repo_id,
             "runtime": flavor, "runtime_source_commit": "d68c468d6c9963d558528df63c3c16dda711b84c",
