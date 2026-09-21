@@ -1,0 +1,176 @@
+{
+  "version": "0.3.0",
+  "verified_at_utc": "2026-09-21T00:53:07.134427+00:00",
+  "quality_gates": {
+    "pytest": {
+      "passed": 148,
+      "failed": 0,
+      "warnings": 1,
+      "command": ".venv/bin/python -m pytest -q",
+      "warning": "Starlette uses a deprecated AnyIO BlockingPortal alias."
+    },
+    "ruff": {
+      "passed": true,
+      "command": ".venv/bin/ruff check qev scripts tests"
+    },
+    "javascript_syntax": {
+      "passed": true
+    },
+    "uv_lock_offline_check": {
+      "passed": true
+    },
+    "wheel": {
+      "passed": true,
+      "path": "dist/qev-0.3.0-py3-none-any.whl",
+      "sha256": "a147615360c8a41423901c962b2124ab585916c8a17fcb2ecf9be5228dd33916",
+      "package_sources_match": true,
+      "source_files_checked": 23
+    },
+    "default_cli": {
+      "passed": true,
+      "report": "terminal_trained_smoke.json"
+    },
+    "real_terminal_controls": {
+      "passed": true,
+      "report": "terminal_controls.json"
+    },
+    "real_mlx_http_sdk": {
+      "passed": true,
+      "checks": 19,
+      "report": "service_mlx.json"
+    }
+  },
+  "benchmarks": {
+    "mlx_8x8_5_seeds": {
+      "parent_mean_food": 3.0,
+      "trained_mean_food": 42.6,
+      "parent_collisions": 5,
+      "trained_collisions": 0,
+      "max_steps": 500
+    },
+    "cuda_8x8_20_seeds": {
+      "parent_mean_food": 3.1,
+      "trained_mean_food": 42.9,
+      "parent_collisions": 20,
+      "trained_collisions": 0,
+      "max_steps": 500
+    },
+    "cuda_12x12_8_seeds": {
+      "parent_mean_food": 0.625,
+      "trained_mean_food": 42.0,
+      "parent_collisions": 8,
+      "trained_collisions": 0,
+      "max_steps": 500
+    },
+    "execution": "model_argmax_direct; static BFS environment features; no action override"
+  },
+  "preservation": {
+    "native_text_image_video_identical_token_probes": 3,
+    "frozen_base_hash_unchanged": true,
+    "mlx_foundation_byte_identical_to_parent": true,
+    "exact_adapter_tensor_checks": 372,
+    "original_checkpoint_files_unchanged": 25,
+    "cross_runtime_logit_parity": "not_run"
+  },
+  "colab_shutdown": {
+    "session": "qev-snake-0921",
+    "hardware": "NVIDIA A100 40GB",
+    "stopped": true,
+    "stop_output": "[colab] Session terminated.",
+    "artifacts_downloaded_before_stop": true
+  },
+  "final_reports": {
+    "base_integrity.json": {
+      "sha256": "db823d6d5f2b5a06fbc53ba494e35283247415fc39601ea620b281af9e86aa15"
+    },
+    "checkpoint_download_validation.json": {
+      "sha256": "a3f1e32c635346c2ae4267de668cb5b64c55877414c8fa603d9189019b6121c3"
+    },
+    "cloud_results_validation.json": {
+      "sha256": "c6976766e1844be3adec55f8e8eccb8c93ec3b544149a59e22ec4eec32b1198d"
+    },
+    "data_manifest.json": {
+      "sha256": "f41151c68d6465b90bb8ea66ca0ea8611a6b37ed48596ba9484abc8ef4deda33"
+    },
+    "data_teacher_evaluation.json": {
+      "sha256": "8f07b99309dee368527f125acbcc8a8d1b1bc842325b9a61f078a94d225775f9"
+    },
+    "data_token_audit.json": {
+      "sha256": "c4a14d1251e3850842ab7d1d3d7480cff0a1b90ffa5e09c2b1b75c5f524d2cd4"
+    },
+    "evaluation.json": {
+      "sha256": "0a230d59e7716e4cf1e07d2591fef1d2853bf9371c9143b88b78c821ec8c7428"
+    },
+    "export_integrity.json": {
+      "sha256": "3cf38f4c60f7fc5e11ddaa522abc84792c3a93cb60d23d98c57c4a959f98b8df"
+    },
+    "initial_development.json": {
+      "sha256": "afef74a0cc6966bd2563eaccc7c8bdda0ec1db3851e3ded76878b5b866d32b38"
+    },
+    "parent-mlx-spatial.json": {
+      "sha256": "3adca27ac57a67987d78f0d3156c44f6a9368e75cf0decefc66c7cc8b74a0c43"
+    },
+    "parent-snake-torch-12.json": {
+      "sha256": "4db575d52650c5ba46a4a609bbd27535c3cebc45fde846999406de8228d02153"
+    },
+    "parent-snake-torch.json": {
+      "sha256": "b09ea9f9ff3b04120dec1d9d2b01566959c5e7398794b1b07649051788fb40bc"
+    },
+    "provenance.json": {
+      "sha256": "ed318a19a494de0efaa2ae8beb70419e67b3eee696c405460d0efa77f1dca823"
+    },
+    "qev_config.json": {
+      "sha256": "27c6c1fd444462082b53a986bc93a89b5ae53b0d0519291a646252c047b00aa3"
+    },
+    "service_mlx.json": {
+      "sha256": "5b81fba2cace6ef0a2fff83353d3f03e4b0f275e400e8c13256ab75a067b3633"
+    },
+    "snake-native.json": {
+      "sha256": "8faf157096f48cd576d7df9d768583d03508ad28a341b72e118634264b7f479d"
+    },
+    "terminal_controls.json": {
+      "sha256": "23291842baf4527fc8907b82bb84b298775eb71705ba53e60f701456bead2c7d"
+    },
+    "terminal_trained_smoke.json": {
+      "sha256": "ca33718c13b3406b81bc3ec8040903b87d81018e90bc9e7c35b0f6cbeb6f8212"
+    },
+    "trained-mlx-spatial.json": {
+      "sha256": "c395fc14613760e0d0feec154b6a9cb3bedc612ab2e7083f6982a7cc28c06ee3"
+    },
+    "trained-snake-torch-12.json": {
+      "sha256": "6dd00feeb3fcf2cbfce3c3739e2d772b2746c792114d86a8355a931dccfa3d56"
+    },
+    "trained-snake-torch.json": {
+      "sha256": "c4aacff3bc96c0135e56d0209de8f8621e45d68bf989c42fba69bb5838277ff2"
+    },
+    "training_metrics_summary.json": {
+      "sha256": "972614abb552309bcd51b481eaa72edbf69015a593f1b51ccd323ffb50dd9629"
+    }
+  },
+  "source_sha256": {
+    "qev/__init__.py": "15438cd810e54743a2e6ffdbc6d50d398fd360e60c63219950ef5cde1a744ab9",
+    "qev/__main__.py": "6d8b7d7846a845059d7a3107143f11131f63c5511d669b44085b15ec5e3d2279",
+    "qev/api.py": "c1791c5f197e72ac12789c9cd9da2ff411aca171c20bea92229220d561ee6767",
+    "qev/cli.py": "691a548e5f6007272dd84e4dbab2e17810c9b3fc4c47b430f64760bbfc319948",
+    "qev/data.py": "4e9fd9dc973fe19256e085ede83ea6a9b8522d1b7d374866a6ec34b3329c7a8f",
+    "qev/demo.py": "1a367d8a7b27954ca48e265b25db9bf9c15b26e29de91fca5bea6e09f1a4c255",
+    "qev/evaluation.py": "7799b27cba7d8b4228569c13cea1f8ec4d390f9ca0464d70d9b0904d98247178",
+    "qev/export.py": "38979228f2bfaf5d4bbf1cce0d1346cf8e3eb1eabdfc8ba50223e1f51e2503bb",
+    "qev/inference.py": "673bd9d9e7c3a393dc3f79057de558a863eef9191d4baab34e2c55a337898e4b",
+    "qev/mlx_runtime.py": "33832d9ff139f2eeb35e69c9010a1191ae657bb7c43ae1cbdf406fde95ee48f3",
+    "qev/model.py": "2dec3e86955678930afa807c272f7715a382429b7fcab4423b5d698095d97ae0",
+    "qev/processing.py": "962d58f7c39cf4d257a2838836ecd1c3107d9cdbb9c59559534d76c2c04b8cd3",
+    "qev/serve.py": "a8f606c76db74894a283626a5dd86dcdd4fa6926a8e583d33f07b27984ac04f1",
+    "qev/snake.py": "fabf36ce25b1198fc03590b4d35247f3a1f0ecec1a6ebb371762c02b5f4a8e43",
+    "qev/snake_cli.py": "460fa8bae3ad4a8ddd722b156c4c7ab5d10b0165d9df12dac3367aedae5102f6",
+    "qev/snake_features.py": "575525b2be4a260e16c45230793167d77b4a1dfffb708d1761c3e345c8bfac6e",
+    "qev/tokenization.py": "53ca04e97221c6c14a3acf0bdac74e3014943324f9986bea549a7bf36135c895",
+    "qev/train.py": "96480346b9c8c61827d44f60657197657477497a8970555d39559c9233f65de7",
+    "qev/web/app.js": "a27c22e28efbcd3333e05051c39d52837e37337f9fd3a1d0d4b0072c4f51e5b0",
+    "qev/web/index.html": "c5f6ce341402b92d33945c4dae085c7286b0ecef16d202fddb822d2c06d43219",
+    "qev/web/playground.js": "9172c7e2bb81a09070d12011738f9992d038c28c64bcab0b0d02ac0dcfb3b310",
+    "qev/web/snake.js": "22782efd959bca27312370b9b03fea3ec9011f35229a90a556e5bf31ab4f1bf5",
+    "qev/web/style.css": "092dff563f46764767c1acf2920db1c8d7d0a61c629c9674062333aa9a5bfec6"
+  },
+  "scope": "Finite same-environment gameplay and preservation checks. Not a Laya equivalence claim, a perfect-play guarantee, or a comprehensive multimodal accuracy evaluation."
+}

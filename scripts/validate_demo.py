@@ -76,8 +76,10 @@ class AssetParser(HTMLParser):
 def audit_step(before, after, *, backend):
     """Check the action against the original request, response, and environment."""
     require(after["id"] == before["id"], "A step changed the session identity")
-    require(after["policy"] == {"mode": "model_direct", "feature_assisted": True,
-                                "planner": False, "guardrail": False}, "Unexpected game policy")
+    expected_policy = {"mode": "model_direct", "feature_assisted": True,
+                       "planner": False, "guardrail": False}
+    require(all(after["policy"].get(key) == value for key, value in expected_policy.items()),
+            "Unexpected game policy")
     trace = after["last_decision"]
     require(isinstance(trace, dict), "Missing decision trace")
     require("error" not in trace and after["terminal_reason"] != "model_error",

@@ -10,20 +10,35 @@ Qev 增加独立的语言 LoRA 决策适配器与候选指针头，保留原始�
 
 ```bash
 uv sync --python 3.12 --extra mlx --extra dev
-uv run qev predict --model models/qev-0.8b-mlx --request examples/request.json
-uv run qev serve --model models/qev-0.8b-mlx --port 8008
+uv run qev snake
+uv run qev predict --model models/qev-snake-0.8b-mlx --request examples/request.json
+uv run qev serve --model models/qev-snake-0.8b-mlx --port 8008
 ```
 
-GPU / PyTorch 版本使用 `models/qev-0.8b`。Mac 优先使用 MLX；MLX 通过 Apple Silicon CPU/GPU 和统一内存运行，不表示调用 Apple Neural Engine，也不会自动提高模型准确率。
+本次专项模型的 GPU / PyTorch 版本为 `models/qev-snake-0.8b`，Mac 版本为 `models/qev-snake-0.8b-mlx`；原 `models/qev-0.8b[-mlx]` 保留。Mac 优先使用 MLX；MLX 通过 Apple Silicon CPU/GPU 和统一内存运行，不表示调用 Apple Neural Engine，也不会自动提高模型准确率。
+
+**贪吃蛇首选终端入口 `qev snake`。** 棋盘旁显示模型候选概率、实际动作、得分和推理耗时；空格暂停/继续，`N` 单步，`+` / `-` 调速，`Q` 或 Ctrl-C 退出。默认优先加载存在的 `models/qev-snake-0.8b-mlx`，否则加载 `models/qev-0.8b-mlx`；使用 `--model` 可固定 checkpoint。专项训练已完成；终端默认加载新权重，原权重仍可显式选择。
+
+默认 `--observation spatial` 提供静态 BFS 可达空间、尾部连通性、食物路径距离和近期访问次数；这些是引擎计算的环境特征，画面明确标注“静态BFS环境特征·无动作接管”。`--observation local` 保留历史碰撞/食物距离观测，便于固定模型、种子和规则做对照。模型仍直接选择并执行方向，可能碰撞的候选不会被剔除。
+
+```bash
+# 历史模型 + 历史局部观测
+uv run qev snake --model models/qev-0.8b-mlx --observation local --seed 7
+# 无界面连续运行十局，种子依次为 10000..10009，逐步保存真实请求与响应
+uv run qev snake --headless --fps 0 --seed 10000 --episodes 10 \
+  --report runs/snake-terminal.jsonl
+```
+
+JSONL 报告逐条写入且拒绝覆盖已有文件；没有 TTY 时自动使用 headless 模式。专项数据与训练复现见 [训练说明](docs/TRAINING.md)，终端/HTTP 模式与完整操作见 [演示说明](docs/DEMO.md)。历史 v0.2 checkpoint 未接受贪吃蛇训练。新模型在相同 8×8、500 步、20 个保留种子的 CUDA 对照中，平均吃食从 3.1 提升到 42.9，碰撞从 20 局降至 0 局；这是有限回合实测，不是永不碰撞保证。完整条件、Mac 结果与多模态保留验证见 [专项模型说明](docs/SNAKE_MODEL.md)。
 
 服务默认只监听 `127.0.0.1:8008`。结构化接口为 `POST /v1/systemone`，原生生成接口为 `POST /v1/chat/completions`。多模态 HTTP 请求使用内嵌图片和采样视频帧，格式见 [接口示例](docs/API.md)。
 
 启动后打开 **http://127.0.0.1:8008** 即可使用内置实验室，无需额外前端服务：
 
-- **自主贪吃蛇**：开始、暂停、单步、固定种子重开，查看每步真实候选概率、耗时及请求，导出本局记录。引擎仅提供碰撞与食物距离特征，由模型直接选动作，没有寻路规划或安全接管。
+- **网页贪吃蛇**：作为另一种可视化界面，支持开始、暂停、单步、固定种子重开，查看每步真实候选概率、耗时及请求，导出本局记录；与终端共用游戏规则和模型决策链路。
 - **接口测试**：编辑并发送真实 JSON 请求，测试 Choice / Noul / Score、原生文字、图片与采样视频帧；查看响应、耗时和 token 使用，并复制调用示例。
 
-详见 [实验室说明](docs/DEMO.md)。本轮模型没有接受贪吃蛇专项训练，游戏表现单独记录；棋盘页面使用文字环境特征，不是视觉决策评估。
+网页与终端都使用文字环境特征；显示的棋盘不是模型图像输入，不属于视觉决策评估。
 
 ```bash
 curl http://127.0.0.1:8008/v1/systemone \
@@ -42,11 +57,11 @@ curl http://127.0.0.1:8008/v1/systemone \
 
 Qwen3.5 的混合架构包含循环状态，普通 attention mask 不能隔离这些状态。因此每个问题独立编码，不使用 Kev 的共享状态分支打包，也不声称多个问题只计算一次状态。
 
-训练数据包含 10 个公开任务来源及中英可执行规则：5,892 条训练问题、620 条校准问题、880 条开发评估问题。全量输入检查未截断状态或候选。固定数据、分区校验与许可证来源在 `data/v1/manifest.json`；没有读取上游 locked test，也没有调用 Jev 获取标签。中文样本只覆盖四种程序规则，不能据此声称通用中文能力。
+历史 v0.2 训练数据包含 10 个公开任务来源及中英可执行规则：5,892 条训练问题、620 条校准问题、880 条开发评估问题。全量输入检查未截断状态或候选。固定数据、分区校验与许可证来源在 `data/v1/manifest.json`；没有读取上游 locked test，也没有调用 Jev 获取标签。中文样本只覆盖四种程序规则，不能据此声称通用中文能力。新增贪吃蛇专项训练从该 checkpoint 继续，使用显式启发式教师生成的动作标签和原任务数据回放；教师不参与运行时的动作执行。
 
 ## 实测与验证
 
-已完成 NVIDIA L4 上的两轮训练，并生成 Torch 与 MLX checkpoint。相同的 880 条 development 问题上，训练前随机指针头准确率为 28.75%；训练后结果如下：
+以下是历史 v0.2 通用决策 checkpoint 的结果，不是新贪吃蛇专项模型的结果。该版本已完成 NVIDIA L4 上的两轮训练，并生成 Torch 与 MLX checkpoint。相同的 880 条 development 问题上，训练前随机指针头准确率为 28.75%；训练后结果如下：
 
 | 运行路径 | 准确率 | 校准 NLL | ECE |
 | --- | --- | --- | --- |
@@ -59,7 +74,7 @@ Qwen3.5 的混合架构包含循环状态，普通 attention mask 不能隔离�
 
 候选顺序会影响结果：28 道候选反转探针中，27 道保持同选；一题包含 77 个候选的 Banking77 问题发生翻转，单候选概率最大变化为 0.585。多模态决策准确率尚未评估；本轮中文证据只覆盖四类程序规则。
 
-产物已下载到本地，Colab 训练会话已停止。文件校验、81 项测试、CLI 示例与 wheel 构建结果汇总在 [交付检查](docs/results/release_checks.json)。
+历史 v0.2 产物已下载到本地，其 Colab 训练会话已停止。该次文件校验、81 项测试、CLI 示例与 wheel 构建结果汇总在 [交付检查](docs/results/release_checks.json)。
 
 ## 复现
 

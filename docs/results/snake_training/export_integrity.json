@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "foundation_tensors_identical_to_parent_mlx": {
+    "backbone/model.safetensors": "d9c47ee9fd3e1ac66f0a4761c6dc961bc5dade2c9307e5b86695705140f24560"
+  },
+  "decision_adapter_tensors_identical_to_trained_torch": 372,
+  "pointer_file_identical": true,
+  "native_generation": "adapter_disabled",
+  "modalities": [
+    "text",
+    "image",
+    "video"
+  ],
+  "scope": "Byte-exact reused full foundation; exact linear adapter mapping and pointer copy. This does not assert CUDA BF16 and MLX FP32 logits are identical."
+}

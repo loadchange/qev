@@ -1,0 +1,84 @@
+{
+  "arguments": {
+    "data": "data/snake-v1",
+    "out": "models/qev-snake-0.8b",
+    "init_checkpoint": "models/qev-0.8b",
+    "base": "Qwen/Qwen3.5-0.8B",
+    "revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "epochs": 2,
+    "batch": 8,
+    "accum": 2,
+    "lr": 3e-05,
+    "seed": 42,
+    "max_length": 1024,
+    "max_state": 384,
+    "device": "cuda",
+    "limit_train": 0,
+    "eval_limit": 0,
+    "checkpointing": false,
+    "baseline": true
+  },
+  "dataset_manifest_sha256": "f41151c68d6465b90bb8ea66ca0ea8611a6b37ed48596ba9484abc8ef4deda33",
+  "questions": {
+    "train": 17892,
+    "calibration": 1120,
+    "development": 1380
+  },
+  "state_truncations": {
+    "train": 0,
+    "calibration": 0,
+    "development": 0
+  },
+  "trainable_parameters": 11346944,
+  "torch": "2.11.0+cu128",
+  "training_dtype": "fp32 master weights; bf16 autocast; fp32 pointer",
+  "evaluation_precision": {
+    "device": "cuda:0",
+    "weight_dtype": "float32",
+    "autocast_dtype": "bfloat16",
+    "pointer_dtype": "float32",
+    "arithmetic": "bf16_autocast"
+  },
+  "hardware": "NVIDIA A100-SXM4-40GB",
+  "frozen_before": {
+    "sha256": "1021eaeed8a1528b435a90a690d42245f07e1b65c7c2dc8a37ec9516a8cf4bee",
+    "parameters": 852985920
+  },
+  "packages": {
+    "torch": "2.11.0+cu128",
+    "transformers": "5.17.0",
+    "peft": "0.21.0",
+    "safetensors": "0.8.0",
+    "numpy": "2.5.3"
+  },
+  "source_sha256": {
+    "__init__.py": "1d37a020848c622fcc0dc84b54508ac1053b08b301ee96df05442de2be08397f",
+    "__main__.py": "6d8b7d7846a845059d7a3107143f11131f63c5511d669b44085b15ec5e3d2279",
+    "api.py": "c1791c5f197e72ac12789c9cd9da2ff411aca171c20bea92229220d561ee6767",
+    "cli.py": "691a548e5f6007272dd84e4dbab2e17810c9b3fc4c47b430f64760bbfc319948",
+    "data.py": "4e9fd9dc973fe19256e085ede83ea6a9b8522d1b7d374866a6ec34b3329c7a8f",
+    "demo.py": "1a367d8a7b27954ca48e265b25db9bf9c15b26e29de91fca5bea6e09f1a4c255",
+    "evaluation.py": "7799b27cba7d8b4228569c13cea1f8ec4d390f9ca0464d70d9b0904d98247178",
+    "export.py": "38979228f2bfaf5d4bbf1cce0d1346cf8e3eb1eabdfc8ba50223e1f51e2503bb",
+    "inference.py": "673bd9d9e7c3a393dc3f79057de558a863eef9191d4baab34e2c55a337898e4b",
+    "mlx_runtime.py": "33832d9ff139f2eeb35e69c9010a1191ae657bb7c43ae1cbdf406fde95ee48f3",
+    "model.py": "2dec3e86955678930afa807c272f7715a382429b7fcab4423b5d698095d97ae0",
+    "processing.py": "962d58f7c39cf4d257a2838836ecd1c3107d9cdbb9c59559534d76c2c04b8cd3",
+    "serve.py": "a8f606c76db74894a283626a5dd86dcdd4fa6926a8e583d33f07b27984ac04f1",
+    "snake.py": "fabf36ce25b1198fc03590b4d35247f3a1f0ecec1a6ebb371762c02b5f4a8e43",
+    "snake_cli.py": "bf8dc13f9ba40359ba09da241c1c97f050b449e00216b363ab7d6f7b68b5bf07",
+    "snake_features.py": "575525b2be4a260e16c45230793167d77b4a1dfffb708d1761c3e345c8bfac6e",
+    "tokenization.py": "53ca04e97221c6c14a3acf0bdac74e3014943324f9986bea549a7bf36135c895",
+    "train.py": "96480346b9c8c61827d44f60657197657477497a8970555d39559c9233f65de7"
+  },
+  "initial_checkpoint": {
+    "path": "/content/qev/models/qev-0.8b",
+    "optimizer_resumed": false,
+    "files_sha256": {
+      "adapter/adapter_model.safetensors": "a1ba15eb0deb91bd9b0b4b9649999c57f0a5b8aac70f52488138a62fd9978549",
+      "pointer.safetensors": "f56860b954742fee0399b50c372c1f262699b84d4500ab52e27d72bff8d49749",
+      "qev_config.json": "121ce48d84da856df67a469033a85825d3ab5a039fec986476aa5853fbb5f814"
+    }
+  },
+  "objective": "supervised cross-entropy over candidate options; no Jev labels or RL"
+}

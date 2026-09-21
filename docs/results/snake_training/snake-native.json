@@ -1,0 +1,193 @@
+{
+  "passed": true,
+  "native_tokens_identical": {
+    "text": true,
+    "image": true,
+    "video": true
+  },
+  "base_integrity": {
+    "before": {
+      "sha256": "1021eaeed8a1528b435a90a690d42245f07e1b65c7c2dc8a37ec9516a8cf4bee",
+      "parameters": 852985920
+    },
+    "after": {
+      "sha256": "1021eaeed8a1528b435a90a690d42245f07e1b65c7c2dc8a37ec9516a8cf4bee",
+      "parameters": 852985920
+    },
+    "unchanged": true,
+    "generation": "Native generation disables the decision LoRA adapter; original vision and language weights are frozen."
+  },
+  "checkpoint_hashes": {
+    "parent": {
+      "adapter/adapter_model.safetensors": "a1ba15eb0deb91bd9b0b4b9649999c57f0a5b8aac70f52488138a62fd9978549",
+      "pointer.safetensors": "f56860b954742fee0399b50c372c1f262699b84d4500ab52e27d72bff8d49749"
+    },
+    "trained": {
+      "adapter/adapter_model.safetensors": "2a922c06a2b3eb7e25d5d9d5a8a24dbd49a2d311281d47f9f4df22b8d9faf3be",
+      "pointer.safetensors": "c4e7d9439a101a4a398f98932e75fa5c92396fd9101d156b0f8af66694fff66a"
+    }
+  },
+  "parent": {
+    "checkpoint": "models/qev-0.8b",
+    "precision": {
+      "device": "cuda:0",
+      "weight_dtype": "float32",
+      "autocast_dtype": "bfloat16",
+      "pointer_dtype": "float32",
+      "arithmetic": "bf16_autocast"
+    },
+    "cases": {
+      "text": {
+        "input_tokens": 25,
+        "token_ids": [
+          20,
+          248046,
+          198,
+          248044
+        ],
+        "text": "5\n",
+        "max_new_tokens": 12,
+        "seconds": 15.964510204999897,
+        "decision_adapter_enabled": false,
+        "processor_fields": [
+          "attention_mask",
+          "input_ids",
+          "mm_token_type_ids"
+        ]
+      },
+      "image": {
+        "input_tokens": 92,
+        "token_ids": [
+          2438,
+          248046,
+          198,
+          248044
+        ],
+        "text": " red\n",
+        "max_new_tokens": 16,
+        "seconds": 1.7614474550000523,
+        "decision_adapter_enabled": false,
+        "processor_fields": [
+          "attention_mask",
+          "image_grid_thw",
+          "input_ids",
+          "mm_token_type_ids",
+          "pixel_values"
+        ]
+      },
+      "video": {
+        "input_tokens": 143,
+        "token_ids": [
+          760,
+          6105,
+          12307,
+          10480,
+          494,
+          2047,
+          310,
+          1245,
+          13,
+          248046,
+          198,
+          248044
+        ],
+        "text": "The blue circle moves from left to right.\n",
+        "max_new_tokens": 48,
+        "seconds": 0.6362067089999073,
+        "decision_adapter_enabled": false,
+        "processor_fields": [
+          "attention_mask",
+          "input_ids",
+          "mm_token_type_ids",
+          "pixel_values_videos",
+          "video_grid_thw"
+        ]
+      }
+    },
+    "base_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "native_generation": "adapter_disabled",
+    "vision_and_lm_head_frozen": true
+  },
+  "trained": {
+    "checkpoint": "models/qev-snake-0.8b",
+    "precision": {
+      "device": "cuda:0",
+      "weight_dtype": "float32",
+      "autocast_dtype": "bfloat16",
+      "pointer_dtype": "float32",
+      "arithmetic": "bf16_autocast"
+    },
+    "cases": {
+      "text": {
+        "input_tokens": 25,
+        "token_ids": [
+          20,
+          248046,
+          198,
+          248044
+        ],
+        "text": "5\n",
+        "max_new_tokens": 12,
+        "seconds": 0.2641582749997724,
+        "decision_adapter_enabled": false,
+        "processor_fields": [
+          "attention_mask",
+          "input_ids",
+          "mm_token_type_ids"
+        ]
+      },
+      "image": {
+        "input_tokens": 92,
+        "token_ids": [
+          2438,
+          248046,
+          198,
+          248044
+        ],
+        "text": " red\n",
+        "max_new_tokens": 16,
+        "seconds": 0.27478123099990626,
+        "decision_adapter_enabled": false,
+        "processor_fields": [
+          "attention_mask",
+          "image_grid_thw",
+          "input_ids",
+          "mm_token_type_ids",
+          "pixel_values"
+        ]
+      },
+      "video": {
+        "input_tokens": 143,
+        "token_ids": [
+          760,
+          6105,
+          12307,
+          10480,
+          494,
+          2047,
+          310,
+          1245,
+          13,
+          248046,
+          198,
+          248044
+        ],
+        "text": "The blue circle moves from left to right.\n",
+        "max_new_tokens": 48,
+        "seconds": 0.6307145639998453,
+        "decision_adapter_enabled": false,
+        "processor_fields": [
+          "attention_mask",
+          "input_ids",
+          "mm_token_type_ids",
+          "pixel_values_videos",
+          "video_grid_thw"
+        ]
+      }
+    },
+    "base_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+    "native_generation": "adapter_disabled",
+    "vision_and_lm_head_frozen": true
+  },
+  "scope": "Same-device deterministic native generation with decision adapters disabled. Three finite probes plus frozen-weight integrity; not a general multimodal accuracy benchmark."
+}

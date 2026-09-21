@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "qev"
-version = "0.2.0"
+version = "0.3.0"
 description = "Qwen3.5 decision models with a Jev-compatible API and native MLX inference"
 requires-python = ">=3.12"
 license = "Apache-2.0"

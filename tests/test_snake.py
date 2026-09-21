@@ -98,7 +98,9 @@ def test_real_model_request_and_exact_action_are_auditable_even_on_collision():
     assert trace["request"] == request
     assert trace["response"]["usage"] == {"input_tokens": 123, "output_tokens": 0}
     assert trace["proposed"] == trace["executed"] == "RIGHT" and not trace["intervened"]
-    assert result["policy"] == {"mode": "model_direct", "feature_assisted": True, "planner": False, "guardrail": False}
+    assert result["policy"] == {"mode": "model_direct", "feature_assisted": True, "planner": False,
+        "guardrail": False, "observation": "spatial", "feature_version": "snake-observable-bfs-v1",
+        "feature_search": True}
     assert store.step(created["id"], 1)["step"] == 1
     assert len(agent.calls) == 1  # No inference after termination.
     with pytest.raises(GameConflict):
@@ -107,6 +109,18 @@ def test_real_model_request_and_exact_action_are_auditable_even_on_collision():
     assert history == [trace]
     history[0]["request"]["state"] = "changed by caller"
     assert store.get(created["id"], history=True)["history"][0]["request"] == request
+
+
+def test_spatial_observations_expose_search_facts_without_teacher_action():
+    spatial, local = SnakeGame(), SnakeGame(observation="local")
+    assert spatial.body == local.body and spatial.food == local.food
+    extra = {"reachable_space", "tail_reachable", "food_path_distance", "recent_visits"}
+    for rich, old in zip(spatial.candidates(), local.candidates()):
+        assert extra == rich.keys() - old.keys()
+        assert {key: rich[key] for key in old} == old
+    assert local.snapshot()["policy"]["feature_search"] is False
+    spatial.advance("DOWN")
+    assert spatial.recent_heads[-1] == spatial.body[0]
 
 
 def test_duplicate_and_inflight_steps_do_not_call_model_twice():

@@ -30,6 +30,15 @@ from .tokenization import collate_encodings
 BASE_REVISION = "2fc06364715b967f1860aea9cf38778875588b17"
 
 
+def prepare_continuation(model, *, max_length, max_state):
+    """Keep trained parameters while removing metadata fitted to an older dataset."""
+    for key in ("model_name", "completed_epochs", "temperature", "calibration_split",
+                "calibration_precision", "dataset_manifest_sha256"):
+        model.config.pop(key, None)
+    model.config.update(max_length=max_length, max_state=max_state)
+    return model
+
+
 def frozen_digest(model):
     """Hash every frozen tensor in bounded chunks, before and after optimization."""
     digest = hashlib.sha256()
@@ -57,6 +66,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--data", required=True)
     ap.add_argument("--out", required=True)
+    ap.add_argument("--init-checkpoint", help="Continue from a trained Qev adapter/head; reset optimizer")
     ap.add_argument("--base", default="Qwen/Qwen3.5-0.8B")
     ap.add_argument("--revision", default=BASE_REVISION)
     ap.add_argument("--epochs", type=int, default=2)
@@ -89,7 +99,11 @@ def main(argv=None):
         raise FileExistsError(f"Checkpoint already exists: {out}")
     out.mkdir(parents=True, exist_ok=True)
     random.seed(args.seed); np.random.seed(args.seed); torch.manual_seed(args.seed)
-    tokenizer = AutoTokenizer.from_pretrained(args.base, revision=args.revision)
+    parent = Path(args.init_checkpoint).resolve() if args.init_checkpoint else None
+    if parent is not None and parent == out.resolve():
+        raise ValueError("Continuation must use a new output directory")
+    tokenizer = AutoTokenizer.from_pretrained(parent / "tokenizer" if parent else args.base,
+                                             revision=None if parent else args.revision)
     if tokenizer.pad_token_id is None:
         tokenizer.pad_token = tokenizer.eos_token
     partitions = {split: load_split(args.data, split) for split in ("train", "calibration", "development")}
@@ -104,12 +118,16 @@ def main(argv=None):
         raise ValueError("Train, calibration and development must each contain labelled questions")
     dataset_hash = hashlib.sha256((Path(args.data) / "manifest.json").read_bytes()).hexdigest()
     dtype = torch.float32
-    model = QevModel.from_pretrained(args.base, revision=args.revision, dtype=dtype,
-        device=args.device, max_length=args.max_length, max_state=args.max_state)
+    if parent:
+        model = prepare_continuation(QevModel.from_checkpoint(parent, dtype=dtype,
+            device=args.device, trainable=True), max_length=args.max_length, max_state=args.max_state)
+    else:
+        model = QevModel.from_pretrained(args.base, revision=args.revision, dtype=dtype,
+            device=args.device, max_length=args.max_length, max_state=args.max_state)
     frozen_before = frozen_digest(model)
     if args.baseline:
         baseline = predict_items(model, encoded["development"], tokenizer, args.batch)
-        write_json(out / "untrained_development.json", report(baseline, 1.))
+        write_json(out / ("initial_development.json" if parent else "untrained_development.json"), report(baseline, 1.))
         print("QEV_BASELINE_COMPLETE", json.dumps(report(baseline, 1.)["raw"]), flush=True)
     if args.checkpointing:
         model.enable_gradient_checkpointing()
@@ -133,6 +151,11 @@ def main(argv=None):
                                ("torch", "transformers", "peft", "safetensors", "numpy")},
                   "source_sha256": {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
                                     for p in sorted(Path(__file__).parent.glob("*.py"))},
+                  "initial_checkpoint": None if parent is None else {
+                      "path": str(parent), "optimizer_resumed": False,
+                      "files_sha256": {str(p.relative_to(parent)): hashlib.sha256(p.read_bytes()).hexdigest()
+                          for p in sorted(parent.rglob("*"))
+                          if p.is_file() and (p.suffix == ".safetensors" or p.name == "qev_config.json")}},
                   "objective": "supervised cross-entropy over candidate options; no Jev labels or RL"}
     write_json(out / "provenance.json", provenance)
     print(json.dumps(provenance), flush=True)

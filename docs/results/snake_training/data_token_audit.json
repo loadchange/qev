@@ -1,0 +1,25 @@
+{
+  "status": "passed",
+  "max_length": 1024,
+  "max_state": 384,
+  "partitions": {
+    "train": {
+      "questions": 17892,
+      "max_tokens": 881,
+      "max_state_tokens": 368,
+      "state_truncations": 0
+    },
+    "calibration": {
+      "questions": 1120,
+      "max_tokens": 810,
+      "max_state_tokens": 332,
+      "state_truncations": 0
+    },
+    "development": {
+      "questions": 1380,
+      "max_tokens": 850,
+      "max_state_tokens": 378,
+      "state_truncations": 0
+    }
+  }
+}

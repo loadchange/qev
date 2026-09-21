@@ -18,7 +18,19 @@ def main(argv=None):
     predict.add_argument("--request", required=True, help="Path to a JSON state/questions request")
     predict.add_argument("--backend", default="auto", choices=["auto", "torch", "mlx"])
     predict.add_argument("--device")
+    from .snake_cli import add_arguments
+
+    add_arguments(sub.add_parser("snake", help="Run real Qev decisions in a terminal Snake game"))
     args = ap.parse_args(argv)
+    if args.command == "snake":
+        from .snake_cli import run
+
+        try:
+            return run(args)
+        except (ValueError, OSError, RuntimeError) as exc:
+            ap.exit(1, f"qev snake: {exc}\n")
+        except KeyboardInterrupt:
+            return 130
     from .inference import Agent
     agent = Agent(args.model, backend=args.backend, device=args.device)
     if args.command == "serve":
@@ -32,4 +44,4 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

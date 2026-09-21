@@ -1,0 +1,48 @@
+{
+  "format": "qev",
+  "format_version": 2,
+  "foundation_architecture": "Qwen3_5ForConditionalGeneration",
+  "modalities": [
+    "text",
+    "image",
+    "video"
+  ],
+  "native_generation": "adapter_disabled",
+  "base_model": "Qwen/Qwen3.5-0.8B",
+  "base_revision": "2fc06364715b967f1860aea9cf38778875588b17",
+  "hidden_size": 1024,
+  "pointer_dim": 256,
+  "pointer_bias": false,
+  "lora_rank": 16,
+  "lora_alpha": 32,
+  "lora_dropout": 0.05,
+  "lora_targets": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj",
+    "in_proj_qkv",
+    "in_proj_z",
+    "in_proj_b",
+    "in_proj_a",
+    "out_proj",
+    "gate_proj",
+    "up_proj",
+    "down_proj"
+  ],
+  "question_isolation": "independent_rows",
+  "max_length": 1024,
+  "max_state": 384,
+  "model_name": "qev-0.8b",
+  "completed_epochs": 2,
+  "temperature": 2.82842712474619,
+  "calibration_split": "calibration",
+  "calibration_precision": {
+    "device": "cuda:0",
+    "weight_dtype": "float32",
+    "autocast_dtype": "bfloat16",
+    "pointer_dtype": "float32",
+    "arithmetic": "bf16_autocast"
+  },
+  "dataset_manifest_sha256": "f41151c68d6465b90bb8ea66ca0ea8611a6b37ed48596ba9484abc8ef4deda33"
+}

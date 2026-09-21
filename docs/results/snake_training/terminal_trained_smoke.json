@@ -1,0 +1,1757 @@
+{
+  "passed": true,
+  "scope": "Real default-checkpoint CLI smoke, five steps. Full terminal key controls are recorded separately.",
+  "events": [
+    {
+      "type": "metadata",
+      "format": "qev-snake-terminal-v1",
+      "created_utc": "2026-09-21T00:51:26.519317+00:00",
+      "settings": {
+        "command": "snake",
+        "model": null,
+        "base_url": null,
+        "backend": "auto",
+        "device": null,
+        "seed": 7,
+        "size": 12,
+        "max_steps": 5,
+        "observation": "spatial",
+        "fps": 0.0,
+        "episodes": 1,
+        "headless": true,
+        "report": "runs/snake-training/terminal-trained-smoke.jsonl",
+        "no_color": false,
+        "no_alt_screen": false,
+        "request_timeout": 120
+      },
+      "policy": {
+        "mode": "model_direct",
+        "feature_assisted": true,
+        "planner": false,
+        "guardrail": false,
+        "observation": "spatial",
+        "feature_version": "snake-observable-bfs-v1",
+        "feature_search": true
+      },
+      "scope": "静态BFS环境特征·无动作接管"
+    },
+    {
+      "type": "source",
+      "mode": "local",
+      "model": "models/qev-snake-0.8b-mlx",
+      "backend": "mlx",
+      "load_seconds": 3.093207541969605
+    },
+    {
+      "type": "episode_start",
+      "episode": 1,
+      "game": {
+        "id": "c3d00224dd2f4b3eb6a7d115eaf2a331",
+        "seed": 7,
+        "size": 12,
+        "width": 12,
+        "height": 12,
+        "body": [
+          [
+            6,
+            6
+          ],
+          [
+            5,
+            6
+          ],
+          [
+            4,
+            6
+          ]
+        ],
+        "food": [
+          1,
+          7
+        ],
+        "direction": "RIGHT",
+        "step": 0,
+        "score": 0,
+        "length": 3,
+        "status": "running",
+        "terminal_reason": null,
+        "alive": true,
+        "won": false,
+        "done": false,
+        "max_steps": 5,
+        "starvation_limit": 288,
+        "steps_since_food": 0,
+        "available_directions": [
+          "UP",
+          "DOWN",
+          "RIGHT"
+        ],
+        "candidates": [
+          {
+            "direction": "UP",
+            "next_cell": [
+              6,
+              5
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 7,
+            "manhattan_change": 1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 7,
+            "recent_visits": 0
+          },
+          {
+            "direction": "DOWN",
+            "next_cell": [
+              6,
+              7
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 5,
+            "manhattan_change": -1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 5,
+            "recent_visits": 0
+          },
+          {
+            "direction": "RIGHT",
+            "next_cell": [
+              7,
+              6
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 7,
+            "manhattan_change": 1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 7,
+            "recent_visits": 0
+          }
+        ],
+        "recent_heads": [
+          [
+            6,
+            6
+          ]
+        ],
+        "policy": {
+          "mode": "model_direct",
+          "feature_assisted": true,
+          "planner": false,
+          "guardrail": false,
+          "observation": "spatial",
+          "feature_version": "snake-observable-bfs-v1",
+          "feature_search": true
+        },
+        "last_decision": null,
+        "history_count": 0,
+        "expires_in_seconds": 86400
+      },
+      "elapsed_seconds": 0.00039291701978072524
+    },
+    {
+      "type": "step",
+      "episode": 1,
+      "game": {
+        "id": "c3d00224dd2f4b3eb6a7d115eaf2a331",
+        "seed": 7,
+        "size": 12,
+        "width": 12,
+        "height": 12,
+        "body": [
+          [
+            6,
+            7
+          ],
+          [
+            6,
+            6
+          ],
+          [
+            5,
+            6
+          ]
+        ],
+        "food": [
+          1,
+          7
+        ],
+        "direction": "DOWN",
+        "step": 1,
+        "score": 0,
+        "length": 3,
+        "status": "running",
+        "terminal_reason": null,
+        "alive": true,
+        "won": false,
+        "done": false,
+        "max_steps": 5,
+        "starvation_limit": 288,
+        "steps_since_food": 1,
+        "available_directions": [
+          "DOWN",
+          "LEFT",
+          "RIGHT"
+        ],
+        "candidates": [
+          {
+            "direction": "DOWN",
+            "next_cell": [
+              6,
+              8
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 6,
+            "manhattan_change": 1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 6,
+            "recent_visits": 0
+          },
+          {
+            "direction": "LEFT",
+            "next_cell": [
+              5,
+              7
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 4,
+            "manhattan_change": -1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 4,
+            "recent_visits": 0
+          },
+          {
+            "direction": "RIGHT",
+            "next_cell": [
+              7,
+              7
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 6,
+            "manhattan_change": 1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 8,
+            "recent_visits": 0
+          }
+        ],
+        "recent_heads": [
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "policy": {
+          "mode": "model_direct",
+          "feature_assisted": true,
+          "planner": false,
+          "guardrail": false,
+          "observation": "spatial",
+          "feature_version": "snake-observable-bfs-v1",
+          "feature_search": true
+        },
+        "last_decision": {
+          "step": 1,
+          "step_before": 0,
+          "step_after": 1,
+          "request": {
+            "model": "qev-0.8b",
+            "state": "Snake on a 12 by 12 board. x increases right, y increases down. Head=(6,6), food=(1,7), heading=RIGHT. Length=3. Steps without food=0. Candidates include static BFS space/path facts and recent visits, not a chosen route plan.",
+            "questions": {
+              "move": {
+                "type": "choice",
+                "instructions": "Choose a Snake move. Avoid collisions. Prefer tail_reachable and enough reachable_space for the snake length. Then follow a short food_path_distance, penalizing recent_visits to avoid loops. An empty food_path_distance means no static path. Prefer straight ahead on ties. All three non-reversing moves remain selectable.",
+                "criteria": {
+                  "UP": {
+                    "next_cell": [
+                      6,
+                      5
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 7,
+                    "manhattan_change": 1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 7,
+                    "recent_visits": 0
+                  },
+                  "DOWN": {
+                    "next_cell": [
+                      6,
+                      7
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 5,
+                    "manhattan_change": -1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 5,
+                    "recent_visits": 0
+                  },
+                  "RIGHT": {
+                    "next_cell": [
+                      7,
+                      6
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 7,
+                    "manhattan_change": 1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 7,
+                    "recent_visits": 0
+                  }
+                }
+              }
+            }
+          },
+          "response": {
+            "model": "qev-0.8b",
+            "answers": {
+              "move": {
+                "type": "choice",
+                "choice": "DOWN",
+                "confidence": 0.9997962390860521,
+                "probabilities": {
+                  "UP": 5.973127331927428e-05,
+                  "DOWN": 0.9998641593907015,
+                  "RIGHT": 7.610933597927612e-05
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 337,
+              "output_tokens": 0
+            },
+            "latency_ms": 241.03,
+            "qev": {
+              "backend": "mlx",
+              "temperature": 2.82842712474619,
+              "training_modalities": [
+                "text"
+              ],
+              "multimodal_decision_accuracy_validated": false,
+              "input_modalities": [
+                "text"
+              ],
+              "truncated_questions": []
+            }
+          },
+          "candidate_facts": [
+            {
+              "direction": "UP",
+              "next_cell": [
+                6,
+                5
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 7,
+              "manhattan_change": 1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 7,
+              "recent_visits": 0
+            },
+            {
+              "direction": "DOWN",
+              "next_cell": [
+                6,
+                7
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 5,
+              "manhattan_change": -1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 5,
+              "recent_visits": 0
+            },
+            {
+              "direction": "RIGHT",
+              "next_cell": [
+                7,
+                6
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 7,
+              "manhattan_change": 1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 7,
+              "recent_visits": 0
+            }
+          ],
+          "probabilities": {
+            "UP": 5.973127331927428e-05,
+            "DOWN": 0.9998641593907015,
+            "RIGHT": 7.610933597927612e-05
+          },
+          "proposed": "DOWN",
+          "executed": "DOWN",
+          "intervened": false,
+          "inference_ms": 241.11,
+          "ate": false,
+          "decision_ms": 241.53,
+          "terminal_reason": null
+        },
+        "history_count": 1,
+        "expires_in_seconds": 86400
+      },
+      "elapsed_seconds": 0.24265458300942555
+    },
+    {
+      "type": "step",
+      "episode": 1,
+      "game": {
+        "id": "c3d00224dd2f4b3eb6a7d115eaf2a331",
+        "seed": 7,
+        "size": 12,
+        "width": 12,
+        "height": 12,
+        "body": [
+          [
+            5,
+            7
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            6,
+            6
+          ]
+        ],
+        "food": [
+          1,
+          7
+        ],
+        "direction": "LEFT",
+        "step": 2,
+        "score": 0,
+        "length": 3,
+        "status": "running",
+        "terminal_reason": null,
+        "alive": true,
+        "won": false,
+        "done": false,
+        "max_steps": 5,
+        "starvation_limit": 288,
+        "steps_since_food": 2,
+        "available_directions": [
+          "UP",
+          "DOWN",
+          "LEFT"
+        ],
+        "candidates": [
+          {
+            "direction": "UP",
+            "next_cell": [
+              5,
+              6
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 5,
+            "manhattan_change": 1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 5,
+            "recent_visits": 0
+          },
+          {
+            "direction": "DOWN",
+            "next_cell": [
+              5,
+              8
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 5,
+            "manhattan_change": 1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 5,
+            "recent_visits": 0
+          },
+          {
+            "direction": "LEFT",
+            "next_cell": [
+              4,
+              7
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 3,
+            "manhattan_change": -1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 3,
+            "recent_visits": 0
+          }
+        ],
+        "recent_heads": [
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            5,
+            7
+          ]
+        ],
+        "policy": {
+          "mode": "model_direct",
+          "feature_assisted": true,
+          "planner": false,
+          "guardrail": false,
+          "observation": "spatial",
+          "feature_version": "snake-observable-bfs-v1",
+          "feature_search": true
+        },
+        "last_decision": {
+          "step": 2,
+          "step_before": 1,
+          "step_after": 2,
+          "request": {
+            "model": "qev-0.8b",
+            "state": "Snake on a 12 by 12 board. x increases right, y increases down. Head=(6,7), food=(1,7), heading=DOWN. Length=3. Steps without food=1. Candidates include static BFS space/path facts and recent visits, not a chosen route plan.",
+            "questions": {
+              "move": {
+                "type": "choice",
+                "instructions": "Choose a Snake move. Avoid collisions. Prefer tail_reachable and enough reachable_space for the snake length. Then follow a short food_path_distance, penalizing recent_visits to avoid loops. An empty food_path_distance means no static path. Prefer straight ahead on ties. All three non-reversing moves remain selectable.",
+                "criteria": {
+                  "DOWN": {
+                    "next_cell": [
+                      6,
+                      8
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 6,
+                    "manhattan_change": 1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 6,
+                    "recent_visits": 0
+                  },
+                  "LEFT": {
+                    "next_cell": [
+                      5,
+                      7
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 4,
+                    "manhattan_change": -1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 4,
+                    "recent_visits": 0
+                  },
+                  "RIGHT": {
+                    "next_cell": [
+                      7,
+                      7
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 6,
+                    "manhattan_change": 1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 8,
+                    "recent_visits": 0
+                  }
+                }
+              }
+            }
+          },
+          "response": {
+            "model": "qev-0.8b",
+            "answers": {
+              "move": {
+                "type": "choice",
+                "choice": "LEFT",
+                "confidence": 0.9988674554917392,
+                "probabilities": {
+                  "DOWN": 0.0007549410995574702,
+                  "LEFT": 0.9992449703278261,
+                  "RIGHT": 8.857261644666468e-08
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 337,
+              "output_tokens": 0
+            },
+            "latency_ms": 214.42,
+            "qev": {
+              "backend": "mlx",
+              "temperature": 2.82842712474619,
+              "training_modalities": [
+                "text"
+              ],
+              "multimodal_decision_accuracy_validated": false,
+              "input_modalities": [
+                "text"
+              ],
+              "truncated_questions": []
+            }
+          },
+          "candidate_facts": [
+            {
+              "direction": "DOWN",
+              "next_cell": [
+                6,
+                8
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 6,
+              "manhattan_change": 1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 6,
+              "recent_visits": 0
+            },
+            {
+              "direction": "LEFT",
+              "next_cell": [
+                5,
+                7
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 4,
+              "manhattan_change": -1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 4,
+              "recent_visits": 0
+            },
+            {
+              "direction": "RIGHT",
+              "next_cell": [
+                7,
+                7
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 6,
+              "manhattan_change": 1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 8,
+              "recent_visits": 0
+            }
+          ],
+          "probabilities": {
+            "DOWN": 0.0007549410995574702,
+            "LEFT": 0.9992449703278261,
+            "RIGHT": 8.857261644666468e-08
+          },
+          "proposed": "LEFT",
+          "executed": "LEFT",
+          "intervened": false,
+          "inference_ms": 214.563,
+          "ate": false,
+          "decision_ms": 215.442,
+          "terminal_reason": null
+        },
+        "history_count": 2,
+        "expires_in_seconds": 86400
+      },
+      "elapsed_seconds": 0.4601543330354616
+    },
+    {
+      "type": "step",
+      "episode": 1,
+      "game": {
+        "id": "c3d00224dd2f4b3eb6a7d115eaf2a331",
+        "seed": 7,
+        "size": 12,
+        "width": 12,
+        "height": 12,
+        "body": [
+          [
+            4,
+            7
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            6,
+            7
+          ]
+        ],
+        "food": [
+          1,
+          7
+        ],
+        "direction": "LEFT",
+        "step": 3,
+        "score": 0,
+        "length": 3,
+        "status": "running",
+        "terminal_reason": null,
+        "alive": true,
+        "won": false,
+        "done": false,
+        "max_steps": 5,
+        "starvation_limit": 288,
+        "steps_since_food": 3,
+        "available_directions": [
+          "UP",
+          "DOWN",
+          "LEFT"
+        ],
+        "candidates": [
+          {
+            "direction": "UP",
+            "next_cell": [
+              4,
+              6
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 4,
+            "manhattan_change": 1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 4,
+            "recent_visits": 0
+          },
+          {
+            "direction": "DOWN",
+            "next_cell": [
+              4,
+              8
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 4,
+            "manhattan_change": 1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 4,
+            "recent_visits": 0
+          },
+          {
+            "direction": "LEFT",
+            "next_cell": [
+              3,
+              7
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 2,
+            "manhattan_change": -1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 2,
+            "recent_visits": 0
+          }
+        ],
+        "recent_heads": [
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            4,
+            7
+          ]
+        ],
+        "policy": {
+          "mode": "model_direct",
+          "feature_assisted": true,
+          "planner": false,
+          "guardrail": false,
+          "observation": "spatial",
+          "feature_version": "snake-observable-bfs-v1",
+          "feature_search": true
+        },
+        "last_decision": {
+          "step": 3,
+          "step_before": 2,
+          "step_after": 3,
+          "request": {
+            "model": "qev-0.8b",
+            "state": "Snake on a 12 by 12 board. x increases right, y increases down. Head=(5,7), food=(1,7), heading=LEFT. Length=3. Steps without food=2. Candidates include static BFS space/path facts and recent visits, not a chosen route plan.",
+            "questions": {
+              "move": {
+                "type": "choice",
+                "instructions": "Choose a Snake move. Avoid collisions. Prefer tail_reachable and enough reachable_space for the snake length. Then follow a short food_path_distance, penalizing recent_visits to avoid loops. An empty food_path_distance means no static path. Prefer straight ahead on ties. All three non-reversing moves remain selectable.",
+                "criteria": {
+                  "UP": {
+                    "next_cell": [
+                      5,
+                      6
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 5,
+                    "manhattan_change": 1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 5,
+                    "recent_visits": 0
+                  },
+                  "DOWN": {
+                    "next_cell": [
+                      5,
+                      8
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 5,
+                    "manhattan_change": 1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 5,
+                    "recent_visits": 0
+                  },
+                  "LEFT": {
+                    "next_cell": [
+                      4,
+                      7
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 3,
+                    "manhattan_change": -1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 3,
+                    "recent_visits": 0
+                  }
+                }
+              }
+            }
+          },
+          "response": {
+            "model": "qev-0.8b",
+            "answers": {
+              "move": {
+                "type": "choice",
+                "choice": "LEFT",
+                "confidence": 0.9999980172712768,
+                "probabilities": {
+                  "UP": 9.617831948522565e-07,
+                  "DOWN": 3.600359537991758e-07,
+                  "LEFT": 0.9999986781808513
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 337,
+              "output_tokens": 0
+            },
+            "latency_ms": 216.34,
+            "qev": {
+              "backend": "mlx",
+              "temperature": 2.82842712474619,
+              "training_modalities": [
+                "text"
+              ],
+              "multimodal_decision_accuracy_validated": false,
+              "input_modalities": [
+                "text"
+              ],
+              "truncated_questions": []
+            }
+          },
+          "candidate_facts": [
+            {
+              "direction": "UP",
+              "next_cell": [
+                5,
+                6
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 5,
+              "manhattan_change": 1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 5,
+              "recent_visits": 0
+            },
+            {
+              "direction": "DOWN",
+              "next_cell": [
+                5,
+                8
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 5,
+              "manhattan_change": 1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 5,
+              "recent_visits": 0
+            },
+            {
+              "direction": "LEFT",
+              "next_cell": [
+                4,
+                7
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 3,
+              "manhattan_change": -1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 3,
+              "recent_visits": 0
+            }
+          ],
+          "probabilities": {
+            "UP": 9.617831948522565e-07,
+            "DOWN": 3.600359537991758e-07,
+            "LEFT": 0.9999986781808513
+          },
+          "proposed": "LEFT",
+          "executed": "LEFT",
+          "intervened": false,
+          "inference_ms": 216.539,
+          "ate": false,
+          "decision_ms": 217.452,
+          "terminal_reason": null
+        },
+        "history_count": 3,
+        "expires_in_seconds": 86400
+      },
+      "elapsed_seconds": 0.6793787080096081
+    },
+    {
+      "type": "step",
+      "episode": 1,
+      "game": {
+        "id": "c3d00224dd2f4b3eb6a7d115eaf2a331",
+        "seed": 7,
+        "size": 12,
+        "width": 12,
+        "height": 12,
+        "body": [
+          [
+            3,
+            7
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            5,
+            7
+          ]
+        ],
+        "food": [
+          1,
+          7
+        ],
+        "direction": "LEFT",
+        "step": 4,
+        "score": 0,
+        "length": 3,
+        "status": "running",
+        "terminal_reason": null,
+        "alive": true,
+        "won": false,
+        "done": false,
+        "max_steps": 5,
+        "starvation_limit": 288,
+        "steps_since_food": 4,
+        "available_directions": [
+          "UP",
+          "DOWN",
+          "LEFT"
+        ],
+        "candidates": [
+          {
+            "direction": "UP",
+            "next_cell": [
+              3,
+              6
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 3,
+            "manhattan_change": 1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 3,
+            "recent_visits": 0
+          },
+          {
+            "direction": "DOWN",
+            "next_cell": [
+              3,
+              8
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 3,
+            "manhattan_change": 1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 3,
+            "recent_visits": 0
+          },
+          {
+            "direction": "LEFT",
+            "next_cell": [
+              2,
+              7
+            ],
+            "collision": null,
+            "eats_food": false,
+            "manhattan_distance": 1,
+            "manhattan_change": -1,
+            "reachable_space": 142,
+            "tail_reachable": true,
+            "food_path_distance": 1,
+            "recent_visits": 0
+          }
+        ],
+        "recent_heads": [
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            3,
+            7
+          ]
+        ],
+        "policy": {
+          "mode": "model_direct",
+          "feature_assisted": true,
+          "planner": false,
+          "guardrail": false,
+          "observation": "spatial",
+          "feature_version": "snake-observable-bfs-v1",
+          "feature_search": true
+        },
+        "last_decision": {
+          "step": 4,
+          "step_before": 3,
+          "step_after": 4,
+          "request": {
+            "model": "qev-0.8b",
+            "state": "Snake on a 12 by 12 board. x increases right, y increases down. Head=(4,7), food=(1,7), heading=LEFT. Length=3. Steps without food=3. Candidates include static BFS space/path facts and recent visits, not a chosen route plan.",
+            "questions": {
+              "move": {
+                "type": "choice",
+                "instructions": "Choose a Snake move. Avoid collisions. Prefer tail_reachable and enough reachable_space for the snake length. Then follow a short food_path_distance, penalizing recent_visits to avoid loops. An empty food_path_distance means no static path. Prefer straight ahead on ties. All three non-reversing moves remain selectable.",
+                "criteria": {
+                  "UP": {
+                    "next_cell": [
+                      4,
+                      6
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 4,
+                    "manhattan_change": 1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 4,
+                    "recent_visits": 0
+                  },
+                  "DOWN": {
+                    "next_cell": [
+                      4,
+                      8
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 4,
+                    "manhattan_change": 1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 4,
+                    "recent_visits": 0
+                  },
+                  "LEFT": {
+                    "next_cell": [
+                      3,
+                      7
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 2,
+                    "manhattan_change": -1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 2,
+                    "recent_visits": 0
+                  }
+                }
+              }
+            }
+          },
+          "response": {
+            "model": "qev-0.8b",
+            "answers": {
+              "move": {
+                "type": "choice",
+                "choice": "LEFT",
+                "confidence": 0.9999977651278973,
+                "probabilities": {
+                  "UP": 1.0907246468690135e-06,
+                  "DOWN": 3.991900882165763e-07,
+                  "LEFT": 0.999998510085265
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 337,
+              "output_tokens": 0
+            },
+            "latency_ms": 218.21,
+            "qev": {
+              "backend": "mlx",
+              "temperature": 2.82842712474619,
+              "training_modalities": [
+                "text"
+              ],
+              "multimodal_decision_accuracy_validated": false,
+              "input_modalities": [
+                "text"
+              ],
+              "truncated_questions": []
+            }
+          },
+          "candidate_facts": [
+            {
+              "direction": "UP",
+              "next_cell": [
+                4,
+                6
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 4,
+              "manhattan_change": 1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 4,
+              "recent_visits": 0
+            },
+            {
+              "direction": "DOWN",
+              "next_cell": [
+                4,
+                8
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 4,
+              "manhattan_change": 1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 4,
+              "recent_visits": 0
+            },
+            {
+              "direction": "LEFT",
+              "next_cell": [
+                3,
+                7
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 2,
+              "manhattan_change": -1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 2,
+              "recent_visits": 0
+            }
+          ],
+          "probabilities": {
+            "UP": 1.0907246468690135e-06,
+            "DOWN": 3.991900882165763e-07,
+            "LEFT": 0.999998510085265
+          },
+          "proposed": "LEFT",
+          "executed": "LEFT",
+          "intervened": false,
+          "inference_ms": 218.343,
+          "ate": false,
+          "decision_ms": 219.164,
+          "terminal_reason": null
+        },
+        "history_count": 4,
+        "expires_in_seconds": 86400
+      },
+      "elapsed_seconds": 0.9001633750158362
+    },
+    {
+      "type": "step",
+      "episode": 1,
+      "game": {
+        "id": "c3d00224dd2f4b3eb6a7d115eaf2a331",
+        "seed": 7,
+        "size": 12,
+        "width": 12,
+        "height": 12,
+        "body": [
+          [
+            2,
+            7
+          ],
+          [
+            3,
+            7
+          ],
+          [
+            4,
+            7
+          ]
+        ],
+        "food": [
+          1,
+          7
+        ],
+        "direction": "LEFT",
+        "step": 5,
+        "score": 0,
+        "length": 3,
+        "status": "finished",
+        "terminal_reason": "max_steps",
+        "alive": true,
+        "won": false,
+        "done": true,
+        "max_steps": 5,
+        "starvation_limit": 288,
+        "steps_since_food": 5,
+        "available_directions": [],
+        "candidates": [],
+        "recent_heads": [
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            3,
+            7
+          ],
+          [
+            2,
+            7
+          ]
+        ],
+        "policy": {
+          "mode": "model_direct",
+          "feature_assisted": true,
+          "planner": false,
+          "guardrail": false,
+          "observation": "spatial",
+          "feature_version": "snake-observable-bfs-v1",
+          "feature_search": true
+        },
+        "last_decision": {
+          "step": 5,
+          "step_before": 4,
+          "step_after": 5,
+          "request": {
+            "model": "qev-0.8b",
+            "state": "Snake on a 12 by 12 board. x increases right, y increases down. Head=(3,7), food=(1,7), heading=LEFT. Length=3. Steps without food=4. Candidates include static BFS space/path facts and recent visits, not a chosen route plan.",
+            "questions": {
+              "move": {
+                "type": "choice",
+                "instructions": "Choose a Snake move. Avoid collisions. Prefer tail_reachable and enough reachable_space for the snake length. Then follow a short food_path_distance, penalizing recent_visits to avoid loops. An empty food_path_distance means no static path. Prefer straight ahead on ties. All three non-reversing moves remain selectable.",
+                "criteria": {
+                  "UP": {
+                    "next_cell": [
+                      3,
+                      6
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 3,
+                    "manhattan_change": 1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 3,
+                    "recent_visits": 0
+                  },
+                  "DOWN": {
+                    "next_cell": [
+                      3,
+                      8
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 3,
+                    "manhattan_change": 1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 3,
+                    "recent_visits": 0
+                  },
+                  "LEFT": {
+                    "next_cell": [
+                      2,
+                      7
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 1,
+                    "manhattan_change": -1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 1,
+                    "recent_visits": 0
+                  }
+                }
+              }
+            }
+          },
+          "response": {
+            "model": "qev-0.8b",
+            "answers": {
+              "move": {
+                "type": "choice",
+                "choice": "LEFT",
+                "confidence": 0.9999958226462548,
+                "probabilities": {
+                  "UP": 2.0445385419233472e-06,
+                  "DOWN": 7.403639548762302e-07,
+                  "LEFT": 0.9999972150975033
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 337,
+              "output_tokens": 0
+            },
+            "latency_ms": 218.03,
+            "qev": {
+              "backend": "mlx",
+              "temperature": 2.82842712474619,
+              "training_modalities": [
+                "text"
+              ],
+              "multimodal_decision_accuracy_validated": false,
+              "input_modalities": [
+                "text"
+              ],
+              "truncated_questions": []
+            }
+          },
+          "candidate_facts": [
+            {
+              "direction": "UP",
+              "next_cell": [
+                3,
+                6
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 3,
+              "manhattan_change": 1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 3,
+              "recent_visits": 0
+            },
+            {
+              "direction": "DOWN",
+              "next_cell": [
+                3,
+                8
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 3,
+              "manhattan_change": 1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 3,
+              "recent_visits": 0
+            },
+            {
+              "direction": "LEFT",
+              "next_cell": [
+                2,
+                7
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 1,
+              "manhattan_change": -1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 1,
+              "recent_visits": 0
+            }
+          ],
+          "probabilities": {
+            "UP": 2.0445385419233472e-06,
+            "DOWN": 7.403639548762302e-07,
+            "LEFT": 0.9999972150975033
+          },
+          "proposed": "LEFT",
+          "executed": "LEFT",
+          "intervened": false,
+          "inference_ms": 218.165,
+          "ate": false,
+          "decision_ms": 219.011,
+          "terminal_reason": "max_steps"
+        },
+        "history_count": 5,
+        "expires_in_seconds": 86400
+      },
+      "elapsed_seconds": 1.1204212080338039
+    },
+    {
+      "type": "episode_end",
+      "episode": 1,
+      "id": "c3d00224dd2f4b3eb6a7d115eaf2a331",
+      "seed": 7,
+      "score": 0,
+      "steps": 5,
+      "length": 3,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "stop_reason": "max_steps",
+      "state_confirmed": true,
+      "observed_decisions": 5,
+      "seconds": 1.1205962090170942,
+      "game": {
+        "id": "c3d00224dd2f4b3eb6a7d115eaf2a331",
+        "seed": 7,
+        "size": 12,
+        "width": 12,
+        "height": 12,
+        "body": [
+          [
+            2,
+            7
+          ],
+          [
+            3,
+            7
+          ],
+          [
+            4,
+            7
+          ]
+        ],
+        "food": [
+          1,
+          7
+        ],
+        "direction": "LEFT",
+        "step": 5,
+        "score": 0,
+        "length": 3,
+        "status": "finished",
+        "terminal_reason": "max_steps",
+        "alive": true,
+        "won": false,
+        "done": true,
+        "max_steps": 5,
+        "starvation_limit": 288,
+        "steps_since_food": 5,
+        "available_directions": [],
+        "candidates": [],
+        "recent_heads": [
+          [
+            6,
+            6
+          ],
+          [
+            6,
+            7
+          ],
+          [
+            5,
+            7
+          ],
+          [
+            4,
+            7
+          ],
+          [
+            3,
+            7
+          ],
+          [
+            2,
+            7
+          ]
+        ],
+        "policy": {
+          "mode": "model_direct",
+          "feature_assisted": true,
+          "planner": false,
+          "guardrail": false,
+          "observation": "spatial",
+          "feature_version": "snake-observable-bfs-v1",
+          "feature_search": true
+        },
+        "last_decision": {
+          "step": 5,
+          "step_before": 4,
+          "step_after": 5,
+          "request": {
+            "model": "qev-0.8b",
+            "state": "Snake on a 12 by 12 board. x increases right, y increases down. Head=(3,7), food=(1,7), heading=LEFT. Length=3. Steps without food=4. Candidates include static BFS space/path facts and recent visits, not a chosen route plan.",
+            "questions": {
+              "move": {
+                "type": "choice",
+                "instructions": "Choose a Snake move. Avoid collisions. Prefer tail_reachable and enough reachable_space for the snake length. Then follow a short food_path_distance, penalizing recent_visits to avoid loops. An empty food_path_distance means no static path. Prefer straight ahead on ties. All three non-reversing moves remain selectable.",
+                "criteria": {
+                  "UP": {
+                    "next_cell": [
+                      3,
+                      6
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 3,
+                    "manhattan_change": 1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 3,
+                    "recent_visits": 0
+                  },
+                  "DOWN": {
+                    "next_cell": [
+                      3,
+                      8
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 3,
+                    "manhattan_change": 1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 3,
+                    "recent_visits": 0
+                  },
+                  "LEFT": {
+                    "next_cell": [
+                      2,
+                      7
+                    ],
+                    "collision": "none",
+                    "eats_food": false,
+                    "manhattan_distance": 1,
+                    "manhattan_change": -1,
+                    "reachable_space": 142,
+                    "tail_reachable": true,
+                    "food_path_distance": 1,
+                    "recent_visits": 0
+                  }
+                }
+              }
+            }
+          },
+          "response": {
+            "model": "qev-0.8b",
+            "answers": {
+              "move": {
+                "type": "choice",
+                "choice": "LEFT",
+                "confidence": 0.9999958226462548,
+                "probabilities": {
+                  "UP": 2.0445385419233472e-06,
+                  "DOWN": 7.403639548762302e-07,
+                  "LEFT": 0.9999972150975033
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 337,
+              "output_tokens": 0
+            },
+            "latency_ms": 218.03,
+            "qev": {
+              "backend": "mlx",
+              "temperature": 2.82842712474619,
+              "training_modalities": [
+                "text"
+              ],
+              "multimodal_decision_accuracy_validated": false,
+              "input_modalities": [
+                "text"
+              ],
+              "truncated_questions": []
+            }
+          },
+          "candidate_facts": [
+            {
+              "direction": "UP",
+              "next_cell": [
+                3,
+                6
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 3,
+              "manhattan_change": 1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 3,
+              "recent_visits": 0
+            },
+            {
+              "direction": "DOWN",
+              "next_cell": [
+                3,
+                8
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 3,
+              "manhattan_change": 1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 3,
+              "recent_visits": 0
+            },
+            {
+              "direction": "LEFT",
+              "next_cell": [
+                2,
+                7
+              ],
+              "collision": null,
+              "eats_food": false,
+              "manhattan_distance": 1,
+              "manhattan_change": -1,
+              "reachable_space": 142,
+              "tail_reachable": true,
+              "food_path_distance": 1,
+              "recent_visits": 0
+            }
+          ],
+          "probabilities": {
+            "UP": 2.0445385419233472e-06,
+            "DOWN": 7.403639548762302e-07,
+            "LEFT": 0.9999972150975033
+          },
+          "proposed": "LEFT",
+          "executed": "LEFT",
+          "intervened": false,
+          "inference_ms": 218.165,
+          "ate": false,
+          "decision_ms": 219.011,
+          "terminal_reason": "max_steps"
+        },
+        "history_count": 5,
+        "expires_in_seconds": 86400
+      }
+    },
+    {
+      "type": "run_end",
+      "format": "qev-snake-run-v1",
+      "policy": {
+        "mode": "model_direct",
+        "feature_assisted": true,
+        "planner": false,
+        "guardrail": false,
+        "observation": "spatial",
+        "feature_version": "snake-observable-bfs-v1",
+        "feature_search": true
+      },
+      "episodes": [
+        {
+          "episode": 1,
+          "id": "c3d00224dd2f4b3eb6a7d115eaf2a331",
+          "seed": 7,
+          "score": 0,
+          "steps": 5,
+          "length": 3,
+          "status": "finished",
+          "terminal_reason": "max_steps",
+          "stop_reason": "max_steps",
+          "state_confirmed": true,
+          "observed_decisions": 5,
+          "seconds": 1.1205962090170942
+        }
+      ],
+      "interrupted": false,
+      "errors": [],
+      "total_steps": 5,
+      "observed_decisions": 5,
+      "source": {
+        "mode": "local",
+        "model": "models/qev-snake-0.8b-mlx",
+        "backend": "mlx"
+      },
+      "load_seconds": 3.093207541969605,
+      "seconds": 1.1208261669962667,
+      "steps_per_second": 4.460995065273717,
+      "inference_p50_ms": 218.165,
+      "exit_code": 0
+    }
+  ]
+}

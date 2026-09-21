@@ -15,7 +15,17 @@ from qev.evaluation import (
     prediction_precision,
     report,
 )
-from qev.train import accumulation_loss
+from qev.train import accumulation_loss, prepare_continuation
+
+
+def test_continuation_keeps_architecture_and_drops_old_dataset_calibration():
+    model = SimpleNamespace(config={"base_revision": "pinned", "modalities": ["text", "image", "video"],
+        "native_generation": "adapter_disabled", "temperature": 1.5, "completed_epochs": 2,
+        "model_name": "qev-0.8b", "dataset_manifest_sha256": "old", "max_length": 512,
+        "calibration_split": "calibration", "calibration_precision": {"old": True}})
+    assert prepare_continuation(model, max_length=1024, max_state=384) is model
+    assert model.config == {"base_revision": "pinned", "modalities": ["text", "image", "video"],
+        "native_generation": "adapter_disabled", "max_length": 1024, "max_state": 384}
 
 
 def test_uneven_microbatches_match_the_full_group_gradient():

@@ -1,8 +1,8 @@
 """Deterministic Snake rules and bounded sessions driven by real Qev decisions.
 
-The model receives only local collision/food-distance facts. There is no path
-planner, action substitution, or collision filtering. Every executed step uses
-the model's original choice and records the exact request and response.
+The model receives explicit environment features, with optional static BFS
+space/path facts. No teacher action or safety replacement is used at runtime.
+Every executed step records the model's original choice and exact request.
 """
 
 from __future__ import annotations
@@ -17,6 +17,8 @@ import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import Any
+
+from .snake_features import FEATURE_VERSION, RECENT_WINDOW, candidate_features
 
 DIRECTIONS = ("UP", "DOWN", "LEFT", "RIGHT")
 VECTORS = {"UP": (0, -1), "DOWN": (0, 1), "LEFT": (-1, 0), "RIGHT": (1, 0)}
@@ -39,18 +41,22 @@ class GameCapacity(Exception):
 class SnakeGame:
     """Head-first coordinates; x increases rightward and y increases downward."""
 
-    def __init__(self, *, seed=7, size=12, max_steps=500):
+    def __init__(self, *, seed=7, size=12, max_steps=500, observation="spatial"):
         if type(seed) is not int or not -(2**31) <= seed < 2**31:
             raise ValueError("seed must be a signed 32-bit integer")
         if type(size) is not int or not 6 <= size <= 20:
             raise ValueError("size must be an integer between 6 and 20")
         if type(max_steps) is not int or not 1 <= max_steps <= 2000:
             raise ValueError("max_steps must be an integer between 1 and 2000")
+        if observation not in ("local", "spatial"):
+            raise ValueError("observation must be local or spatial")
+        self.observation = observation
         self.seed, self.size, self.max_steps = seed, size, max_steps
         self.starvation_limit = 2 * size * size
         self.rng = random.Random(seed)
         middle = size // 2
         self.body = [(middle, middle), (middle - 1, middle), (middle - 2, middle)]
+        self.recent_heads = [self.body[0]]
         self.direction = "RIGHT"
         self.step = self.score = self.steps_since_food = 0
         self.status, self.terminal_reason = "running", None
@@ -81,7 +87,8 @@ class SnakeGame:
             result.append({"direction": direction, "next_cell": list(target), "collision": collision,
                            "eats_food": eats, "manhattan_distance": new_distance,
                            "manhattan_change": new_distance - distance})
-        return result
+        return (candidate_features(self.body, self.food, self.size, result, self.recent_heads)
+                if self.observation == "spatial" else result)
 
     def advance(self, direction):
         if self.status != "running":
@@ -96,6 +103,8 @@ class SnakeGame:
             self.status, self.terminal_reason = "dead", move["collision"]
             return False
         self.body.insert(0, tuple(move["next_cell"]))
+        self.recent_heads.append(self.body[0])
+        self.recent_heads = self.recent_heads[-RECENT_WINDOW:]
         if move["eats_food"]:
             self.score += 1
             self.steps_since_food = 0
@@ -122,25 +131,35 @@ class SnakeGame:
                 "max_steps": self.max_steps, "starvation_limit": self.starvation_limit,
                 "steps_since_food": self.steps_since_food,
                 "available_directions": [move["direction"] for move in candidates], "candidates": candidates,
-                "policy": dict(POLICY)}
+                "recent_heads": [list(cell) for cell in self.recent_heads],
+                "policy": {**POLICY, "observation": self.observation,
+                           "feature_version": FEATURE_VERSION if self.observation == "spatial" else "local-v1",
+                           "feature_search": self.observation == "spatial"}}
 
 
 def decision_request(game, model):
-    """Local facts only: no full body, rollout, connectivity search, or 'best' label."""
+    """Exact observable facts for both training and play; never a 'best' label."""
     head, food = game.body[0], game.food
     state = (f"Snake on a {game.size} by {game.size} board. x increases right, y increases down. "
              f"Head=({head[0]},{head[1]}), food=({food[0]},{food[1]}), heading={game.direction}. "
              f"Length={len(game.body)}. Steps without food={game.steps_since_food}. "
-             "The candidates contain immediate next-cell facts, not a route plan.")
+             + ("Candidates include static BFS space/path facts and recent visits, not a chosen route plan."
+                if game.observation == "spatial" else
+                "The candidates contain immediate next-cell facts, not a route plan."))
     facts = game.candidates()
     criteria = {move["direction"]: {key: ("none" if key == "collision" and value is None else value)
                                    for key, value in move.items() if key != "direction"}
                 for move in facts}
     request = {"model": model, "state": state, "questions": {"move": {
         "type": "choice",
-        "instructions": ("Choose one Snake move. Avoid wall and body collisions first, then eat food or "
+        "instructions": (("Choose a Snake move. Avoid collisions. Prefer tail_reachable and enough reachable_space "
+                         "for the snake length. Then follow a short food_path_distance, penalizing recent_visits "
+                         "to avoid loops. An empty food_path_distance means no static path. Prefer straight ahead on ties. "
+                         "All three non-reversing moves remain selectable.")
+                         if game.observation == "spatial" else
+                         ("Choose one Snake move. Avoid wall and body collisions first, then eat food or "
                          "move toward it. A negative manhattan_change reduces distance. "
-                         "Immediate reverse is excluded; collision moves are still selectable."),
+                         "Immediate reverse is excluded; collision moves are still selectable.")),
         "criteria": criteria,
     }}}
     return request, facts
@@ -223,8 +242,8 @@ class GameStore:
                 session.last_access = self.clock()
                 session.lock.release()
 
-    def create(self, *, seed=7, size=12, max_steps=500):
-        game = SnakeGame(seed=seed, size=size, max_steps=max_steps)
+    def create(self, *, seed=7, size=12, max_steps=500, observation="spatial"):
+        game = SnakeGame(seed=seed, size=size, max_steps=max_steps, observation=observation)
         with self._lock:
             self._prune()
             if len(self._sessions) >= self.max_games:

@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "verified_at": "2026-09-21T00:37:14.263631+00:00",
+  "checkpoint": "/Volumes/ExternalDisk/UserData/code/loadchange/qev/models/qev-snake-0.8b",
+  "files_verified": 19,
+  "parent_files_unchanged": 25,
+  "archive": {
+    "archive": "/content/qev-snake-checkpoint.tar.gz",
+    "bytes": 49736668,
+    "sha256": "0b51b09ce6706f0196417d4bb87b54d0c4f79d8f2842cab831272cf7a2ee569a",
+    "checkpoint_files": 19,
+    "checkpoint_manifest_sha256": "41180b4fd4fabb099815ff6125b327183d88a646136f223f91d9a6c7a395c78f",
+    "training_return_code": 0,
+    "evaluation_return_code_at_collection": null,
+    "base_unchanged": true
+  },
+  "config_sha256": "27c6c1fd444462082b53a986bc93a89b5ae53b0d0519291a646252c047b00aa3",
+  "manifest_sha256": "41180b4fd4fabb099815ff6125b327183d88a646136f223f91d9a6c7a395c78f"
+}

@@ -1,0 +1,668 @@
+{
+  "format": "qev-data-v1",
+  "seed": 20260921,
+  "partitions": {
+    "train": {
+      "sha256": "3c090694d4f2455d35d0a918e3aa65df9728f34ba58eadbb062ec1b10406a507",
+      "records": 16692,
+      "questions": 17892,
+      "question_types": {
+        "noul": 2126,
+        "choice": 14318,
+        "score": 1448
+      },
+      "sources": {
+        "imdb": 400,
+        "synthetic_snake_observable_teacher": 12000,
+        "yelp": 400,
+        "banking77": 442,
+        "synthetic_rules_en": 250,
+        "mnli": 442,
+        "sst5": 400,
+        "agnews": 428,
+        "amazon": 400,
+        "trec": 438,
+        "boolq": 400,
+        "dbpedia14": 442,
+        "synthetic_rules_zh": 250
+      },
+      "snake_records": 12000,
+      "snake_label_directions": {
+        "RIGHT": 2935,
+        "DOWN": 3005,
+        "UP": 3057,
+        "LEFT": 3003
+      },
+      "snake_label_positions": {
+        "1": 3993,
+        "0": 3946,
+        "2": 4061
+      },
+      "episode_seeds": [
+        -2089625962,
+        1675924870,
+        -1368498223,
+        1831741870,
+        -776840652,
+        -1928646146,
+        539307713,
+        -683289239,
+        -946742079,
+        -1504905855,
+        -507824258,
+        1795031635,
+        -482216212,
+        736992533,
+        -1540710411,
+        -639370246,
+        -125240074,
+        1475869043,
+        1196301143,
+        426971828,
+        979857341,
+        -563983557,
+        402426854,
+        -588398035,
+        -1508064975,
+        -1868970611,
+        -1505432145,
+        1019054913,
+        1167441498,
+        -1187484238,
+        274301918,
+        1301578263,
+        1425935470,
+        1675034652,
+        -1821894300,
+        1314871752,
+        -434629737,
+        -1453727194,
+        448439096,
+        -1883174593,
+        -37011024,
+        1208146278,
+        645084200,
+        -996509818,
+        -1482549676,
+        457917720,
+        -2101746919,
+        486353223,
+        9440056,
+        -29032538,
+        1869798277,
+        -414945373,
+        416164306,
+        1003324422,
+        -1520446179,
+        -382364777,
+        -547058989,
+        229473588,
+        -295213512,
+        1434868598,
+        -822807005,
+        -294339375,
+        -68154038,
+        984931114,
+        1243519788,
+        2074199514,
+        1223214692,
+        -1510914488,
+        1250516289,
+        2034028553,
+        1746750817,
+        1715450362,
+        -310153979,
+        2109651715,
+        -655317550,
+        2002545329,
+        -2051780906,
+        1597163328,
+        1358459864,
+        -1799646982,
+        -619541562,
+        -2111291347,
+        -626296360,
+        -275359286,
+        -1080949411,
+        -2036099039,
+        855281456,
+        -2060245550,
+        -710671841,
+        2061709904,
+        514855950,
+        1113788339,
+        -1031007913,
+        -195090494,
+        387421205,
+        775896830,
+        528934121,
+        -1544876471,
+        477990574,
+        -2001163534,
+        617508691,
+        1359973873,
+        -363404228,
+        464025336,
+        1503936774,
+        1595244098,
+        847285821,
+        -365964331,
+        2074257807,
+        362326919,
+        -1941712819,
+        -1040574972,
+        522491438,
+        -1579644956,
+        967302887,
+        743669330,
+        -249435482,
+        -348518523,
+        -927851718,
+        1037993881,
+        1686268216,
+        -1931300428,
+        1012802659,
+        625851216,
+        181094203,
+        -248088116,
+        835447111,
+        -194564567,
+        583023653,
+        -1535999713,
+        -1716925560,
+        1622904827,
+        -655549380,
+        -2041626142,
+        -2135553978,
+        -1695637018,
+        -241434523,
+        369369180,
+        83389939,
+        -514714493,
+        887541817,
+        -678294817,
+        1564832191,
+        341395026,
+        -1525995740,
+        1188539030,
+        -1606873645,
+        738027382,
+        -605380099,
+        658784505,
+        1058455178,
+        859636431,
+        712441416,
+        -2090096762,
+        -243020731,
+        -1739707888,
+        -1123899299,
+        -46301814,
+        -1982237682,
+        1472872214,
+        1313088233,
+        1205253563,
+        1402458863,
+        -1263794599,
+        -1013008858,
+        1636103288,
+        756796987,
+        147404690,
+        -1266130111,
+        953307431,
+        -172228429,
+        -1872773198,
+        -1977789712,
+        655680966,
+        323032175,
+        655893955,
+        -1585796640,
+        -1566944581,
+        -554705675,
+        1817697593,
+        -1650093867,
+        -1421185896,
+        1615114705,
+        -916082100,
+        -982513513,
+        1481619657,
+        1526975604,
+        -14398725,
+        -1269891468,
+        181320229,
+        246142534,
+        259145240,
+        -529910400,
+        1885369422,
+        -1562146190,
+        1560676450,
+        -1907607998,
+        1405055635,
+        -428799601,
+        -616314866,
+        2098014140,
+        338176759,
+        1079219078,
+        799202753,
+        -1019638246,
+        337067936,
+        -1937827792,
+        325665734,
+        -1933252255,
+        96783921,
+        1814677769,
+        -1114602631,
+        1946281910,
+        -1701686448,
+        89672329,
+        1879341232,
+        481743117,
+        1819599968,
+        -1907888264,
+        872244159,
+        -900969012,
+        1058672740,
+        18349357,
+        970878942,
+        -2066271046,
+        -1969105590,
+        1296469129,
+        887776699,
+        -1397312344,
+        1107472682,
+        -998194783,
+        -63025681,
+        -55502055,
+        -367533362,
+        946038402,
+        -1374791888,
+        1405286040,
+        263762649,
+        -212080489,
+        2076649032,
+        1346801720,
+        262230044,
+        -374948899,
+        585109725,
+        1271370219,
+        -148748932,
+        1820634652,
+        -1525581267,
+        -1229349738,
+        -1755017955,
+        -108481230
+      ]
+    },
+    "calibration": {
+      "sha256": "8d4fa1984695ea929cf49fc3bf4f50039121573cf7c903444004ec6cd4d3143f",
+      "records": 1000,
+      "questions": 1120,
+      "question_types": {
+        "choice": 726,
+        "noul": 226,
+        "score": 168
+      },
+      "sources": {
+        "agnews": 40,
+        "boolq": 40,
+        "synthetic_snake_observable_teacher": 500,
+        "amazon": 40,
+        "synthetic_rules_zh": 50,
+        "banking77": 40,
+        "synthetic_rules_en": 50,
+        "mnli": 40,
+        "dbpedia14": 40,
+        "trec": 40,
+        "sst5": 40,
+        "yelp": 40,
+        "imdb": 40
+      },
+      "snake_records": 500,
+      "snake_label_directions": {
+        "DOWN": 125,
+        "LEFT": 118,
+        "RIGHT": 130,
+        "UP": 127
+      },
+      "snake_label_positions": {
+        "2": 174,
+        "1": 168,
+        "0": 158
+      },
+      "episode_seeds": [
+        384745719,
+        1826768235,
+        -1435946591,
+        -500668953,
+        -1058202818,
+        1777473570,
+        -1853104148,
+        685521647,
+        -460115492,
+        528481849,
+        1894145341
+      ]
+    },
+    "development": {
+      "sha256": "775efc5811c1694059965e7e6f7ca298205f9361509c5d9dc098548ff833c45b",
+      "records": 1200,
+      "questions": 1380,
+      "question_types": {
+        "score": 228,
+        "choice": 826,
+        "noul": 326
+      },
+      "sources": {
+        "sst5": 60,
+        "mnli": 60,
+        "yelp": 60,
+        "agnews": 60,
+        "synthetic_snake_observable_teacher": 500,
+        "dbpedia14": 60,
+        "boolq": 60,
+        "synthetic_rules_en": 50,
+        "synthetic_rules_zh": 50,
+        "imdb": 60,
+        "trec": 60,
+        "amazon": 60,
+        "banking77": 60
+      },
+      "snake_records": 500,
+      "snake_label_directions": {
+        "DOWN": 127,
+        "UP": 130,
+        "LEFT": 123,
+        "RIGHT": 120
+      },
+      "snake_label_positions": {
+        "1": 164,
+        "2": 182,
+        "0": 154
+      },
+      "episode_seeds": [
+        106965011,
+        1103221001,
+        1847835926,
+        2020418683,
+        645842895,
+        -806100949,
+        1713620753,
+        1792025913,
+        -1019110717,
+        -1329276186,
+        -1006186476
+      ]
+    }
+  },
+  "license": "Mixed replay dataset licenses plus Apache-2.0 Snake data",
+  "replay": {
+    "directory": "data/v1",
+    "manifest_sha256": "77805c57b30dd34bba4b5840d975f8f9421f4839fef83d24948bf0df09a5aab0",
+    "partitions": {
+      "train": {
+        "sha256": "6b62720216c47d8727d3246e78b1cc28fc1fb50987ca9dce0772d3f56d79818f",
+        "records": 4692,
+        "questions": 5892
+      },
+      "calibration": {
+        "sha256": "dc21a46d6d2a0a10185e3ebd22229d2745bc53581c7de8f9aef6a8f42c36a5b1",
+        "records": 500,
+        "questions": 620
+      },
+      "development": {
+        "sha256": "1473b7d04497862d68510d9b73c4878bb1c0d58ae32897c495a1760d1b92a009",
+        "records": 700,
+        "questions": 880
+      }
+    },
+    "preserve_original_rows_and_partitions": true,
+    "license": "Mixed source dataset licenses; see source_datasets",
+    "source_datasets": [
+      {
+        "repository": "CogComp/trec",
+        "revision": "65752bf53af25bc935a0dce92fb5b6c930728450",
+        "model_card_url": "https://huggingface.co/datasets/CogComp/trec/blob/65752bf53af25bc935a0dce92fb5b6c930728450/README.md",
+        "declared_license": "not_declared",
+        "license_name": null,
+        "license_link": null,
+        "card_metadata_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+      },
+      {
+        "repository": "SetFit/amazon_reviews_multi_en",
+        "revision": "ec73b665e4be0f567b69d39425355401cfe0d29b",
+        "model_card_url": "https://huggingface.co/datasets/SetFit/amazon_reviews_multi_en/blob/ec73b665e4be0f567b69d39425355401cfe0d29b/README.md",
+        "declared_license": "apache-2.0",
+        "license_name": null,
+        "license_link": null,
+        "card_metadata_sha256": "3589dbeb94a252b2c2324b8fe22cc037100f84b05a59656c6e8ee4a0b46cbb22"
+      },
+      {
+        "repository": "SetFit/sst5",
+        "revision": "e51bdcd8cd3a30da231967c1a249ba59361279a3",
+        "model_card_url": "https://huggingface.co/datasets/SetFit/sst5/blob/e51bdcd8cd3a30da231967c1a249ba59361279a3/README.md",
+        "declared_license": "not_declared",
+        "license_name": null,
+        "license_link": null,
+        "card_metadata_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+      },
+      {
+        "repository": "Yelp/yelp_review_full",
+        "revision": "c1f9ee939b7d05667af864ee1cb066393154bf85",
+        "model_card_url": "https://huggingface.co/datasets/Yelp/yelp_review_full/blob/c1f9ee939b7d05667af864ee1cb066393154bf85/README.md",
+        "declared_license": [
+          "other"
+        ],
+        "license_name": null,
+        "license_link": null,
+        "card_metadata_sha256": "faf74150c2fa3934ee7eff1d4c6ed8b6484a5dfbcb8450f6fb27702756219d3b"
+      },
+      {
+        "repository": "fancyzhx/ag_news",
+        "revision": "eb185aade064a813bc0b7f42de02595523103ca4",
+        "model_card_url": "https://huggingface.co/datasets/fancyzhx/ag_news/blob/eb185aade064a813bc0b7f42de02595523103ca4/README.md",
+        "declared_license": [
+          "unknown"
+        ],
+        "license_name": null,
+        "license_link": null,
+        "card_metadata_sha256": "a4c7c6afd1ef705e44237a98cdbcb9c6c33bfef2aa6ec3079cdbe7793151f1f8"
+      },
+      {
+        "repository": "fancyzhx/dbpedia_14",
+        "revision": "9abd46cf7fc8b4c64290f26993c540b92aa145ac",
+        "model_card_url": "https://huggingface.co/datasets/fancyzhx/dbpedia_14/blob/9abd46cf7fc8b4c64290f26993c540b92aa145ac/README.md",
+        "declared_license": [
+          "cc-by-sa-3.0"
+        ],
+        "license_name": null,
+        "license_link": null,
+        "card_metadata_sha256": "74a20bf49cf3e42ab269e0a4a70299043b8c89f2167d90652331fab8e77cb27d"
+      },
+      {
+        "repository": "google/boolq",
+        "revision": "35b264d03638db9f4ce671b711558bf7ff0f80d5",
+        "model_card_url": "https://huggingface.co/datasets/google/boolq/blob/35b264d03638db9f4ce671b711558bf7ff0f80d5/README.md",
+        "declared_license": [
+          "cc-by-sa-3.0"
+        ],
+        "license_name": null,
+        "license_link": null,
+        "card_metadata_sha256": "2b6422e3d2f955185163c7091ff79f69f0b60b5af0fa64b9e230174e786b1aae"
+      },
+      {
+        "repository": "legacy-datasets/banking77",
+        "revision": "f54121560de48f2852f90be299010d1d6dc612ec",
+        "model_card_url": "https://huggingface.co/datasets/legacy-datasets/banking77/blob/f54121560de48f2852f90be299010d1d6dc612ec/README.md",
+        "declared_license": [
+          "cc-by-4.0"
+        ],
+        "license_name": null,
+        "license_link": null,
+        "card_metadata_sha256": "935860d63d7491d37656637444da0dba78ff1338383093b2eabbd77f16253804"
+      },
+      {
+        "repository": "nyu-mll/multi_nli",
+        "revision": "da70db2af9d09693783c3320c4249840212ee221",
+        "model_card_url": "https://huggingface.co/datasets/nyu-mll/multi_nli/blob/da70db2af9d09693783c3320c4249840212ee221/README.md",
+        "declared_license": [
+          "cc-by-3.0",
+          "cc-by-sa-3.0",
+          "mit",
+          "other"
+        ],
+        "license_name": null,
+        "license_link": null,
+        "card_metadata_sha256": "e98c1e3f3c09fddb903196533fb80e2c1ada3239ebed39e0895e7ced730a02ce"
+      },
+      {
+        "repository": "stanfordnlp/imdb",
+        "revision": "e6281661ce1c48d982bc483cf8a173c1bbeb5d31",
+        "model_card_url": "https://huggingface.co/datasets/stanfordnlp/imdb/blob/e6281661ce1c48d982bc483cf8a173c1bbeb5d31/README.md",
+        "declared_license": [
+          "other"
+        ],
+        "license_name": null,
+        "license_link": null,
+        "card_metadata_sha256": "d1af90bf5e6e4b232f62f50fefeb92bae62fa33f2a71316fad4ab80fb3f314c1"
+      }
+    ]
+  },
+  "synthetic": {
+    "source": "synthetic_snake_observable_teacher",
+    "feature_version": "snake-observable-bfs-v1",
+    "code_sha256": {
+      "scripts/prepare_snake_data.py": "a096db8606396dd65ac3ce5ac85b33e5e1d6937c67612333a971b979a98d738c",
+      "qev/snake.py": "fabf36ce25b1198fc03590b4d35247f3a1f0ecec1a6ebb371762c02b5f4a8e43",
+      "qev/snake_features.py": "575525b2be4a260e16c45230793167d77b4a1dfffb708d1761c3e345c8bfac6e"
+    },
+    "label_source": "Explicit deterministic teacher over model-visible feature values only",
+    "external_model_labels": false,
+    "optimal_play_ground_truth": false
+  },
+  "protocol": {
+    "locked_test_read": false,
+    "splits": "Independent game seeds/groups; disjoint normalized states and observations",
+    "sizes": [
+      6,
+      8,
+      12,
+      16
+    ],
+    "episode_steps": 600,
+    "samples_per_episode": 48,
+    "exploration_probability": 0.1,
+    "exploration_actions": "uniform over collision-free candidates",
+    "recent_head_window": 32,
+    "candidate_permutation": "fixed per observation in all splits",
+    "replay_mixed": true,
+    "duplicates_excluded": {
+      "repeated_observation": 32
+    },
+    "reserved_closed_loop_benchmark_seeds": [
+      10000,
+      10001,
+      10002,
+      10003,
+      10004,
+      10005,
+      10006,
+      10007,
+      10008,
+      10009,
+      10010,
+      10011,
+      10012,
+      10013,
+      10014,
+      10015,
+      10016,
+      10017,
+      10018,
+      10019
+    ],
+    "teacher_inputs": "request criteria plus visible size, length, heading; no hidden body, food RNG, or future rollout",
+    "limitations": [
+      "Heuristic imitation labels, not optimal-action proofs",
+      "Static BFS features are environment assistance, not model-learned geometry",
+      "Teacher can starve or exhaust its step budget",
+      "Held-out game seeds do not establish novel-rule generalization"
+    ]
+  },
+  "token_audit": {
+    "status": "passed",
+    "max_length": 1024,
+    "max_state": 384,
+    "partitions": {
+      "train": {
+        "questions": 17892,
+        "max_tokens": 881,
+        "max_state_tokens": 368,
+        "state_truncations": 0
+      },
+      "calibration": {
+        "questions": 1120,
+        "max_tokens": 810,
+        "max_state_tokens": 332,
+        "state_truncations": 0
+      },
+      "development": {
+        "questions": 1380,
+        "max_tokens": 850,
+        "max_state_tokens": 378,
+        "state_truncations": 0
+      }
+    }
+  },
+  "episodes": {
+    "file": "episodes.jsonl",
+    "sha256": "2ab2b75d9cac1fce377033a6bc30461820d75488aca841bc7be083ca0d29b09f",
+    "count": 273
+  },
+  "teacher_evaluation": {
+    "file": "teacher_evaluation.json",
+    "sha256": "8f07b99309dee368527f125acbcc8a8d1b1bc842325b9a61f078a94d225775f9",
+    "summary": {
+      "6": {
+        "episodes": 20,
+        "mean_score": 30.7,
+        "min_score": 17,
+        "max_score": 33,
+        "mean_steps": 317.55,
+        "terminal_reasons": {
+          "starvation": 7,
+          "board_filled": 13
+        }
+      },
+      "8": {
+        "episodes": 20,
+        "mean_score": 54.95,
+        "min_score": 44,
+        "max_score": 61,
+        "mean_steps": 834.25,
+        "terminal_reasons": {
+          "starvation": 16,
+          "board_filled": 4
+        }
+      },
+      "12": {
+        "episodes": 20,
+        "mean_score": 102.95,
+        "min_score": 94,
+        "max_score": 110,
+        "mean_steps": 2000.0,
+        "terminal_reasons": {
+          "max_steps": 20
+        }
+      },
+      "16": {
+        "episodes": 20,
+        "mean_score": 102.05,
+        "min_score": 91,
+        "max_score": 114,
+        "mean_steps": 2000.0,
+        "terminal_reasons": {
+          "max_steps": 20
+        }
+      }
+    }
+  }
+}

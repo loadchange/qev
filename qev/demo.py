@@ -1,5 +1,7 @@
 """Local demo API; model and game state stay authoritative on the server."""
 
+from typing import Literal
+
 from fastapi import APIRouter, HTTPException, Response
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -11,6 +13,7 @@ class CreateGame(BaseModel):
     seed: int = Field(default=7, ge=-(2**31), lt=2**31)
     size: int = Field(default=12, ge=6, le=20)
     max_steps: int = Field(default=500, ge=1, le=2000)
+    observation: Literal["local", "spatial"] = "spatial"
 
 
 class StepGame(BaseModel):

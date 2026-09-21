@@ -1,0 +1,38 @@
+{
+  "temperature": 2.82842712474619,
+  "training_seconds": 1484.693956375122,
+  "optimizer_steps": 2238,
+  "forward_tokens": 9992028,
+  "initial_snake": {
+    "n": 500,
+    "accuracy": 0.736,
+    "nll": 0.6332765788074997,
+    "brier": 0.3648938935907012,
+    "ece": 0.08253579614310942,
+    "confident_error_rate": 0.002
+  },
+  "trained_snake": {
+    "n": 500,
+    "accuracy": 0.984,
+    "nll": 0.06450042285864938,
+    "brier": 0.025878707558094703,
+    "ece": 0.006173020010911379,
+    "confident_error_rate": 0.008
+  },
+  "initial_general": {
+    "n": 880,
+    "accuracy": 0.8125
+  },
+  "trained_general": {
+    "n": 880,
+    "accuracy": 0.8170454545454545,
+    "nll": 0.5204855867721229,
+    "brier": 0.26511936650288503,
+    "ece": 0.04947658549354751,
+    "confident_error_rate": 0.03295454545454545,
+    "score_mae": 0.4661770030349037
+  },
+  "base_unchanged": true,
+  "config_model_name": "qev-0.8b",
+  "scope": "Same A100 continuation initial vs final development; Snake decision imitation and original 880 general/rule questions, not closed-loop results."
+}
