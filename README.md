@@ -10,10 +10,20 @@ Qev 增加独立的语言 LoRA 决策适配器与候选指针头，保留原始�
 
 ```bash
 uv sync --python 3.12 --extra mlx --extra dev
+uv run hf download twainsk/qev-0.8b-mlx --local-dir models/qev-snake-0.8b-mlx
 uv run qev snake
 uv run qev predict --model models/qev-snake-0.8b-mlx --request examples/request.json
 uv run qev serve --model models/qev-snake-0.8b-mlx --port 8008
 ```
+
+代码位于 [GitHub](https://github.com/loadchange/qev)，模型权重单独发布到 Hugging Face，Git clone 不包含权重：
+
+| 下载仓库 | 内容 | 适用环境 |
+| --- | --- | --- |
+| [twainsk/qev-0.8b](https://huggingface.co/twainsk/qev-0.8b) | 约 85 MB，LoRA、指针头与处理器；首次运行另外下载固定版本 Qwen3.5 基座 | PyTorch / NVIDIA |
+| [twainsk/qev-0.8b-mlx](https://huggingface.co/twainsk/qev-0.8b-mlx) | 约 3.48 GB，完整 FP32 多模态基座、适配器与指针头 | Apple Silicon / MLX |
+
+两个仓库均为 v0.3.0 贪吃蛇专项续训后的模型，保留原通用任务回放训练和原生多模态生成。它们需要 Qev 运行时，不能直接当作标准 Transformers pipeline 或 Ollama 模型使用。PyTorch 版下载命令为 `uv run hf download twainsk/qev-0.8b --local-dir models/qev-snake-0.8b`。每个仓库包含模型卡、许可证、评测摘要与 `release_manifest.json` 文件校验清单。
 
 本次专项模型的 GPU / PyTorch 版本为 `models/qev-snake-0.8b`，Mac 版本为 `models/qev-snake-0.8b-mlx`；原 `models/qev-0.8b[-mlx]` 保留。Mac 优先使用 MLX；MLX 通过 Apple Silicon CPU/GPU 和统一内存运行，不表示调用 Apple Neural Engine，也不会自动提高模型准确率。
 
