@@ -38,6 +38,9 @@ BACKBONES = {
     "a2d-qwen3": {"repo": "dllm-hub/Qwen3-0.6B-diffusion-mdlm-v0.1",
                   "revision": "c8d24a3f4adaeef46881b450e1bf7d1005203bd7",
                   "family": "qwen", "kind": "qwen3", "lora_targets": QWEN3_TARGETS},
+    "lfm2-230m": {"repo": "LiquidAI/LFM2.5-230M", "revision": "40cb2ad3b3044d5a41eee083a6103c8b523afa45",
+                  "family": "lfm2", "kind": "lfm2",
+                  "lora_targets": ("q_proj", "k_proj", "v_proj", "out_proj", "in_proj", "w1", "w2", "w3")},
     "lfm2-vl": {"repo": "LiquidAI/LFM2.5-VL-450M", "revision": "fc6221ca597f3315e4f82fc2df606783267b34ba",
                 "family": "lfm2", "kind": "lfm2_vl",
                 "lora_targets": ("q_proj", "k_proj", "v_proj", "out_proj", "in_proj", "w1", "w2", "w3")},
@@ -175,6 +178,12 @@ def load_foundation(name, *, dtype=torch.float32, local_files_only=False):
     spec = BACKBONES[name]
     if spec["kind"] == "qwen3":
         foundation, loading = _load_qwen3(spec["repo"], spec["revision"], dtype, local_files_only)
+    elif spec["kind"] == "lfm2":
+        from transformers import Lfm2ForCausalLM
+
+        foundation, loading = Lfm2ForCausalLM.from_pretrained(
+            spec["repo"], revision=spec["revision"], dtype=dtype, attn_implementation="sdpa",
+            output_loading_info=True, local_files_only=local_files_only)
     else:
         from transformers import Lfm2VlForConditionalGeneration
 
@@ -220,12 +229,12 @@ class QevDModel(nn.Module):
 
     @property
     def text_model(self):
-        return self.foundation.model if self.config["kind"] == "qwen3" else self.foundation.model.language_model
+        return self.foundation.model if self.config["kind"] in ("qwen3", "lfm2") else self.foundation.model.language_model
 
     def set_text_model(self, module):
         # Assign inside the foundation: nn.Module.__setattr__ would bypass a
         # property setter and register a second, detached submodule instead.
-        if self.config["kind"] == "qwen3":
+        if self.config["kind"] in ("qwen3", "lfm2"):
             self.foundation.model = module
         else:
             self.foundation.model.language_model = module
@@ -280,10 +289,10 @@ class QevDModel(nn.Module):
         else:
             if segments is None:
                 raise ValueError(f"{mode} attention requires segment ids")
-            if self.config["kind"] == "lfm2_vl" and mode == "packed_causal":
+            if self.config["kind"] in ("lfm2", "lfm2_vl") and mode == "packed_causal":
                 raise ValueError("LFM2 short convolutions cross packed segments; use independent rows")
             mask = {"full_attention": attention_mask_4d(attention_mask, segments, mode, position_ids)}
-            if self.config["kind"] == "lfm2_vl":
+            if self.config["kind"] in ("lfm2", "lfm2_vl"):
                 from transformers.masking_utils import create_recurrent_attention_mask
 
                 mask["conv"] = create_recurrent_attention_mask(

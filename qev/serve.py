@@ -75,6 +75,7 @@ def create_app(agent, *, request_log=None):
 
     def known_model(name):
         return name in {"qev-latest", "jev-latest", "qev-0.8b", "qev-0.8b-mlx", "qev:0.8b", "qev:0.8b-mlx", "qev-native",
+                        "qev-450m", "qev-450m-mlx", "qev:450m", "qev-230m", "qev-230m-mlx", "qev:230m",
                         agent.config.get("model_name"), agent.config.get("base_model"), agent.config.get("base")}
 
     @app.get("/health")
@@ -88,11 +89,14 @@ def create_app(agent, *, request_log=None):
     @app.get("/v1/models")
     def models():
         name = agent.config.get("model_name", "qev-0.8b")
-        return {"models": [{"name": name, "description": "Qwen3.5 typed decisions; image decisions are zero-shot transfer from text training", "release_date": "2026-09-20"},
+        foundation = agent.config.get("base_model", "Qwen/Qwen3.5-0.8B").rsplit("/", 1)[-1]
+        modalities = agent.config.get("modalities", ["text", "image", "video"])
+        media = "/".join(modalities)
+        decisions = (f"{foundation} typed decisions; image decisions are zero-shot transfer from text training"
+                     if "image" in modalities else f"{foundation} typed text decisions")
+        return {"models": [{"name": name, "description": decisions, "release_date": "2026-09-20"},
                            {"name": "qev-latest", "description": f"Alias of {name}", "release_date": "2026-09-20"},
-                           {"name": "qev:0.8b", "description": f"Alias of loaded checkpoint {name}", "release_date": "2026-09-20"},
-                           {"name": "qev:0.8b-mlx", "description": f"Alias of loaded checkpoint {name}; aliases do not switch the runtime", "release_date": "2026-09-20"},
-                           {"name": "qev-native", "description": "Native Qwen text/image/video generation with the decision adapter disabled", "release_date": "2026-09-20"}]}
+                           {"name": "qev-native", "description": f"Native {foundation} {media} generation with the decision adapter disabled", "release_date": "2026-09-20"}]}
 
     @app.post("/v1/systemone")
     def system_one(request: SystemOneRequest):

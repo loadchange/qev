@@ -250,7 +250,7 @@ class MLXRuntime:
             self._adapters = _install_adapters(
                 backbone, adapter_weights, config["lora_alpha"] / config["lora_rank"]
             )
-        _correct_delta_normalization(backbone)
+        self._prepare_backbone(backbone)
         backbone.eval()
         # Safetensors loads and dtype casts are lazy. MLX 0.32 primitive streams
         # belong to their creating thread; evaluating a loading-thread graph in
@@ -370,6 +370,27 @@ class MLXRuntime:
                 # success and failure paths before another worker can reuse it.
                 self._materialize_state()
 
+    # Model-specific hooks; LFM2Runtime overrides them for LFM2-VL.
+    def _prepare_backbone(self, backbone):
+        _correct_delta_normalization(backbone)
+
+    def _processed_inputs(self, values):
+        return _processed_inputs(values)
+
+    def _hidden_states(self, inputs):
+        features = self._embeddings(inputs)
+        return self.backbone.language_model.model(
+            inputs["input_ids"], inputs_embeds=features["inputs_embeds"],
+            position_ids=features["position_ids"], cache=None)
+
+    def _prefill(self, language, ids, cache, features):
+        return language(ids, cache=cache, **features)
+
+    def _step(self, language, token, cache, features):
+        import mlx.core as mx
+
+        return language(mx.array([[token]], dtype=mx.int32), cache=cache, rope_deltas=features["rope_deltas"])
+
     def _embeddings(self, inputs):
         """Official vision and MRoPE; also handle images and videos together.
 
@@ -419,12 +440,8 @@ class MLXRuntime:
                 limit = self.config.get("multimodal_max_length", 8192) if has_media else self.config.get("max_length", 512)
                 validate_encoding(encoded, int(limit))
                 values["input_ids"] = [encoded["ids"]]
-                inputs = _processed_inputs(values)
-                features = self._embeddings(inputs)
-                hidden = self.backbone.language_model.model(
-                    inputs["input_ids"], inputs_embeds=features["inputs_embeds"],
-                    position_ids=features["position_ids"], cache=None,
-                ).astype(mx.float32)
+                inputs = self._processed_inputs(values)
+                hidden = self._hidden_states(inputs).astype(mx.float32)
                 query = hidden[0, encoded["decision_position"]] @ self.q_weight.T
                 keys = hidden[0, mx.array(encoded["option_positions"])] @ self.k_weight.T
                 logits = (keys @ query) / math.sqrt(self.config["pointer_dim"])
@@ -462,7 +479,7 @@ class MLXRuntime:
         with self._decision_mode(False):
             # Tensor conversion and tolist() can themselves schedule MLX work,
             # so they also belong inside the lock and thread-local streams.
-            inputs = _processed_inputs(processed_inputs)
+            inputs = self._processed_inputs(processed_inputs)
             ids = inputs["input_ids"]
             generated = ids.tolist()[0]
             if max_new_tokens == 0:
@@ -470,7 +487,7 @@ class MLXRuntime:
             features = self._embeddings(inputs)
             language = self.backbone.language_model
             cache = language.make_cache()
-            output = language(ids, cache=cache, **features)
+            output = self._prefill(language, ids, cache, features)
             # MLX's process-global RNG may retain a lazy key graph from the
             # loading thread (including unused random model initialization).
             # Keep sampling state local to this call and pass explicit keys.
@@ -478,7 +495,7 @@ class MLXRuntime:
             # Match HF GenerationConfig: explicit generation settings, then the
             # original text config. mlx-vlm's top-level config adds im_end to
             # EOS, which would stop earlier than the original Qwen3.5 model.
-            text_config = self.backbone.config.text_config
+            text_config = getattr(self.backbone.config, "text_config", self.backbone.config)
             eos = self.generation_config.get("eos_token_id", text_config.eos_token_id)
             eos = set(eos if isinstance(eos, (list, tuple)) else ([] if eos is None else [eos]))
             for step in range(max_new_tokens):
@@ -502,8 +519,7 @@ class MLXRuntime:
                 generated.append(token)
                 if token in eos or step + 1 == max_new_tokens:
                     break
-                output = language(mx.array([[token]], dtype=mx.int32), cache=cache,
-                                  rope_deltas=features["rope_deltas"])
+                output = self._step(language, token, cache, features)
         return np.asarray([generated], dtype=np.int64)
 
 

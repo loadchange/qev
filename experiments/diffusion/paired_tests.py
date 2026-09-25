@@ -20,9 +20,14 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--runs", required=True)
     ap.add_argument("--output", required=True)
+    ap.add_argument("--pairs", nargs="+", metavar="A:B", help="arm pairs to test (default: the diffusion study)")
     args = ap.parse_args(argv)
+    pairs = [tuple(pair.split(":", 1)) for pair in args.pairs] if args.pairs else PAIRS
     rows = {}
+    needed = {arm for pair in pairs for arm in pair}
     for path in Path(args.runs).glob("*/development_rows.json"):
+        if path.parent.name not in needed:
+            continue
         data = json.loads(path.read_text())
         rows[path.parent.name] = {r["index"]: (int(np.argmax(r["logits"]) == r["label"]), r["source"],
                                                r["record_id"], r["question_id"]) for r in data}
@@ -31,7 +36,7 @@ def main(argv=None):
         if any(values[k][2:] != reference[k][2:] for k in reference):
             raise ValueError(f"{arm} rows do not align with the other arms")
     result = []
-    for a, b in PAIRS:
+    for a, b in pairs:
         for subset, keep in (("general", lambda s: s != SNAKE), ("snake", lambda s: s == SNAKE)):
             keys = [k for k in reference if keep(reference[k][1])]
             x = np.array([rows[a][k][0] for k in keys])

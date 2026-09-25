@@ -220,7 +220,7 @@ def multi_question_encodings(runner, args, count, rng):
 
 def packable(model):
     return isinstance(model, qevd.QevDModel) and model.config["attention"] != "full" \
-        and model.config["kind"] != "lfm2_vl"
+        and model.config["kind"] not in ("lfm2", "lfm2_vl")
 
 
 def latency(runner, dev_items, args):

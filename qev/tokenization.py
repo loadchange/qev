@@ -14,18 +14,33 @@ SPECIAL = {
     "end_option": "<|box_end|>",
     "decision": "<|fim_suffix|>",
 }
+# LFM2 has no <|box_*|> or <|fim_prefix|>; reuse its own trained single tokens.
+FAMILY_SPECIAL = {
+    "qwen": SPECIAL,
+    "lfm2": {"state": "<|fim_pre|>", "question": "<|fim_mid|>", "option": "<|tool_call_start|>",
+             "end_option": "<|tool_call_end|>", "decision": "<|fim_suf|>"},
+}
 _SPECIAL_RE = re.compile(r"<\|([^<>\r\n]*?)\|>")
 
 
-def user_tokens(tokenizer, text: str) -> list[int]:
-    """Prevent user text from creating structural special tokens."""
+def clean_text(text: str, family: str = "qwen") -> str:
+    """Prevent user text from creating structural or media special tokens."""
     text = _SPECIAL_RE.sub(r"<¦\1¦>", str(text))
-    return list(tokenizer(text, add_special_tokens=False)["input_ids"])
+    return text.replace("<image>", "<¦image¦>") if family == "lfm2" else text
 
 
-def special_token_ids(tokenizer) -> dict[str, int]:
+def user_tokens(tokenizer, text: str, family: str = "qwen") -> list[int]:
+    return list(tokenizer(clean_text(text, family), add_special_tokens=False)["input_ids"])
+
+
+def family_prefix(tokenizer, family: str = "qwen") -> list[int]:
+    """LFM2 sequences start with BOS as in its training; Qwen uses none."""
+    return [int(tokenizer.bos_token_id)] if family == "lfm2" and tokenizer.bos_token_id is not None else []
+
+
+def special_token_ids(tokenizer, family: str = "qwen") -> dict[str, int]:
     ids = {}
-    for name, token in SPECIAL.items():
+    for name, token in FAMILY_SPECIAL[family].items():
         encoded = tokenizer(token, add_special_tokens=False)["input_ids"]
         token_id = tokenizer.convert_tokens_to_ids(token)
         if token_id is None or token_id == tokenizer.unk_token_id or encoded != [token_id]:
@@ -42,13 +57,15 @@ def encode_question(
     tok,
     max_length: int = 512,
     max_state: int = 320,
+    family: str = "qwen",
 ) -> dict[str, Any]:
     """Encode state + one question, preserving every option's boundary marker.
 
     State is the only automatically truncated content. Instructions and options
     are kept verbatim: if all candidates cannot fit, fail rather than silently
     changing a criterion (for example truncating its negation or numeric limit).
-    ``max_state`` includes the leading state delimiter.
+    ``max_state`` includes the leading state delimiter; an LFM2 BOS prefix
+    counts toward ``max_length`` only.
     """
     if max_length < 8 or not 1 <= max_state <= max_length:
         raise ValueError("Expected max_length >= 8 and 1 <= max_state <= max_length")
@@ -60,19 +77,20 @@ def encode_question(
     instruction = question.get("instr")
     if not isinstance(instruction, str):
         raise ValueError("question.instr must be a string")  # noqa: TRY004 -- request validation uses ValueError
-    special = special_token_ids(tok)
-    instruction_ids = user_tokens(tok, instruction)
-    spans = [user_tokens(tok, option) for option in options]
+    special = special_token_ids(tok, family)
+    prefix = family_prefix(tok, family)
+    instruction_ids = user_tokens(tok, instruction, family)
+    spans = [user_tokens(tok, option, family) for option in options]
     # One state marker, question marker, two markers per option, decision marker.
-    fixed = 3 + len(instruction_ids) + sum(len(span) + 2 for span in spans)
+    fixed = len(prefix) + 3 + len(instruction_ids) + sum(len(span) + 2 for span in spans)
     if fixed > max_length:
         raise ValueError(
             f"Question and all {len(options)} options require {fixed} tokens before state; "
             f"increase max_length={max_length} or shorten the criteria"
         )
-    state_ids = user_tokens(tok, state)
+    state_ids = user_tokens(tok, state, family)
     state_budget = min(max_state - 1, max_length - fixed)
-    ids = [special["state"], *state_ids[:state_budget], special["question"], *instruction_ids]
+    ids = [*prefix, special["state"], *state_ids[:state_budget], special["question"], *instruction_ids]
     positions = []
     for span in spans:
         ids.extend([special["option"], *span, special["end_option"]])
@@ -224,3 +242,53 @@ def encode_multimodal_question(
     return {"inputs": inputs, "ids": ids, "option_positions": positions,
             "decision_position": decisions[0], "state_truncated": False,
             "state_tokens": len(state_tokens)}
+
+
+def encode_lfm2_multimodal_question(
+    state: str,
+    question: dict[str, Any],
+    processor,
+    *,
+    images=None,
+    option_images=None,
+    max_length: int = 8192,
+) -> dict[str, Any]:
+    """One LFM2-VL image decision; the processor expands each ``<image>``.
+
+    State images follow the state text; candidate images stay inside their
+    option markers. Nothing is truncated. Arrays are numpy for the MLX runtime.
+    """
+    import numpy as np
+
+    tok = processor.tokenizer
+    special = special_token_ids(tok, "lfm2")
+    names = FAMILY_SPECIAL["lfm2"]
+    options, instruction = question.get("options"), question.get("instr")
+    if not isinstance(instruction, str) or not isinstance(options, list) or not 1 <= len(options) <= 255:
+        raise ValueError("Expected an instruction and 1..255 candidate options")
+    images = list(images or [])
+    if option_images is not None and len(option_images) != len(options):
+        raise ValueError("Provide one option_images list per candidate")
+    attached = [list(group) for group in option_images] if option_images is not None else [[] for _ in options]
+    bos = tok.convert_ids_to_tokens(family_prefix(tok, "lfm2"))
+    prompt = "".join(bos) + names["state"] + clean_text(state, "lfm2") + "<image>" * len(images)
+    prompt += names["question"] + clean_text(instruction, "lfm2")
+    for option, group in zip(options, attached, strict=True):
+        prompt += names["option"] + clean_text(option, "lfm2") + "<image>" * len(group) + names["end_option"]
+    prompt += names["decision"]
+    all_images = [*images, *(image for group in attached for image in group)]
+    kwargs = {"text": [prompt], "return_tensors": "np", "add_special_tokens": False}
+    if all_images:
+        kwargs["images"] = [all_images]
+    inputs = dict(processor(**kwargs))
+    ids = [int(i) for i in inputs["input_ids"][0]]
+    if len(ids) > max_length:
+        raise ValueError(f"Expanded multimodal question needs {len(ids)} tokens, exceeding max_length={max_length}")
+    positions = [i for i, token in enumerate(ids) if token == special["end_option"]]
+    decisions = [i for i, token in enumerate(ids) if token == special["decision"]]
+    if len(positions) != len(options) or decisions != [len(ids) - 1]:
+        raise ValueError("Processor did not preserve the complete candidate structure")
+    inputs.update(option_positions=np.asarray([positions]), option_mask=np.ones((1, len(positions)), dtype=bool),
+                  decision_positions=np.asarray(decisions))
+    return {"inputs": inputs, "ids": ids, "option_positions": positions, "decision_position": decisions[0],
+            "state_truncated": False, "state_tokens": len(user_tokens(tok, state, "lfm2"))}

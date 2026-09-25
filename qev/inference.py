@@ -45,12 +45,18 @@ class Agent:
 
             from .mlx_runtime import MLXRuntime
 
-            self.model = MLXRuntime.from_checkpoint(
+            runtime = MLXRuntime
+            if self.config.get("family") == "lfm2":
+                from .lfm2_runtime import LFM2Runtime as runtime
+            self.model = runtime.from_checkpoint(
                 self.path, decision_weights=decision_weights or os.environ.get("QEV_DECISION_WEIGHTS", "adapter"))
             self.config = self.model.config
             self.tokenizer = self.model.tokenizer
         elif self.backend == "torch":
             import torch
+
+            if self.config.get("family", "qwen") != "qwen":
+                raise ValueError("This checkpoint runs only on the MLX backend")
 
             from .model import QevModel
             self.device = device or ("cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu")
@@ -64,6 +70,22 @@ class Agent:
             raise ValueError("backend must be auto, torch, or mlx")
         self.processor = None
 
+    @property
+    def family(self):
+        return getattr(self, "config", {}).get("family", "qwen")
+
+    @property
+    def modalities(self):
+        return getattr(self, "config", {}).get("modalities", ["text", "image", "video"])
+
+    def _require_media(self, kinds):
+        # Video arrives as ordered frames, so any image model can take it.
+        accepted = set(self.modalities) | ({"video"} if "image" in self.modalities else set())
+        kinds = [kind for kind in kinds if kind not in accepted]
+        if kinds:
+            name = self.config.get("model_name", "this model")
+            raise ValueError(f"{name} accepts text only; {' and '.join(kinds)} input is not supported")
+
     def _processor(self):
         if self.processor is None:
             if hasattr(self.model, "get_processor"):
@@ -76,16 +98,25 @@ class Agent:
 
     def _predict_media(self, decoded, record, option_images=None, timings=None):
         encode_started = time.perf_counter()
-        from .tokenization import encode_multimodal_question
+        from .tokenization import encode_lfm2_multimodal_question, encode_multimodal_question
         processor = self._processor()
         per_question_images = option_images if option_images is not None else [None] * len(record["questions"])
-        encodings = [encode_multimodal_question(
-            decoded.text, question, processor, images=decoded.images or None,
-            videos=decoded.videos or None, video_fps=decoded.video_fps or None,
-            option_images=attached,
-            max_length=self.config.get("multimodal_max_length", 8192), max_state=None,
-            return_tensors="np" if self.backend == "mlx" else "pt",
-        ) for question, attached in zip(record["questions"], per_question_images, strict=True)]
+        if self.family == "lfm2":
+            # LFM2-VL has no video input: submitted frames become ordered images.
+            from PIL import Image
+            frames = [Image.fromarray(frame) for video in decoded.videos for frame in video]
+            encodings = [encode_lfm2_multimodal_question(
+                decoded.text, question, processor, images=[*decoded.images, *frames], option_images=attached,
+                max_length=self.config.get("multimodal_max_length", 8192),
+            ) for question, attached in zip(record["questions"], per_question_images, strict=True)]
+        else:
+            encodings = [encode_multimodal_question(
+                decoded.text, question, processor, images=decoded.images or None,
+                videos=decoded.videos or None, video_fps=decoded.video_fps or None,
+                option_images=attached,
+                max_length=self.config.get("multimodal_max_length", 8192), max_state=None,
+                return_tensors="np" if self.backend == "mlx" else "pt",
+            ) for question, attached in zip(record["questions"], per_question_images, strict=True)]
         inference_started = time.perf_counter()
         if timings is not None:
             timings["encode"] += (inference_started - encode_started) * 1000
@@ -133,6 +164,9 @@ class Agent:
         decoded_options = [decode_question_options(question, budget) for question in request.questions.values()]
         option_images = [[option.images for option in options] for options in decoded_options]
         media_rows = [decoded.has_media or any(images) for images in option_images]
+        if any(media_rows):
+            self._require_media((["image"] if decoded.images or any(any(images) for images in option_images) else [])
+                                + (["video"] if decoded.videos else []))
         temperatures = [1.0 if has_media else self.temperature for has_media in media_rows]
         encodings, ps = [None] * len(meta), [None] * len(meta)
         queue_started = time.perf_counter()
@@ -150,7 +184,9 @@ class Agent:
             text_indices = [i for i, has_media in enumerate(media_rows) if not has_media]
             encode_started = time.perf_counter()
             text_encodings = [encode_question(rec["state"], rec["questions"][i], self.tokenizer,
-                self.config.get("max_length", 1024), self.config.get("max_state", 384)) for i in text_indices]
+                self.config.get("max_length", 1024), self.config.get("max_state", 384),
+                **({"family": self.family} if self.family != "qwen" else {}))
+                for i in text_indices]
             for i, encoding in zip(text_indices, text_encodings, strict=True):
                 encodings[i] = encoding
             inference_started = time.perf_counter()
@@ -193,6 +229,12 @@ class Agent:
             raise NotImplementedError("Native generation requires a full multimodal checkpoint")
         start = time.perf_counter()
         messages, budget, video_fps = decode_chat_messages(request.messages)
+        self._require_media(sorted({item["type"] for message in messages for item in message["content"]} - {"text"}))
+        if self.family == "lfm2":
+            from PIL import Image
+            messages = [{**message, "content": [part for item in message["content"] for part in (
+                [{"type": "image", "image": Image.fromarray(frame)} for frame in item["video"]]
+                if item["type"] == "video" else [item])]} for message in messages]
         with self.lock:
             processor = self._processor()
             video_metadata = []
