@@ -1,0 +1,427 @@
+{
+  "format": "qev-snake-benchmark-v1",
+  "created_utc": "2026-09-25T09:28:40.944178+00:00",
+  "protocol": {
+    "seeds": [
+      10000,
+      10001,
+      10002,
+      10003,
+      10004,
+      10005,
+      10006,
+      10007,
+      10008,
+      10009,
+      10010,
+      10011,
+      10012,
+      10013,
+      10014,
+      10015,
+      10016,
+      10017,
+      10018,
+      10019
+    ],
+    "size": 8,
+    "initial_length": 3,
+    "max_steps": 500,
+    "starvation_limit": 128,
+    "observation": "spatial",
+    "feature_version": "snake-observable-bfs-v1",
+    "execution": "model_argmax_direct",
+    "guardrail": false,
+    "game_source_sha256": "9ce31db90413f24a6308eb0f51fccd8afc32f093d03cb8ac63e550f9ecb27f55",
+    "prompt_source_sha256": "d570ce52a30ba4e56f37fd538183fdb1b46195d21c5e4a87aa3787e47e9a13a3",
+    "feature_source_sha256": "575525b2be4a260e16c45230793167d77b4a1dfffb708d1761c3e345c8bfac6e",
+    "action_validation_sha256": "58cc52a64a7d48968c9688ad04c9b00a382c18ca41926c6210fb210cb09126ff",
+    "direction_order": [
+      "UP",
+      "DOWN",
+      "LEFT",
+      "RIGHT"
+    ],
+    "direction_vectors": {
+      "UP": [
+        0,
+        -1
+      ],
+      "DOWN": [
+        0,
+        1
+      ],
+      "LEFT": [
+        -1,
+        0
+      ],
+      "RIGHT": [
+        1,
+        0
+      ]
+    },
+    "opposites": {
+      "UP": "DOWN",
+      "DOWN": "UP",
+      "LEFT": "RIGHT",
+      "RIGHT": "LEFT"
+    }
+  },
+  "source": {
+    "kind": "qevd-experiment",
+    "label": "qwen35-causal",
+    "backbone": "qwen3_5",
+    "attention": "causal",
+    "temperature": 1.741101126592248,
+    "precision": "cuda bf16 autocast, fp32 pointer"
+  },
+  "execution": {
+    "batch_size": 8,
+    "warmup_calls": 1,
+    "timing": "multi-game prediction batch wall time, not per-step latency",
+    "batch_padding_caveat": "Batching/padding can change floating-point probabilities."
+  },
+  "machine": {
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.39",
+    "python": "3.13.15"
+  },
+  "episodes": [
+    {
+      "seed": 10000,
+      "food": 37,
+      "score": 37,
+      "steps": 500,
+      "length": 40,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10001,
+      "food": 52,
+      "score": 52,
+      "steps": 500,
+      "length": 55,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10002,
+      "food": 44,
+      "score": 44,
+      "steps": 500,
+      "length": 47,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10003,
+      "food": 32,
+      "score": 32,
+      "steps": 500,
+      "length": 35,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10004,
+      "food": 50,
+      "score": 50,
+      "steps": 500,
+      "length": 53,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10005,
+      "food": 40,
+      "score": 40,
+      "steps": 500,
+      "length": 43,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10006,
+      "food": 45,
+      "score": 45,
+      "steps": 500,
+      "length": 48,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10007,
+      "food": 39,
+      "score": 39,
+      "steps": 500,
+      "length": 42,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10008,
+      "food": 37,
+      "score": 37,
+      "steps": 500,
+      "length": 40,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10009,
+      "food": 43,
+      "score": 43,
+      "steps": 500,
+      "length": 46,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10010,
+      "food": 44,
+      "score": 44,
+      "steps": 500,
+      "length": 47,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10011,
+      "food": 51,
+      "score": 51,
+      "steps": 500,
+      "length": 54,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10012,
+      "food": 43,
+      "score": 43,
+      "steps": 500,
+      "length": 46,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10013,
+      "food": 44,
+      "score": 44,
+      "steps": 500,
+      "length": 47,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10014,
+      "food": 47,
+      "score": 47,
+      "steps": 500,
+      "length": 50,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10015,
+      "food": 42,
+      "score": 42,
+      "steps": 500,
+      "length": 45,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10016,
+      "food": 48,
+      "score": 48,
+      "steps": 500,
+      "length": 51,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10017,
+      "food": 34,
+      "score": 34,
+      "steps": 500,
+      "length": 37,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10018,
+      "food": 45,
+      "score": 45,
+      "steps": 500,
+      "length": 48,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    },
+    {
+      "seed": 10019,
+      "food": 49,
+      "score": 49,
+      "steps": 500,
+      "length": 52,
+      "status": "finished",
+      "terminal_reason": "max_steps",
+      "collision": false,
+      "starvation": false,
+      "won": false,
+      "argmax_direct": true,
+      "interventions": 0
+    }
+  ],
+  "errors": [],
+  "complete": true,
+  "warmup_seconds": 0.11008606499990492,
+  "aggregate": {
+    "episodes": 20,
+    "food": {
+      "count": 20,
+      "mean": 43.3,
+      "p50": 44.0,
+      "p95": 51,
+      "max": 52
+    },
+    "total_food": 866,
+    "steps": 10000,
+    "collisions": 0,
+    "starvations": 0,
+    "wins": 0,
+    "terminal_reasons": {
+      "max_steps": 20
+    },
+    "argmax_direct_steps": 10000,
+    "interventions": 0,
+    "selected_candidate_positions": {
+      "0": 4045,
+      "1": 1514,
+      "2": 4441
+    },
+    "collision_with_safe_alternative": 0,
+    "missed_immediate_food": 147,
+    "distance_increased_with_safe_closer_alternative": 1495,
+    "local_diagnostic_note": "Moving away from food can be valid with spatial planning; this is not an error label."
+  },
+  "timing": {
+    "seconds_excluding_load_and_warmup": 172.40064732100018,
+    "executed_steps_per_second_including_game_and_trace": 58.00442257841741,
+    "prediction_calls": 1500,
+    "decision_requests": 10000,
+    "prediction_call_ms": {
+      "count": 1500,
+      "mean": 110.17529416001041,
+      "p50": 109.89097700007733,
+      "p95": 117.70917100011502,
+      "max": 124.77677599963499
+    },
+    "prediction_batch_sizes": {
+      "8": 1000,
+      "4": 500
+    },
+    "prediction_decisions_per_second": 60.50963346632409,
+    "input_tokens_per_request": {
+      "count": 10000,
+      "mean": 329.5144,
+      "p50": 330.0,
+      "p95": 334,
+      "max": 340
+    }
+  }
+}

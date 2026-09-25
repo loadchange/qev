@@ -1,0 +1,29 @@
+{
+  "format": "qevd",
+  "format_version": 1,
+  "backbone": "lfm2-vl",
+  "repo": "LiquidAI/LFM2.5-VL-450M",
+  "revision": "fc6221ca597f3315e4f82fc2df606783267b34ba",
+  "family": "lfm2",
+  "kind": "lfm2_vl",
+  "attention": "block",
+  "hidden_size": 1024,
+  "pointer_dim": 256,
+  "lora_rank": 16,
+  "lora_alpha": 32,
+  "lora_dropout": 0.05,
+  "lora_targets": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "out_proj",
+    "in_proj",
+    "w1",
+    "w2",
+    "w3"
+  ],
+  "max_length": 1024,
+  "max_state": 384,
+  "temperature": 1.4640856959456252,
+  "label": "lfm2-block"
+}

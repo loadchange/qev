@@ -1,0 +1,28 @@
+{
+  "format": "qevd",
+  "format_version": 1,
+  "backbone": "a2d-qwen3",
+  "repo": "dllm-hub/Qwen3-0.6B-diffusion-mdlm-v0.1",
+  "revision": "c8d24a3f4adaeef46881b450e1bf7d1005203bd7",
+  "family": "qwen",
+  "kind": "qwen3",
+  "attention": "block",
+  "hidden_size": 1024,
+  "pointer_dim": 256,
+  "lora_rank": 16,
+  "lora_alpha": 32,
+  "lora_dropout": 0.05,
+  "lora_targets": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj",
+    "gate_proj",
+    "up_proj",
+    "down_proj"
+  ],
+  "max_length": 1024,
+  "max_state": 384,
+  "temperature": 1.3660402567543952,
+  "label": "a2d-block"
+}

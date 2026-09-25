@@ -1,0 +1,53 @@
+{
+  "dataset": "HuggingFaceM4/A-OKVQA",
+  "revision": "d1b0efa3a436e9101dfbde3752db7607da696c35",
+  "split": "validation",
+  "rows": 500,
+  "scope": "Zero-shot transfer of text-trained decision heads; letter = frozen foundation via chat template.",
+  "arms": {
+    "lfm2-causal": {
+      "kind": "qevd",
+      "path": "/content/qevd-runs/lfm2-causal",
+      "n": 500,
+      "decision_accuracy": 0.696,
+      "decision_no_image_accuracy": 0.352,
+      "letter_accuracy": 0.758,
+      "chance": 0.25,
+      "decision_ms_p50": 68.43486449952252,
+      "seconds": 94.0709666040002
+    },
+    "lfm2-block": {
+      "kind": "qevd",
+      "path": "/content/qevd-runs/lfm2-block",
+      "n": 500,
+      "decision_accuracy": 0.666,
+      "decision_no_image_accuracy": 0.308,
+      "letter_accuracy": 0.758,
+      "chance": 0.25,
+      "decision_ms_p50": 68.23046899990004,
+      "seconds": 93.18353299299997
+    },
+    "qwen35-causal": {
+      "kind": "qev",
+      "path": "/content/qevd-runs/qwen35-causal",
+      "n": 500,
+      "decision_accuracy": 0.702,
+      "decision_no_image_accuracy": 0.338,
+      "letter_accuracy": 0.714,
+      "chance": 0.25,
+      "decision_ms_p50": 153.31045550010458,
+      "seconds": 232.85963171599997
+    },
+    "published-qev-snake-0.8b": {
+      "kind": "qev",
+      "path": "/content/qev/models/qev-snake-0.8b",
+      "n": 500,
+      "decision_accuracy": 0.694,
+      "decision_no_image_accuracy": 0.326,
+      "letter_accuracy": 0.714,
+      "chance": 0.25,
+      "decision_ms_p50": 151.3521454999136,
+      "seconds": 216.1672861119996
+    }
+  }
+}
