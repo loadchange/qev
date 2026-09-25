@@ -143,4 +143,4 @@ uv run python experiments/diffusion/mlx_qev_adapters.py models/qev-snake-0.8b-ml
 
 Colab 编排用到 `package.py`、`colab_setup.py`、`colab_extract.py`、`colab_launch.py`（组队列）、`colab_poll.py`、`colab_collect.py` 和 `colab_djev.py`（vLLM nightly 加 `djev_zeroshot.py`）。colab CLI（≤ 0.7.2）不会刷新 1 小时有效的运行时 token，会把仍在运行的会话清理掉；长任务期间请每 20 分钟左右用 CLI 自带的解释器运行一次 `colab_refresh.py`。
 
-报告和逐题结果在 [`docs/results/diffusion`](../../docs/results/diffusion)，`report.py` 可以据此重建上面的表格。6 个检查点（LoRA adapter、指针头和各组报告）存档在 Hugging Face 私有仓库 `twainsk/qev-diffusion-experiment`；只能用本目录的代码（`QevDModel.from_checkpoint`）加载，`qwen35-causal` 则用 `qev.model.QevModel` 加载。
+报告和逐题结果在 [`docs/results/diffusion`](../../docs/results/diffusion)，`report.py` 可以据此重建上面的表格。6 个检查点（LoRA adapter、指针头和各组报告）存档在 Hugging Face 私有仓库 `twainsk/qev-diffusion-experiment`；只能用本目录的代码（`QevDModel.from_checkpoint`）加载，`qwen35-causal` 则用 `qev.model.QevModel` 加载。`publish_archive.py` 可以重建该存档并核验每个上传文件（[发布记录](../../docs/results/diffusion/huggingface_archive.json)）。

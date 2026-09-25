@@ -1,0 +1,9 @@
+This folder contains a LoRA adapter and a pointer head trained by the Qev project
+(https://github.com/loadchange/qev, experiments/diffusion) on top of
+LiquidAI/LFM2.5-VL-450M revision fc6221ca597f3315e4f82fc2df606783267b34ba.
+
+Modification notice: the adapter and pointer head are new files produced by
+supervised decision training; the base model weights are unchanged and are not
+included. These files are a Derivative Work distributed under the LFM Open
+License v1.0 (LICENSE in this folder). Commercial use by a Legal Entity with
+annual revenue of USD 10 million or more is not licensed.

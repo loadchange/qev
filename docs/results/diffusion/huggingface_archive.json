@@ -1,0 +1,12 @@
+{
+  "repo_id": "twainsk/qev-diffusion-experiment",
+  "url": "https://huggingface.co/twainsk/qev-diffusion-experiment",
+  "commit": "b554ce1db697efe3f1395b45fbdf622f0b1efa79",
+  "private": true,
+  "code_commit": "664e6764d218d2e1a2baa4a40355a88d6d4d8501",
+  "verified_files": 90,
+  "verified_lfs_sha256": 14,
+  "passed": true,
+  "release_manifest_sha256": "b54caabcef465eadc23e013f966ac4f14bfe0c50a85c6d77c1bffc52d8f98cf9",
+  "files": 90
+}
