@@ -1,5 +1,7 @@
 import asyncio
 import json
+import os
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -115,7 +117,8 @@ def test_cli_records_requests_in_default_or_selected_directory(tmp_path, monkeyp
         response = client.post("/v1/systemone", json=request)
     assert response.status_code == 200
     assert response.headers["x-qev-log-status"] == "saved"
-    folder = tmp_path / (directory or "runs/request-logs") / response.headers["x-qev-request-id"]
+    root = tmp_path / directory if directory else Path(os.environ["QEV_HOME"]) / "request-logs"
+    folder = root / response.headers["x-qev-request-id"]
     assert json.loads((folder / "request.json").read_text()) == request
     assert json.loads((folder / "response.json").read_text()) == response.json()
     context = json.loads((folder / "metadata.json").read_text())["model_context"]

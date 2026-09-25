@@ -74,7 +74,17 @@ def _install_adapters(model, weights, scale):
         def weight(self):
             return self.linear.weight
 
+        def merge(self, dtype):
+            """Keep a separate decision weight W + scale*B@A; W itself is untouched."""
+            merged = self.linear.weight.astype(mx.float32) + scale * (self.lora_b @ self.lora_a)
+            self.merged = merged.astype(dtype)
+
         def __call__(self, inputs):
+            if self.enabled and "merged" in self:
+                output = inputs.astype(self.merged.dtype) @ self.merged.T
+                if "bias" in self.linear:
+                    output = output + self.linear.bias.astype(output.dtype)
+                return output.astype(inputs.dtype)
             base = self.linear(inputs)
             if not self.enabled:
                 return base
@@ -286,8 +296,34 @@ class MLXRuntime:
             mx.set_default_stream(previous_compute)
             mx.set_default_device(previous_device)
 
+    DECISION_WEIGHTS = ("adapter", "merged", "merged-bf16", "bf16")
+
+    def merge_decision_weights(self, mode: str = "merged") -> None:
+        """Serve decisions from merged LoRA weights; native generation is unchanged.
+
+        ``adapter`` computes LoRA separately (the validated default). ``merged``
+        stores float32 W + scale*B@A per adapted layer (same math, fewer kernel
+        launches, more memory). ``merged-bf16`` stores that copy in bfloat16.
+        ``bf16`` also casts the whole foundation, vision tower included, to
+        bfloat16: the smallest and fastest mode, with native generation in
+        bfloat16 as well. Merges use the float32 LoRA factors before any cast.
+        """
+        import mlx.core as mx
+
+        if mode not in self.DECISION_WEIGHTS:
+            raise ValueError(f"decision weights must be one of {self.DECISION_WEIGHTS}")
+        if mode == "adapter":
+            return
+        with self._lock:
+            for adapter in self._adapters:
+                adapter.merge(mx.float32 if mode == "merged" else mx.bfloat16)
+            if mode == "bf16":
+                self.backbone.set_dtype(mx.bfloat16)
+            self.config = {**self.config, "decision_weights": mode}
+            self._materialize_state()
+
     @classmethod
-    def from_checkpoint(cls, path: str | Path) -> MLXRuntime:
+    def from_checkpoint(cls, path: str | Path, *, decision_weights: str = "adapter") -> MLXRuntime:
         """Load local version-2 exports including the complete vision tower."""
         import mlx.core as mx
         from mlx_vlm.utils import load_model
@@ -306,11 +342,13 @@ class MLXRuntime:
             raise ValueError("The complete Qwen3.5 multimodal foundation is required")
         backbone = load_model(backbone_path, lazy=True, strict=True)
         processor = load_original_processor(backbone_path)
-        return cls(backbone, mx.load(str(path / "pointer.safetensors")), config,
-                   processor=processor,
-                   generation_config=json.loads((backbone_path / "generation_config.json").read_text())
-                   if (backbone_path / "generation_config.json").is_file() else None,
-                   adapter_weights=mx.load(str(path / "decision_adapters.safetensors")))
+        runtime = cls(backbone, mx.load(str(path / "pointer.safetensors")), config,
+                      processor=processor,
+                      generation_config=json.loads((backbone_path / "generation_config.json").read_text())
+                      if (backbone_path / "generation_config.json").is_file() else None,
+                      adapter_weights=mx.load(str(path / "decision_adapters.safetensors")))
+        runtime.merge_decision_weights(decision_weights)
+        return runtime
 
     @contextmanager
     def _decision_mode(self, enabled):

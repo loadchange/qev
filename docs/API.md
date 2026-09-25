@@ -31,7 +31,7 @@ Available aliases include `qev-latest`, `qev:0.8b`, `qev:0.8b-mlx`, `qev-0.8b`, 
 
 ## Local request logs
 
-`qev serve` logs `POST /v1/systemone` and `POST /v1/chat/completions` to `runs/request-logs` by default, relative to the working directory. Use `--request-log-dir PATH` to change the directory or `--no-request-log` to disable logging. Programmatic `create_app(agent)` does not enable file logging unless a `request_log` is supplied. GET requests and Snake demo endpoints are outside this log.
+`qev serve` logs `POST /v1/systemone` and `POST /v1/chat/completions` to `$QEV_HOME/request-logs` (default `~/.qev/request-logs`). Use `--request-log-dir PATH` to change the directory or `--no-request-log` to disable logging. Programmatic `create_app(agent)` does not enable file logging unless a `request_log` is supplied. GET requests and Snake demo endpoints are outside this log.
 
 Each request gets a directory named with UTC time and a UUID. It contains the original `request.json`, including complete data URLs for replay; `response.json` for a completed response; and `metadata.json` with the request ID, time, endpoint, status, elapsed time and model information. Malformed JSON is also preserved verbatim and marked with `request_parse_error`. `media/` stores extracted original PNG/JPEG/WebP bytes, including sampled video frames, without re-encoding. Each media entry records `json_pointer`, `path`, `mime`, `bytes` and `sha256` so it can be matched to the request. A compact `index.jsonl` in the log root lists records. Request headers, including authentication credentials, are not collected, and these files are not served over HTTP.
 

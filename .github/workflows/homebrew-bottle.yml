@@ -1,0 +1,66 @@
+name: Homebrew bottle
+
+# Builds the qev formula from this commit on the oldest supported macOS
+# (Sonoma arm64; Homebrew pours it on every newer macOS as well), tests it and
+# bottles it. Manual runs keep the bottle as a workflow artifact; tag pushes
+# also attach it to the GitHub release for that tag.
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  bottle:
+    runs-on: macos-14
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Formula for this commit
+        run: |
+          version=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml', 'rb'))['project']['version'])")
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          git archive --prefix="qev-$version/" -o "$RUNNER_TEMP/qev-$version.tar.gz" HEAD
+          python3 packaging/homebrew/generate_formula.py \
+            --source-tarball "$RUNNER_TEMP/qev-$version.tar.gz" --output "$RUNNER_TEMP/qev.rb"
+          brew tap-new --no-git loadchange/qev
+          cp "$RUNNER_TEMP/qev.rb" "$(brew --repository)/Library/Taps/loadchange/homebrew-qev/Formula/qev.rb"
+
+      - name: Build
+        run: brew install --build-bottle loadchange/qev/qev
+
+      - name: Test
+        run: |
+          brew test loadchange/qev/qev
+          qev --version
+          qev doctor || true
+
+      - name: Bottle
+        run: |
+          mkdir -p bottles && cd bottles
+          brew bottle --json --root-url "https://github.com/loadchange/qev/releases/download/v$VERSION" loadchange/qev/qev
+          # Release assets must be named as the formula's bottle URL expects.
+          for json in *.bottle.json; do
+            jq -r '.[].bottle.tags[] | "\(.local_filename) \(.filename)"' "$json" | while read -r local remote; do
+              [ "$local" = "$remote" ] || mv "$local" "$remote"
+            done
+          done
+          ls -la
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qev-bottle-${{ env.VERSION }}
+          path: bottles/*
+
+      - name: Attach to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || gh release create "$GITHUB_REF_NAME" --title "qev $VERSION" --notes "qev $VERSION"
+          gh release upload "$GITHUB_REF_NAME" bottles/*.tar.gz bottles/*.json --clobber

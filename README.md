@@ -10,6 +10,18 @@ This release is a small supervised training experiment. See the [model card](doc
 
 ## Install and run
 
+On Apple Silicon (macOS 14+), install the command-line tool with Homebrew:
+
+```bash
+brew tap loadchange/qev https://github.com/loadchange/qev
+brew install loadchange/qev/qev
+qev pull                     # download and verify the model into ~/.qev
+qev decide "Card declined twice at checkout" -i "Which team?" --choice billing technical account
+brew services start qev      # keep the model warm: CLI decisions then take a fraction of a second
+```
+
+See the [command-line guide](docs/CLI.md) for decisions with images, the HTTP service and speed options. From a source checkout:
+
 ```bash
 uv sync --python 3.12 --extra mlx --extra dev
 uv run hf download twainsk/qev-0.8b-mlx --local-dir models/qev-snake-0.8b-mlx
@@ -18,7 +30,7 @@ uv run qev predict --model models/qev-snake-0.8b-mlx --request examples/request.
 uv run qev serve --model models/qev-snake-0.8b-mlx --port 8008
 ```
 
-`qev serve` records the two model API POST endpoints under `runs/request-logs` by default. Change the location with `--request-log-dir PATH` or disable logging with `--no-request-log`; see [local request logs](docs/API.md#local-request-logs).
+`qev serve` records the two model API POST endpoints under `~/.qev/request-logs` (`$QEV_HOME/request-logs`) by default. Change the location with `--request-log-dir PATH` or disable logging with `--no-request-log`; see [local request logs](docs/API.md#local-request-logs).
 
 The code is on [GitHub](https://github.com/loadchange/qev). Model weights are published separately on Hugging Face and are not included in a Git clone:
 

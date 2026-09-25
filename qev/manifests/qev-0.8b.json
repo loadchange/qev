@@ -1,0 +1,150 @@
+{
+  "format": "qev-hub-release-v1",
+  "version": "0.3.0",
+  "repo_id": "twainsk/qev-0.8b-mlx",
+  "runtime": "mlx",
+  "runtime_source_commit": "d68c468d6c9963d558528df63c3c16dda711b84c",
+  "files": {
+    "LICENSE": {
+      "size": 11343,
+      "sha256": "6b08bb37982c233aa12bcbdf19106da12f3f4fcf800773ea42e28ebeddd34fb8"
+    },
+    "NOTICE": {
+      "size": 1621,
+      "sha256": "51fe66986820c9e92931939ee399da5ee338767a595dc9bb30138dd0fa8eeea7"
+    },
+    "README.md": {
+      "size": 10406,
+      "sha256": "bfaf86b0c713c5d0940744d03e2edd6c56d8bf81791fbed6d011e50e365d8b36"
+    },
+    "backbone/BASE_MODEL_README.md": {
+      "size": 61705,
+      "sha256": "87a163af54f32fa608a0f8d3ac67945c53dd2b4a7c96740b3d7fdc28e8458864"
+    },
+    "backbone/LICENSE": {
+      "size": 11544,
+      "sha256": "bbedc3fda3305820b977265f01b8619d87570a6739de3a5582c3464840f1e57a"
+    },
+    "backbone/README.md": {
+      "size": 84,
+      "sha256": "9a272b5949a803ab6eadf0703706dab183229952e2b374501d1069d0f6d16557"
+    },
+    "backbone/chat_template.jinja": {
+      "size": 7755,
+      "sha256": "273d8e0e683b885071fb17e08d71e5f2a5ddfb5309756181681de4f5a1822d80"
+    },
+    "backbone/config.json": {
+      "size": 2907,
+      "sha256": "b90b86f35c8e6925ef74ee04d0e758f0a845c83a42089ad82bbaa948de9b4204"
+    },
+    "backbone/foundation_manifest.json": {
+      "size": 406,
+      "sha256": "abd6ea2c0b53ccfbe45f1beb47e6b8050c989d4fedc60a48b9bed3ed6198c129"
+    },
+    "backbone/model.safetensors": {
+      "size": 3412001809,
+      "sha256": "d9c47ee9fd3e1ac66f0a4761c6dc961bc5dade2c9307e5b86695705140f24560"
+    },
+    "backbone/model.safetensors.index.json": {
+      "size": 38712,
+      "sha256": "e693d25c3656879e5f823af1fa423696a0018f95474b1329d79ff447e5bfc7f4"
+    },
+    "backbone/preprocessor_config.json": {
+      "size": 390,
+      "sha256": "27225450ac9c6529872ee1924fcb0962ff5634834f817040f444118116f4e516"
+    },
+    "backbone/processor_config.json": {
+      "size": 1220,
+      "sha256": "bfbc24af59a3e73a9cd0653b8d4ae758dfaec4e3e6c15dfb1c6c8ee8d5683c85"
+    },
+    "backbone/tokenizer.json": {
+      "size": 19989325,
+      "sha256": "06b9509352d2af50381ab2247e083b80d32d5c0aba91c272ca9ff729b6a0e523"
+    },
+    "backbone/tokenizer_config.json": {
+      "size": 1164,
+      "sha256": "7488550a894dcf741616126e322ea31d66cf9457b59ec5825f4c7efdced421f8"
+    },
+    "backbone/video_preprocessor_config.json": {
+      "size": 385,
+      "sha256": "7768af27c1fafa9cc9011c1dc20067e03f8915e03b63504550e11d5066986d13"
+    },
+    "backbone/vocab.json": {
+      "size": 6722759,
+      "sha256": "ce99b4cb2983d118806ce0a8b777a35b093e2000a503ebde25853284c9dfa003"
+    },
+    "decision_adapters.safetensors": {
+      "size": 43337494,
+      "sha256": "4d27561fc569dceed431d6e80db7146b215a9e9943064c598345bcecfcadf6f8"
+    },
+    "pointer.safetensors": {
+      "size": 2097320,
+      "sha256": "c4e7d9439a101a4a398f98932e75fa5c92396fd9101d156b0f8af66694fff66a"
+    },
+    "qev_config.json": {
+      "size": 2056,
+      "sha256": "72608203d8498b14ecc8975980fcf0aef52c11e695238f9af597a7ec75296697"
+    },
+    "reports/base_integrity.json": {
+      "size": 403,
+      "sha256": "db823d6d5f2b5a06fbc53ba494e35283247415fc39601ea620b281af9e86aa15"
+    },
+    "reports/data_manifest.json": {
+      "size": 17703,
+      "sha256": "f41151c68d6465b90bb8ea66ca0ea8611a6b37ed48596ba9484abc8ef4deda33"
+    },
+    "reports/evaluation.json": {
+      "size": 14813,
+      "sha256": "0a230d59e7716e4cf1e07d2591fef1d2853bf9371c9143b88b78c821ec8c7428"
+    },
+    "reports/export_integrity.json": {
+      "size": 538,
+      "sha256": "3cf38f4c60f7fc5e11ddaa522abc84792c3a93cb60d23d98c57c4a959f98b8df"
+    },
+    "reports/general_training_data_manifest.json": {
+      "size": 8605,
+      "sha256": "77805c57b30dd34bba4b5840d975f8f9421f4839fef83d24948bf0df09a5aab0"
+    },
+    "reports/initial_development.json": {
+      "size": 6770,
+      "sha256": "afef74a0cc6966bd2563eaccc7c8bdda0ec1db3851e3ded76878b5b866d32b38"
+    },
+    "reports/parent-mlx-spatial.json": {
+      "size": 3598,
+      "sha256": "3adca27ac57a67987d78f0d3156c44f6a9368e75cf0decefc66c7cc8b74a0c43"
+    },
+    "reports/parent-snake-torch-12.json": {
+      "size": 5217,
+      "sha256": "4db575d52650c5ba46a4a609bbd27535c3cebc45fde846999406de8228d02153"
+    },
+    "reports/parent-snake-torch.json": {
+      "size": 7539,
+      "sha256": "b09ea9f9ff3b04120dec1d9d2b01566959c5e7398794b1b07649051788fb40bc"
+    },
+    "reports/provenance.json": {
+      "size": 3493,
+      "sha256": "ed318a19a494de0efaa2ae8beb70419e67b3eee696c405460d0efa77f1dca823"
+    },
+    "reports/service_mlx.json": {
+      "size": 17480,
+      "sha256": "5b81fba2cace6ef0a2fff83353d3f03e4b0f275e400e8c13256ab75a067b3633"
+    },
+    "reports/snake-native.json": {
+      "size": 5096,
+      "sha256": "8faf157096f48cd576d7df9d768583d03508ad28a341b72e118634264b7f479d"
+    },
+    "reports/trained-mlx-spatial.json": {
+      "size": 6775,
+      "sha256": "c395fc14613760e0d0feec154b6a9cb3bedc612ab2e7083f6982a7cc28c06ee3"
+    },
+    "reports/trained-snake-torch-12.json": {
+      "size": 8115,
+      "sha256": "6dd00feeb3fcf2cbfce3c3739e2d772b2746c792114d86a8355a931dccfa3d56"
+    },
+    "reports/trained-snake-torch.json": {
+      "size": 12330,
+      "sha256": "c4aacff3bc96c0135e56d0209de8f8621e45d68bf989c42fba69bb5838277ff2"
+    }
+  },
+  "scope": "Runtime files and evaluation summaries; raw training records are not included."
+}

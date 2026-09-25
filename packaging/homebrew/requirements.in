@@ -1,0 +1,17 @@
+# Runtime of the Homebrew build: Apple Silicon, Python 3.12, MLX, no torch.
+# mlx-vlm is added by the formula without dependencies: Qev needs only its
+# Qwen3.5 model code and numpy processors, not its audio, OpenCV or server extras.
+mlx==0.32.2
+numpy>=2.2,<3
+pydantic>=2.10,<3
+huggingface-hub>=0.34,<2
+safetensors>=0.6
+tokenizers>=0.22
+transformers>=5.17,<5.18
+jinja2>=3.1
+fastapi>=0.115
+uvicorn>=0.30
+pillow>=11
+requests>=2.31
+# Build backend, so qev itself installs offline.
+hatchling

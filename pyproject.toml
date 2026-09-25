@@ -4,20 +4,23 @@ build-backend = "hatchling.build"
 
 [project]
 name = "qev"
-version = "0.3.0"
+version = "0.4.0"
 description = "Qwen3.5 decision models with a Jev-compatible API and native MLX inference"
 requires-python = ">=3.12"
 license = "Apache-2.0"
 dependencies = [
   "numpy>=2.2,<3", "pydantic>=2.10,<3", "huggingface-hub>=0.34,<2",
-  "safetensors>=0.6", "tokenizers>=0.22", "transformers>=5.17,<5.18",
-  "torch>=2.10,<3", "torchvision>=0.25,<0.30", "peft>=0.21,<0.22", "accelerate>=1.12,<2",
-  "fastapi>=0.115", "uvicorn>=0.30", "pyarrow>=18", "Pillow>=11",
+  "safetensors>=0.6", "tokenizers>=0.22", "transformers>=5.17,<5.18", "jinja2>=3.1",
+  "fastapi>=0.115", "uvicorn>=0.30", "Pillow>=11",
 ]
 
 [project.optional-dependencies]
-mlx = ["mlx>=0.32.2,<0.33; sys_platform == 'darwin' and platform_machine == 'arm64'", "mlx-lm>=0.31.3,<0.32; sys_platform == 'darwin' and platform_machine == 'arm64'", "mlx-vlm>=0.7.1,<0.8; sys_platform == 'darwin' and platform_machine == 'arm64'"]
-dev = ["pytest>=8", "httpx>=0.28", "ruff>=0.12", "typesafe-sdk>=0.7,<0.8"]
+# Apple Silicon runtime; images and video use numpy processors when torch is absent.
+mlx = ["mlx>=0.32.2,<0.33; sys_platform == 'darwin' and platform_machine == 'arm64'", "mlx-vlm>=0.7.1,<0.8; sys_platform == 'darwin' and platform_machine == 'arm64'"]
+# Training, CUDA/CPU inference and the Transformers image/video processors.
+torch = ["torch>=2.10,<3", "torchvision>=0.25,<0.30", "peft>=0.21,<0.22", "accelerate>=1.12,<2"]
+data = ["pyarrow>=18"]
+dev = ["qev[torch,data]", "pytest>=8", "httpx>=0.28", "ruff>=0.12", "typesafe-sdk>=0.7,<0.8", "mlx-lm>=0.31.3,<0.32; sys_platform == 'darwin' and platform_machine == 'arm64'"]
 
 [project.scripts]
 qev = "qev.cli:main"

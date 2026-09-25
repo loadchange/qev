@@ -24,7 +24,8 @@ from .tokenization import encode_question
 
 
 class Agent:
-    def __init__(self, checkpoint, *, backend="auto", device=None, batch_size=1, calibrated=True):
+    def __init__(self, checkpoint, *, backend="auto", device=None, batch_size=1, calibrated=True,
+                 decision_weights=None):
         self.path = Path(checkpoint).expanduser().resolve()
         self.config = json.loads((self.path / "qev_config.json").read_text())
         self.backend = self.config.get("runtime", "torch") if backend == "auto" else backend
@@ -40,8 +41,13 @@ class Agent:
             raise ValueError("Invalid checkpoint temperature")
         self.lock = threading.Lock()
         if self.backend == "mlx":
+            import os
+
             from .mlx_runtime import MLXRuntime
-            self.model = MLXRuntime.from_checkpoint(self.path)
+
+            self.model = MLXRuntime.from_checkpoint(
+                self.path, decision_weights=decision_weights or os.environ.get("QEV_DECISION_WEIGHTS", "adapter"))
+            self.config = self.model.config
             self.tokenizer = self.model.tokenizer
         elif self.backend == "torch":
             import torch
@@ -78,6 +84,7 @@ class Agent:
             videos=decoded.videos or None, video_fps=decoded.video_fps or None,
             option_images=attached,
             max_length=self.config.get("multimodal_max_length", 8192), max_state=None,
+            return_tensors="np" if self.backend == "mlx" else "pt",
         ) for question, attached in zip(record["questions"], per_question_images, strict=True)]
         inference_started = time.perf_counter()
         if timings is not None:
@@ -171,6 +178,7 @@ class Agent:
                 "usage": {"input_tokens": sum(len(e["ids"]) for e in encodings), "output_tokens": 0},
                 "latency_ms": timings["total"],
                 "qev": {"backend": self.backend, "temperature": temperatures[0] if len(set(temperatures)) == 1 else None,
+                        "decision_weights": self.config.get("decision_weights", "adapter") if self.backend == "mlx" else None,
                         "timings_ms": timings,
                         "question_temperatures": {m["id"]: t for m, t in zip(meta, temperatures, strict=True)},
                         "training_modalities": ["text"], "multimodal_decision_accuracy_validated": False,
@@ -197,7 +205,7 @@ class Agent:
             video_kwargs = {"video_metadata": video_metadata, "do_sample_frames": False,
                             "cap_pixels_per_frame": False} if video_metadata else {}
             inputs = processor.apply_chat_template(
-                messages, tokenize=True, return_dict=True, return_tensors="pt",
+                messages, tokenize=True, return_dict=True, return_tensors="np" if self.backend == "mlx" else "pt",
                 add_generation_prompt=True, enable_thinking=request.enable_thinking,
                 processor_kwargs=video_kwargs,
             )

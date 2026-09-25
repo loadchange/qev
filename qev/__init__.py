@@ -1,2 +1,2 @@
 """Qev: typed decisions and preserved native Qwen3.5 multimodal generation."""
-__version__ = "0.3.0"
+__version__ = "0.4.0"

@@ -31,7 +31,7 @@ uv run qev serve --model models/qev-0.8b --backend torch --port 8008
 
 ## 本地请求日志
 
-`qev serve` 默认将 `POST /v1/systemone` 和 `POST /v1/chat/completions` 记录到工作目录下的 `runs/request-logs`。可用 `--request-log-dir PATH` 更改目录，或用 `--no-request-log` 关闭。程序化调用 `create_app(agent)` 默认不写文件，需显式传入 `request_log` 才启用。GET 请求及贪吃蛇演示接口不在此日志范围内。
+`qev serve` 默认将 `POST /v1/systemone` 和 `POST /v1/chat/completions` 记录到 `$QEV_HOME/request-logs`（默认 `~/.qev/request-logs`）。可用 `--request-log-dir PATH` 更改目录，或用 `--no-request-log` 关闭。程序化调用 `create_app(agent)` 默认不写文件，需显式传入 `request_log` 才启用。GET 请求及贪吃蛇演示接口不在此日志范围内。
 
 每次请求使用 UTC 时间加 UUID 命名的独立目录，包含原始 `request.json`（保留完整 data URL，可用于重放）、已完成响应的 `response.json`，以及记录请求 ID、时间、端点、状态、耗时和模型信息的 `metadata.json`。无效 JSON 也原样保留，并标记 `request_parse_error`。`media/` 提取保存原始 PNG/JPEG/WebP 字节，包括视频采样帧，不重新编码；每项媒体记录 `json_pointer`、`path`、`mime`、`bytes` 和 `sha256`，便于与请求核对。日志根目录的 `index.jsonl` 保存精简索引。不采集 HTTP 请求头及其中的认证凭据，这些文件也不通过 HTTP 提供。
 

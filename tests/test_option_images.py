@@ -162,7 +162,8 @@ def test_mixed_questions_keep_candidate_pixels_local_and_text_calibrated(process
     assert len(media) == 2 and len(calls) == 3
     for call, colors in zip(media, [["red"], ["blue", "green"]], strict=True):
         expected = processor.image_processor(images=[Image.new("RGB", (4, 4), color) for color in colors], return_tensors="pt")
-        torch.testing.assert_close(call["pixel_values"], expected["pixel_values"])
+        # The MLX backend receives numpy arrays so it can run without torch.
+        torch.testing.assert_close(torch.as_tensor(np.asarray(call["pixel_values"])), expected["pixel_values"])
         assert len(call["image_grid_thw"]) == len(colors)
 
 

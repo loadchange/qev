@@ -130,6 +130,7 @@ def encode_multimodal_question(
     option_images=None,
     max_length: int = 8192,
     max_state: int | None = None,
+    return_tensors: str = "pt",
 ) -> dict[str, Any]:
     """Process one independent image/video decision with the original processor.
 
@@ -144,9 +145,12 @@ def encode_multimodal_question(
     The returned ``inputs`` dict can be passed directly to ``QevModel.forward``;
     the remaining fields are metadata, not model keyword arguments. Run each
     question independently; the text-only collator cannot combine pixel grids.
+    ``return_tensors="np"`` keeps the MLX runtime free of torch.
     """
-    import torch
+    import numpy as np
 
+    if return_tensors not in ("pt", "np"):
+        raise ValueError("return_tensors must be 'pt' or 'np'")
     tok = processor.tokenizer
     special = special_token_ids(tok)
     options, instruction = question.get("options"), question.get("instr")
@@ -190,7 +194,7 @@ def encode_multimodal_question(
             prompt += processor.vision_start_token + processor.image_token + processor.vision_end_token
         prompt += SPECIAL["end_option"]
     prompt += SPECIAL["decision"]
-    kwargs = {"text": [prompt], "return_tensors": "pt", "add_special_tokens": False}
+    kwargs = {"text": [prompt], "return_tensors": return_tensors, "add_special_tokens": False}
     if all_images:
         kwargs["images"] = all_images
     if videos:
@@ -207,13 +211,16 @@ def encode_multimodal_question(
     decisions = [i for i, token_id in enumerate(ids) if token_id == special["decision"]]
     if len(positions) != len(options) or decisions != [len(ids) - 1]:
         raise ValueError("Processor did not preserve the complete candidate structure")
-    inputs.update(
-        option_positions=torch.tensor([positions], dtype=torch.long),
-        option_mask=torch.ones((1, len(positions)), dtype=torch.bool),
-        decision_positions=torch.tensor(decisions, dtype=torch.long),
-    )
+    markers = {"option_positions": np.asarray([positions], dtype=np.int64),
+               "option_mask": np.ones((1, len(positions)), dtype=bool),
+               "decision_positions": np.asarray(decisions, dtype=np.int64)}
     if "attention_mask" not in inputs:
-        inputs["attention_mask"] = torch.ones_like(inputs["input_ids"])
+        markers["attention_mask"] = np.ones(np.asarray(inputs["input_ids"]).shape, dtype=np.int64)
+    if return_tensors == "pt":
+        import torch
+
+        markers = {key: torch.from_numpy(value) for key, value in markers.items()}
+    inputs.update(markers)
     return {"inputs": inputs, "ids": ids, "option_positions": positions,
             "decision_position": decisions[0], "state_truncated": False,
             "state_tokens": len(state_tokens)}

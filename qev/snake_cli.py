@@ -26,10 +26,12 @@ from .snake_terminal import render_frame
 
 def add_arguments(parser):
     source = parser.add_mutually_exclusive_group()
-    source.add_argument("--model", help="Local checkpoint; prefer models/qev-snake-0.8b-mlx when present")
+    source.add_argument("--model", help="Checkpoint directory or registry name; defaults to models/qev-snake-0.8b-mlx in a checkout, a running server, or the installed qev-0.8b")
     source.add_argument("--base-url", help="Use an existing Qev service, e.g. http://127.0.0.1:8008")
     parser.add_argument("--backend", choices=["auto", "torch", "mlx"], default="auto")
     parser.add_argument("--device", help="Torch device for local inference")
+    parser.add_argument("--decision-weights", choices=["adapter", "merged", "merged-bf16", "bf16"],
+                        help="MLX decision weights for local inference (default: $QEV_DECISION_WEIGHTS or adapter)")
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--size", type=int, default=12, help="Square board size, 6..20")
     parser.add_argument("--max-steps", type=int, default=500, help="Per-game limit, 1..2000")
@@ -121,9 +123,28 @@ def make_driver(args):
     if args.base_url:
         return HTTPDriver(args.base_url, args.request_timeout)
 
+    from .models import ModelNotInstalled, canonical, resolve
+
     preferred, legacy = "models/qev-snake-0.8b-mlx", "models/qev-0.8b-mlx"
-    model = args.model or next((path for path in (preferred, legacy)
-                               if (Path(path) / "qev_config.json").is_file()), preferred)
+    if args.model and canonical(args.model):
+        model = str(resolve(args.model))
+    else:
+        model = args.model or next((path for path in (preferred, legacy)
+                                   if (Path(path) / "qev_config.json").is_file()), None)
+    if model is None and args.backend != "torch":
+        # Outside a source checkout: reuse a warm local server, then the
+        # installed default model (qev pull).
+        from .client import health, server_url
+
+        url = server_url()
+        if health(url):
+            print(f"Using the running Qev server at {url}", file=sys.stderr, flush=True)
+            return HTTPDriver(url, args.request_timeout)
+        try:
+            model = str(resolve(None))
+        except ModelNotInstalled:
+            pass
+    model = model or preferred
     config_path = Path(model).expanduser() / "qev_config.json"
     if not config_path.is_file():
         repository = "twainsk/qev-0.8b" if args.backend == "torch" else "twainsk/qev-0.8b-mlx"
@@ -131,12 +152,14 @@ def make_driver(args):
             f"Qev checkpoint is missing: {config_path}\n"
             f"Download a checkpoint to {model}:\n"
             f"  uv run hf download {repository} --local-dir {shlex.quote(str(model))}\n"
-            "Or use --model with an existing Qev checkpoint directory."
+            "Or use --model with an existing Qev checkpoint directory"
+            + (", or install the default model with: qev pull" if args.backend != "torch" else ".")
         )
     from .inference import Agent
 
     print(f"Loading local Qev checkpoint: {model}", file=sys.stderr, flush=True)
-    return LocalDriver(Agent(model, backend=args.backend, device=args.device), model)
+    return LocalDriver(Agent(model, backend=args.backend, device=args.device,
+                             decision_weights=getattr(args, "decision_weights", None)), model)
 
 
 class Keyboard(AbstractContextManager):

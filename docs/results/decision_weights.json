@@ -1,0 +1,134 @@
+{
+  "model": "/Volumes/ExternalDisk/UserData/code/loadchange/qev/models/qev-snake-0.8b-mlx",
+  "questions": 1380,
+  "temperature": 2.82842712474619,
+  "mlx": "0.32.2",
+  "modes": {
+    "adapter": {
+      "development": {
+        "n": 1380,
+        "accuracy": 0.8789855072463768,
+        "nll": 0.3551030458132824,
+        "brier": 0.17835774701511883,
+        "ece": 0.0267677178315475,
+        "confident_error_rate": 0.02391304347826087
+      },
+      "snake": {
+        "n": 500,
+        "accuracy": 0.984,
+        "nll": 0.06428306002569938,
+        "brier": 0.025718053450708475,
+        "ece": 0.006331929549219887,
+        "confident_error_rate": 0.008
+      },
+      "general": {
+        "n": 880,
+        "accuracy": 0.8193181818181818,
+        "nll": 0.5203416741016819,
+        "brier": 0.26508484563126106,
+        "ece": 0.04541620064220717,
+        "confident_error_rate": 0.03295454545454545
+      },
+      "seconds": 223.96558941600233,
+      "snake_request_ms_p50": 219.07831249882292,
+      "active_memory_gib": 3.219893228262663,
+      "peak_memory_gib": 4.297182388603687
+    },
+    "merged": {
+      "development": {
+        "n": 1380,
+        "accuracy": 0.8789855072463768,
+        "nll": 0.35510329036339583,
+        "brier": 0.17835789275763628,
+        "ece": 0.02676776416443856,
+        "confident_error_rate": 0.02391304347826087
+      },
+      "snake": {
+        "n": 500,
+        "accuracy": 0.984,
+        "nll": 0.06428323664394978,
+        "brier": 0.025718115738274514,
+        "ece": 0.006331936058188697,
+        "confident_error_rate": 0.008
+      },
+      "general": {
+        "n": 880,
+        "accuracy": 0.8193181818181818,
+        "nll": 0.5203419572494448,
+        "brier": 0.2650850387913645,
+        "ece": 0.045416273222621956,
+        "confident_error_rate": 0.03295454545454545
+      },
+      "seconds": 182.19234450000295,
+      "snake_request_ms_p50": 185.49614600124187,
+      "active_memory_gib": 5.07418705150485,
+      "peak_memory_gib": 6.32904248777777,
+      "argmax_changes_vs_adapter": 0,
+      "max_probability_difference_vs_adapter": 1.2479215619309869e-05
+    },
+    "merged-bf16": {
+      "development": {
+        "n": 1380,
+        "accuracy": 0.8789855072463768,
+        "nll": 0.35470637238270214,
+        "brier": 0.17810361852990433,
+        "ece": 0.02807356281597554,
+        "confident_error_rate": 0.02318840579710145
+      },
+      "snake": {
+        "n": 500,
+        "accuracy": 0.984,
+        "nll": 0.06401762603190038,
+        "brier": 0.025620034727037912,
+        "ece": 0.006354368926368318,
+        "confident_error_rate": 0.008
+      },
+      "general": {
+        "n": 880,
+        "accuracy": 0.8193181818181818,
+        "nll": 0.519870432809294,
+        "brier": 0.26474201841789663,
+        "ece": 0.04750961483379742,
+        "confident_error_rate": 0.031818181818181815
+      },
+      "seconds": 171.19753750000018,
+      "snake_request_ms_p50": 170.51804199945764,
+      "active_memory_gib": 4.146773111075163,
+      "peak_memory_gib": 6.32904248777777,
+      "argmax_changes_vs_adapter": 5,
+      "max_probability_difference_vs_adapter": 0.04120232750117564
+    },
+    "bf16": {
+      "development": {
+        "n": 1380,
+        "accuracy": 0.8789855072463768,
+        "nll": 0.35452740982013775,
+        "brier": 0.1783614824841174,
+        "ece": 0.0258884786744634,
+        "confident_error_rate": 0.02318840579710145
+      },
+      "snake": {
+        "n": 500,
+        "accuracy": 0.984,
+        "nll": 0.06356239744686186,
+        "brier": 0.02551145555945596,
+        "ece": 0.00662856649354171,
+        "confident_error_rate": 0.008
+      },
+      "general": {
+        "n": 880,
+        "accuracy": 0.8193181818181818,
+        "nll": 0.5198484395776809,
+        "brier": 0.2652080886913114,
+        "ece": 0.044123082014396214,
+        "confident_error_rate": 0.031818181818181815
+      },
+      "seconds": 148.82444620800015,
+      "snake_request_ms_p50": 149.08031249979103,
+      "active_memory_gib": 2.5382400304079056,
+      "peak_memory_gib": 6.32904248777777,
+      "argmax_changes_vs_adapter": 7,
+      "max_probability_difference_vs_adapter": 0.06814672306623878
+    }
+  }
+}

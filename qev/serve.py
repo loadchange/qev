@@ -79,12 +79,16 @@ def create_app(agent, *, request_log=None):
 
     @app.get("/health")
     def health():
-        return {"status": "ok", "backend": agent.backend}
+        # The CLI reuses this server only when it runs the requested checkpoint.
+        checkpoint = getattr(agent, "path", None)
+        config = getattr(agent, "config", None) or {}
+        return {"status": "ok", "backend": agent.backend, "model": config.get("model_name", "qev-0.8b"),
+                "checkpoint": str(checkpoint) if checkpoint else None, "version": __version__}
 
     @app.get("/v1/models")
     def models():
         name = agent.config.get("model_name", "qev-0.8b")
-        return {"models": [{"name": name, "description": "Qwen3.5 typed decisions; multimodal decision accuracy is not yet validated", "release_date": "2026-09-20"},
+        return {"models": [{"name": name, "description": "Qwen3.5 typed decisions; image decisions are zero-shot transfer from text training", "release_date": "2026-09-20"},
                            {"name": "qev-latest", "description": f"Alias of {name}", "release_date": "2026-09-20"},
                            {"name": "qev:0.8b", "description": f"Alias of loaded checkpoint {name}", "release_date": "2026-09-20"},
                            {"name": "qev:0.8b-mlx", "description": f"Alias of loaded checkpoint {name}; aliases do not switch the runtime", "release_date": "2026-09-20"},

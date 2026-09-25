@@ -10,6 +10,18 @@ Qev 增加独立的语言 LoRA 决策适配器与候选指针头，保留原始�
 
 ## 安装与运行
 
+在 Apple Silicon（macOS 14+）上，用 Homebrew 安装命令行工具：
+
+```bash
+brew tap loadchange/qev https://github.com/loadchange/qev
+brew install loadchange/qev/qev
+qev pull                     # 下载并校验模型，存放在 ~/.qev
+qev decide "结账时卡被拒两次" -i "哪个部门处理？" --choice billing technical account
+brew services start qev      # 让模型常驻：之后命令行判断不到一秒
+```
+
+带图判断、HTTP 服务和速度选项见 [命令行指南](docs/CLI.zh-CN.md)。在源码目录中：
+
 ```bash
 uv sync --python 3.12 --extra mlx --extra dev
 uv run hf download twainsk/qev-0.8b-mlx --local-dir models/qev-snake-0.8b-mlx
@@ -18,7 +30,7 @@ uv run qev predict --model models/qev-snake-0.8b-mlx --request examples/request.
 uv run qev serve --model models/qev-snake-0.8b-mlx --port 8008
 ```
 
-`qev serve` 默认把两个模型 API POST 端点的请求记录到 `runs/request-logs`。可用 `--request-log-dir PATH` 更改位置，或用 `--no-request-log` 关闭；详见 [本地请求日志](docs/API.zh-CN.md#本地请求日志)。
+`qev serve` 默认把两个模型 API POST 端点的请求记录到 `~/.qev/request-logs`（`$QEV_HOME/request-logs`）。可用 `--request-log-dir PATH` 更改位置，或用 `--no-request-log` 关闭；详见 [本地请求日志](docs/API.zh-CN.md#本地请求日志)。
 
 代码位于 [GitHub](https://github.com/loadchange/qev)，模型权重单独发布到 Hugging Face，Git clone 不包含权重：
 

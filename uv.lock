@@ -1210,63 +1210,75 @@ wheels = [
 
 [[package]]
 name = "qev"
-version = "0.3.0"
+version = "0.4.0"
 source = { editable = "." }
 dependencies = [
-    { name = "accelerate" },
     { name = "fastapi" },
     { name = "huggingface-hub" },
+    { name = "jinja2" },
     { name = "numpy" },
-    { name = "peft" },
     { name = "pillow" },
-    { name = "pyarrow" },
     { name = "pydantic" },
     { name = "safetensors" },
     { name = "tokenizers" },
-    { name = "torch" },
-    { name = "torchvision" },
     { name = "transformers" },
     { name = "uvicorn" },
 ]
 
 [package.optional-dependencies]
+data = [
+    { name = "pyarrow" },
+]
 dev = [
+    { name = "accelerate" },
     { name = "httpx" },
+    { name = "mlx-lm", marker = "platform_machine == 'arm64' and sys_platform == 'darwin'" },
+    { name = "peft" },
+    { name = "pyarrow" },
     { name = "pytest" },
     { name = "ruff" },
+    { name = "torch" },
+    { name = "torchvision" },
     { name = "typesafe-sdk" },
 ]
 mlx = [
     { name = "mlx", marker = "platform_machine == 'arm64' and sys_platform == 'darwin'" },
-    { name = "mlx-lm", marker = "platform_machine == 'arm64' and sys_platform == 'darwin'" },
     { name = "mlx-vlm", marker = "platform_machine == 'arm64' and sys_platform == 'darwin'" },
+]
+torch = [
+    { name = "accelerate" },
+    { name = "peft" },
+    { name = "torch" },
+    { name = "torchvision" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "accelerate", specifier = ">=1.12,<2" },
+    { name = "accelerate", marker = "extra == 'torch'", specifier = ">=1.12,<2" },
     { name = "fastapi", specifier = ">=0.115" },
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.28" },
     { name = "huggingface-hub", specifier = ">=0.34,<2" },
+    { name = "jinja2", specifier = ">=3.1" },
     { name = "mlx", marker = "platform_machine == 'arm64' and sys_platform == 'darwin' and extra == 'mlx'", specifier = ">=0.32.2,<0.33" },
-    { name = "mlx-lm", marker = "platform_machine == 'arm64' and sys_platform == 'darwin' and extra == 'mlx'", specifier = ">=0.31.3,<0.32" },
+    { name = "mlx-lm", marker = "platform_machine == 'arm64' and sys_platform == 'darwin' and extra == 'dev'", specifier = ">=0.31.3,<0.32" },
     { name = "mlx-vlm", marker = "platform_machine == 'arm64' and sys_platform == 'darwin' and extra == 'mlx'", specifier = ">=0.7.1,<0.8" },
     { name = "numpy", specifier = ">=2.2,<3" },
-    { name = "peft", specifier = ">=0.21,<0.22" },
+    { name = "peft", marker = "extra == 'torch'", specifier = ">=0.21,<0.22" },
     { name = "pillow", specifier = ">=11" },
-    { name = "pyarrow", specifier = ">=18" },
+    { name = "pyarrow", marker = "extra == 'data'", specifier = ">=18" },
     { name = "pydantic", specifier = ">=2.10,<3" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "qev", extras = ["torch", "data"], marker = "extra == 'dev'" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.12" },
     { name = "safetensors", specifier = ">=0.6" },
     { name = "tokenizers", specifier = ">=0.22" },
-    { name = "torch", specifier = ">=2.10,<3" },
-    { name = "torchvision", specifier = ">=0.25,<0.30" },
+    { name = "torch", marker = "extra == 'torch'", specifier = ">=2.10,<3" },
+    { name = "torchvision", marker = "extra == 'torch'", specifier = ">=0.25,<0.30" },
     { name = "transformers", specifier = ">=5.17,<5.18" },
     { name = "typesafe-sdk", marker = "extra == 'dev'", specifier = ">=0.7,<0.8" },
     { name = "uvicorn", specifier = ">=0.30" },
 ]
-provides-extras = ["mlx", "dev"]
+provides-extras = ["mlx", "torch", "data", "dev"]
 
 [[package]]
 name = "regex"
