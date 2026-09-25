@@ -8,6 +8,7 @@
 | Laya-MLX | Native MLX execution and numerical comparisons across runtimes | Does not use Laya's ModernBERT weights; Qev must retain vision modules and the generation head |
 | Jev / TypeSafe | The `state + questions → typed answers` interface | Its unpublished weights and training details are unknown; Qev makes no claim of reproduction or equivalent performance |
 | Qwen3.5-0.8B | Original text, image, and video understanding, plus language generation | Freezes the foundation and adds about 11.35 million trainable decision parameters |
+| djev (DiffusionGemma) | Reading every answer slot in one forward pass | In a controlled test diffusion reads did not improve accuracy, so Qev keeps an autoregressive foundation; see the [backbone experiment](../experiments/diffusion/README.md) |
 
 ```mermaid
 flowchart LR
@@ -30,7 +31,7 @@ Each question independently encodes the state, instructions, and complete candid
 
 Training updates only rank-16 LoRA in the language module and the small pointer head. `choice` selects the candidate with the highest probability, `noul` returns the probability of yes, and `score` returns the expected value over ordered levels. Application code constructs the JSON.
 
-Qwen's GatedDeltaNet carries recurrent and convolutional state. Ordinary attention masks cannot isolate multiple question branches within one sequence. Qev therefore uses independent batch rows; MLX performs an uncached prefill for each question, while generation creates a fresh cache for every request. Throughput does not scale through Kev-style shared prefixes.
+Qwen's GatedDeltaNet carries recurrent and convolutional state. Ordinary attention masks cannot isolate multiple question branches within one sequence. Qev therefore uses independent batch rows; MLX performs an uncached prefill for each question, while generation creates a fresh cache for every request. Throughput does not scale through Kev-style shared prefixes. Pure-attention backbones can share one state exactly across questions; the [backbone experiment](../experiments/diffusion/README.md) found this pays off only for long shared states such as images.
 
 The public Torch API also calls the model one question at a time by default (`Agent(..., batch_size=1)`), so a question's computation shape does not change with other questions in the request. CUDA BF16 batch and padding shapes can cause numerical differences even when rows share no state. Python callers may explicitly choose a larger `batch_size` for throughput, but probabilities are then not guaranteed to match individual-question execution. Training and offline evaluation retain batch 4; reported metrics correspond to their actual precision and batching policies.
 
@@ -40,7 +41,7 @@ The text training budget is 1024 tokens, with at most 384 state tokens. Expanded
 
 Retaining multimodal capabilities requires more than retaining a tokenizer or a Qwen label in a filename. Qev instantiates the complete `Qwen3_5ForConditionalGeneration`, including vision, the full processor, language layers, vocabulary, and generation head. Training freezes all original parameters and saves LoRA separately. Native generation runs with LoRA disabled and restores adapter state afterward.
 
-Frozen foundation hashes and native token comparisons validate this path. The guarantee concerns the original generation path: retaining weights does not automatically guarantee the new pointer head's visual decision quality. Decision supervision in this run is textual; visual decisions are executable but have not undergone a dedicated accuracy evaluation.
+Frozen foundation hashes and native token comparisons validate this path. The guarantee concerns the original generation path: retaining weights does not automatically guarantee the new pointer head's visual decision quality. Decision supervision in this run is textual. A later zero-shot probe of the Snake checkpoint answered 69.4% of 500 A-OKVQA questions correctly with the image (32.6% without); visual decisions have not been trained or calibrated.
 
 ## MLX
 

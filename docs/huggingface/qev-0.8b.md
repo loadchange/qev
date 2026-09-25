@@ -105,7 +105,7 @@ All 28 new-model games reached the step cap; none filled the board. These are fi
 
 ## Multimodal preservation and limitations
 
-Full frozen-foundation hashes matched before and after training. On the same A100, adapter-disabled native generation produced identical token IDs for three fixed probes covering text, image and video. This is weight-preservation and limited regression evidence, **not a comprehensive multimodal quality evaluation**. Decision accuracy on image/video inputs has not been measured; multimodal decision probabilities remain uncalibrated.
+Full frozen-foundation hashes matched before and after training. On the same A100, adapter-disabled native generation produced identical token IDs for three fixed probes covering text, image and video. This is weight-preservation and limited regression evidence, **not a comprehensive multimodal quality evaluation**. A later zero-shot probe (500 A-OKVQA validation questions, 4 options) answered 69.4% correctly with the image and 32.6% without; video decisions have not been measured and multimodal decision probabilities remain uncalibrated.
 
 The checkpoint is a small supervised decision experiment. General task coverage and Chinese task evidence are limited. It does not establish performance parity with Jev, TypeSafe or Laya; Jev compatibility refers to interface and answer types. It does not learn Snake geometry directly from pixels. The initial generic model, dataset provenance and additional limitations are documented in the [original model card](https://github.com/loadchange/qev/blob/main/docs/MODEL_CARD.md); v0.3.0 results above supersede the original checkpoint's metrics for this release.
 

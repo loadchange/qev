@@ -4,7 +4,7 @@
 
 Qev provides two endpoints: `/v1/systemone` returns probabilities over fixed candidates, while `/v1/chat/completions` uses the complete Qwen3.5 foundation's native text, image, and video generation. Native generation disables Qev's decision LoRA and uses the preserved vision modules, language model, and vocabulary output head.
 
-The current decision adapter was trained only on text. Images and videos can participate in the decision forward pass, but **multimodal decision accuracy has not been validated**. Temperature fitted on text tasks is not applied to these probabilities. API compatibility does not imply matching Jev's model quality or confidence values.
+The current decision adapter was trained only on text. Images and videos can participate in the decision forward pass, but **multimodal decision accuracy has only a limited zero-shot measurement**: on 500 A-OKVQA questions the published Snake checkpoint answered 69.4% correctly with the image (32.6% without; chance 25%), see the [backbone experiment](../experiments/diffusion/README.md). Temperature fitted on text tasks is not applied to these probabilities. API compatibility does not imply matching Jev's model quality or confidence values.
 
 ## Startup and model names
 

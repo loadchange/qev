@@ -8,6 +8,7 @@
 | Laya-MLX | 原生 MLX 实现与跨运行时数值对照 | 不使用 Laya 的 ModernBERT 权重；这里需要保留视觉模块和生成头 |
 | Jev / TypeSafe | `state + questions → typed answers` 接口 | 不知道其未公开权重与训练细节，不声称复现或性能相等 |
 | Qwen3.5-0.8B | 原始文字、图像、视频理解与语言生成 | 冻结基座，增加约 1,135 万可训练决策参数 |
+| djev（DiffusionGemma） | 一次前向读出所有答案槽位 | 对照实验中扩散式读取没有提升准确率，因此保留自回归基座；见[骨干对照实验](../experiments/diffusion/README.zh-CN.md) |
 
 ```mermaid
 flowchart LR
@@ -30,7 +31,7 @@ Qwen3.5-0.8B 是混合线性注意力和全注意力的稠密模型。24 个语�
 
 训练只更新语言模块中的 rank 16 LoRA 及小型指针头。`choice` 取最大概率候选，`noul` 返回 yes 的概率，`score` 返回有序等级的概率期望。JSON 由程序构造。
 
-Qwen 的 GatedDeltaNet 有循环状态与卷积状态，普通 attention mask 不能隔离同一序列内的多题分支。因此这里按独立 batch row 推理，MLX 使用逐题无缓存 prefill；生成则为每次请求建立全新的缓存。吞吐不会按 Kev 的共享前缀方式扩展。
+Qwen 的 GatedDeltaNet 有循环状态与卷积状态，普通 attention mask 不能隔离同一序列内的多题分支。因此这里按独立 batch row 推理，MLX 使用逐题无缓存 prefill；生成则为每次请求建立全新的缓存。吞吐不会按 Kev 的共享前缀方式扩展。纯注意力骨干可以让多道题精确共享同一个 state；[骨干对照实验](../experiments/diffusion/README.zh-CN.md)发现只有共享 state 很长（例如图片）时才划算。
 
 公开 API 的 Torch 路径也默认逐题调用（`Agent(..., batch_size=1)`），使一个问题的计算形状不随同请求的其他问题变化。CUDA BF16 的批量与 padding 形状会带来数值差异，即使各行之间没有共享状态。Python 调用方可显式设置更大的 `batch_size` 换取吞吐，但此时不保证与逐题概率相同。训练和离线评估保持 batch 4，它们的指标对应报告中的实际精度与批量策略。
 
@@ -40,7 +41,7 @@ Qwen 的 GatedDeltaNet 有循环状态与卷积状态，普通 attention mask �
 
 保留多模态不能只保留 tokenizer 或文件名中的 Qwen 标签。本项目实例化完整 `Qwen3_5ForConditionalGeneration`，保留 vision、完整 processor、语言层、词表与生成头。训练时冻结所有原始参数，保存 LoRA sidecar；原生生成在禁用 LoRA 的上下文中执行，结束后恢复适配器状态。
 
-基座冻结哈希与 native token 对照验证这条路径。该保证针对原始生成路径：新指针头的视觉决策效果不由权重保留自动保证。本轮决策监督样本为文本，视觉决策目前属于可运行但未经过专门准确率评估的功能。
+基座冻结哈希与 native token 对照验证这条路径。该保证针对原始生成路径：新指针头的视觉决策效果不由权重保留自动保证。本轮决策监督样本为文本。之后对贪吃蛇检查点的零样本探测中，500 道 A-OKVQA 题带图答对 69.4%（无图 32.6%）；视觉决策尚未经过训练和校准。
 
 ## MLX
 
