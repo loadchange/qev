@@ -149,7 +149,7 @@ def main(argv=None):
     source.add_argument("--source-url")
     source.add_argument("--source-tarball", type=Path, help="Local release tarball (file:// URL, for testing)")
     ap.add_argument("--source-sha256")
-    ap.add_argument("--decision-weights", default="merged-bf16", choices=["adapter", "merged", "merged-bf16"])
+    ap.add_argument("--decision-weights", default="bf16", choices=["adapter", "merged", "merged-bf16", "bf16"])
     ap.add_argument("--bottle-json", type=Path, help="`brew bottle --json` output to embed")
     ap.add_argument("--output", type=Path, required=True)
     args = ap.parse_args(argv)
