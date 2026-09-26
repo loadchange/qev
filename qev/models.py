@@ -38,12 +38,21 @@ class ModelSpec:
 
 
 REGISTRY = {
+    "qev-450m": ModelSpec(
+        "qev-450m", "twainsk/qev-450m-mlx", "2aa0473a6d41536513ce1112f73ec8825dffb895", "mlx",
+        "Qev 450M v0.4.0: LFM2.5-VL-450M text+image foundation, decision adapter and pointer head (MLX bfloat16)"),
+    "qev-230m": ModelSpec(
+        "qev-230m", "twainsk/qev-230m-mlx", "b129ebd4497b0adf96828540c5c2561bf7dd75b1", "mlx",
+        "Qev 230M v0.4.0: LFM2.5-230M text-only foundation, decision adapter and pointer head (MLX bfloat16)"),
     "qev-0.8b": ModelSpec(
         "qev-0.8b", "twainsk/qev-0.8b-mlx", "0dcf82a746794e813357d19c8d94812b1e686169", "mlx",
         "Qev 0.8B v0.3.0: Qwen3.5 multimodal foundation, decision adapter and pointer head (MLX float32)"),
 }
-ALIASES = {"qev-latest": "qev-0.8b", "qev:0.8b": "qev-0.8b", "qev-0.8b-mlx": "qev-0.8b"}
-DEFAULT_MODEL = "qev-0.8b"
+ALIASES = {"qev-latest": "qev-450m",
+           "qev:450m": "qev-450m", "qev-450m-mlx": "qev-450m",
+           "qev:230m": "qev-230m", "qev-230m-mlx": "qev-230m",
+           "qev:0.8b": "qev-0.8b", "qev-0.8b-mlx": "qev-0.8b"}
+DEFAULT_MODEL = "qev-450m"
 
 
 class ModelNotInstalled(LookupError):

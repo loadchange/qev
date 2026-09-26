@@ -33,7 +33,7 @@ WEIGHTS_HELP = ("MLX decision weights: adapter (float32 + separate LoRA, validat
                 "Default: $QEV_DECISION_WEIGHTS or adapter")
 
 
-def _add_model(parser, help_text="Registry name (default: $QEV_MODEL or qev-0.8b) or checkpoint directory"):
+def _add_model(parser, help_text="Registry name (default: $QEV_MODEL or qev-450m) or checkpoint directory"):
     parser.add_argument("--model", help=help_text)
     parser.add_argument("--no-pull", action="store_true", help="Fail instead of downloading a missing registry model")
     parser.add_argument("--decision-weights", choices=["adapter", "merged", "merged-bf16", "bf16"], help=WEIGHTS_HELP)

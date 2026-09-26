@@ -54,7 +54,7 @@ TEMPLATE = '''class Qev < Formula
 
   def caveats
     <<~EOS
-      Download and verify the model (3.5 GB) into ~/.qev once:
+      Download and verify the default model (1.0 GB) into ~/.qev once:
         qev pull
       Then ask directly, or keep the model warm in the background:
         qev decide "Card declined twice at checkout" -i "Which team?" --choice billing technical account
@@ -72,8 +72,8 @@ TEMPLATE = '''class Qev < Formula
 
   test do
     assert_match version.to_s, shell_output("#{{bin}}/qev --version")
-    system libexec/"bin/python", "-c", "import mlx.core, mlx_vlm.models.qwen3_5, qev.mlx_runtime, qev.processing"
-    assert_match "qev-0.8b", shell_output("#{{bin}}/qev list")
+    system libexec/"bin/python", "-c", "import mlx.core, mlx_vlm.models.qwen3_5, mlx_vlm.models.lfm2_vl, qev.mlx_runtime, qev.lfm2_runtime, qev.processing"
+    assert_match "qev-450m", shell_output("#{{bin}}/qev list")
   end
 end
 '''

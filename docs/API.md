@@ -2,7 +2,7 @@
 
 **English** | [简体中文](API.zh-CN.md)
 
-Qev provides two endpoints: `/v1/systemone` returns probabilities over fixed candidates, while `/v1/chat/completions` uses the complete Qwen3.5 foundation's native text, image, and video generation. Native generation disables Qev's decision LoRA and uses the preserved vision modules, language model, and vocabulary output head.
+Qev provides two endpoints: `/v1/systemone` returns probabilities over fixed candidates, while `/v1/chat/completions` uses the loaded checkpoint's complete foundation for native generation (LFM2.5-VL-450M text/image by default; Qwen3.5-0.8B adds video; qev-230m is text-only). Native generation disables Qev's decision LoRA and uses the preserved vision modules, language model, and vocabulary output head.
 
 The current decision adapter was trained only on text. Images and videos can participate in the decision forward pass, but **multimodal decision accuracy has only a limited zero-shot measurement**: on 500 A-OKVQA questions the published Snake checkpoint answered 69.4% correctly with the image (32.6% without; chance 25%), see the [backbone experiment](../experiments/diffusion/README.md). Temperature fitted on text tasks is not applied to these probabilities. API compatibility does not imply matching Jev's model quality or confidence values.
 
@@ -27,7 +27,7 @@ The service listens on `127.0.0.1` by default. The local API does not require an
 
 Pages and model endpoints share the same origin and require no separate frontend build. On the first visit, the page chooses English or Simplified Chinese from the browser language; a manual language switch is saved in the current browser and survives refreshes. Interface language does not rewrite user input or API fields. Snake creation, stepping, export, and related endpoints live under `/api/snake/games`, with state and decisions maintained by the server. See the [demo guide](DEMO.md) for that protocol. These demo endpoints do not change the existing Jev / TypeSafe protocol.
 
-Available aliases include `qev-latest`, `qev:0.8b`, `qev:0.8b-mlx`, `qev-0.8b`, `qev-0.8b-mlx`, and `jev-latest` for older clients. The generation endpoint defaults to `qev-native`. These names refer to the **currently loaded checkpoint**; a request does not switch weights or the Torch/MLX backend.
+Available aliases include `qev-latest`, `qev:450m`, `qev-450m[-mlx]`, `qev:230m`, `qev-230m[-mlx]`, `qev:0.8b`, `qev-0.8b[-mlx]`, and `jev-latest` for older clients. The generation endpoint defaults to `qev-native`. These names refer to the **currently loaded checkpoint**; a request does not switch weights or the Torch/MLX backend.
 
 ## Local request logs
 

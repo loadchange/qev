@@ -2,7 +2,7 @@
 
 **English** | [简体中文](README.zh-CN.md)
 
-A structured decision model built on the complete **Qwen3.5-0.8B multimodal foundation**, with a Jev / TypeSafe-style API and an Apple Silicon MLX runtime.
+A structured decision model on a complete, unchanged multimodal foundation — **LFM2.5-VL-450M** by default, with Qwen3.5-0.8B and a text-only LFM2.5-230M also released — exposing a Jev / TypeSafe-style API and an Apple Silicon MLX runtime.
 
 Qev adds a separate language LoRA decision adapter and a candidate pointer head while retaining the original vision encoder, language model, image/video processors, and generation head. Ordinary chat disables the decision adapter and uses the original foundation. Structured decisions enable the adapter and construct JSON directly from candidate probabilities, without generating and parsing answer text.
 
@@ -36,6 +36,8 @@ The code is on [GitHub](https://github.com/loadchange/qev). Model weights are pu
 
 | Repository | Contents | Runtime |
 | --- | --- | --- |
+| [twainsk/qev-450m-mlx](https://huggingface.co/twainsk/qev-450m-mlx) | **v0.4.0 default.** About 1.00 GB: unchanged LFM2.5-VL-450M foundation (text+image), decision adapter, and pointer head | Apple Silicon / MLX |
+| [twainsk/qev-230m-mlx](https://huggingface.co/twainsk/qev-230m-mlx) | About 0.53 GB: unchanged text-only LFM2.5-230M foundation, decision adapter, and pointer head | Apple Silicon / MLX |
 | [twainsk/qev-0.8b](https://huggingface.co/twainsk/qev-0.8b) | About 85 MB: LoRA, pointer head, and processor; the pinned Qwen3.5 foundation is downloaded separately on first use | PyTorch / NVIDIA |
 | [twainsk/qev-0.8b-mlx](https://huggingface.co/twainsk/qev-0.8b-mlx) | About 3.48 GB: complete FP32 multimodal foundation, adapters, and pointer head | Apple Silicon / MLX |
 

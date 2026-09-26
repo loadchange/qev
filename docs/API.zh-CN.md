@@ -2,7 +2,7 @@
 
 [English](API.md) | **简体中文**
 
-Qev 提供两个入口：`/v1/systemone` 返回固定候选的概率；`/v1/chat/completions` 使用完整 Qwen3.5 的原生文本、图像和视频生成能力。原生生成会禁用 Qev 决策 LoRA，使用保留的视觉模块、语言模型和词表输出头。
+Qev 提供两个入口：`/v1/systemone` 返回固定候选的概率；`/v1/chat/completions` 使用当前加载 checkpoint 的完整底模做原生生成（默认 LFM2.5-VL-450M 支持文本/图像；Qwen3.5-0.8B 另支持视频；qev-230m 仅文本）。原生生成会禁用 Qev 决策 LoRA，使用保留的视觉模块、语言模型和词表输出头。
 
 当前决策适配器只使用文本训练。图像和视频可以进入决策前向计算，但**多模态决策准确率只有有限的零样本测量**：已发布的贪吃蛇检查点在 500 道 A-OKVQA 题上带图答对 69.4%（无图 32.6%，随机 25%），见[骨干对照实验](../experiments/diffusion/README.zh-CN.md)；文本任务拟合的温度不会应用到这些概率。API 兼容不表示与 Jev 的模型质量或置信度数值相同。
 
@@ -27,7 +27,7 @@ uv run qev serve --model models/qev-0.8b --backend torch --port 8008
 
 页面与模型接口同源，无需单独构建前端。网页首次按浏览器语言选择英文或简体中文，并提供手动切换；选择保存在当前浏览器，刷新后仍生效。界面语言不会改写用户输入或 API 字段。贪吃蛇的创建、单步、导出等接口位于 `/api/snake/games`，状态与决策均由服务端维护，具体协议见 [实验室说明](DEMO.zh-CN.md)。这些演示接口不改变原有 Jev / TypeSafe 协议。
 
-可用别名包括 `qev-latest`、`qev:0.8b`、`qev:0.8b-mlx`、`qev-0.8b`、`qev-0.8b-mlx` 和旧客户端的 `jev-latest`。生成入口默认 `qev-native`。这些名称指向**当前已加载的 checkpoint**，不会在请求内切换权重或 Torch/MLX 后端。
+可用别名包括 `qev-latest`、`qev:450m`、`qev-450m[-mlx]`、`qev:230m`、`qev-230m[-mlx]`、`qev:0.8b`、`qev-0.8b[-mlx]` 和旧客户端的 `jev-latest`。生成入口默认 `qev-native`。这些名称指向**当前已加载的 checkpoint**，不会在请求内切换权重或 Torch/MLX 后端。
 
 ## 本地请求日志
 

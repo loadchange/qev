@@ -40,8 +40,9 @@ def tiny_registry(tmp_path, monkeypatch):
 
 
 def test_registry_names_aliases_and_paths(tmp_path):
-    assert models.canonical("qev-latest") == "qev-0.8b" and models.canonical("nope") is None
-    with pytest.raises(models.ModelNotInstalled, match="qev pull qev-0.8b"):
+    assert models.canonical("qev-latest") == "qev-450m" and models.canonical("nope") is None
+    assert models.canonical("qev-230m-mlx") == "qev-230m" and models.canonical("qev:0.8b") == "qev-0.8b"
+    with pytest.raises(models.ModelNotInstalled, match="qev pull qev-450m"):
         models.resolve()
     checkpoint = tmp_path / "ckpt"
     checkpoint.mkdir()
@@ -219,7 +220,7 @@ def test_chat_and_list(monkeypatch, capsys):
     assert capsys.readouterr().out == "Hello!\n"
     assert sent[0][0] == "/v1/chat/completions" and sent[0][1]["messages"] == [{"role": "user", "content": "Say hi"}]
     assert cli.main(["list"]) == 0
-    assert "qev-0.8b *" in capsys.readouterr().out
+    assert "qev-450m *" in capsys.readouterr().out
 
 
 def test_health_reports_the_checkpoint():
@@ -250,4 +251,4 @@ def test_doctor_json(capsys):
     assert cli.main(["doctor", "--json"]) in (0, 1)
     report = json.loads(capsys.readouterr().out)
     names = {check["name"] for check in report["checks"]}
-    assert {"platform", "processor", "QEV_HOME", "model qev-0.8b", "server"} <= names
+    assert {"platform", "processor", "QEV_HOME", "model qev-450m", "server"} <= names

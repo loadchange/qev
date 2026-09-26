@@ -9,13 +9,23 @@
 ```bash
 brew tap loadchange/qev https://github.com/loadchange/qev
 brew install loadchange/qev/qev
-qev pull            # 下载并校验默认模型（3.5 GB），存放在 ~/.qev
+qev pull            # 下载并校验默认模型（1.0 GB），存放在 ~/.qev
 qev doctor          # 检查芯片、MLX/Metal、模型文件和本机服务
 ```
 
 要求：Apple Silicon，macOS 14 或更新。Homebrew 可能会先要求信任这个 tap（`brew trust loadchange/qev`）。在源码目录中，`uv sync --python 3.12 --extra mlx` 后用 `uv run qev …` 效果相同。
 
-`qev pull --from 目录 [--link]` 可以导入已经下载好的检查点（例如用 `hf download twainsk/qev-0.8b-mlx` 下载的），导入前会按 qev 自带的发布清单逐个校验运行时文件。
+`qev pull --from 目录 [--link]` 可以导入已经下载好的检查点（例如用 `hf download twainsk/qev-450m-mlx` 下载的），导入前会按 qev 自带的发布清单逐个校验运行时文件。
+
+注册表模型（用 `QEV_MODEL`、`--model` 或 `qev pull 名称` 选择）：
+
+| 名称 | 底模 | 决策输入 | 下载体积 |
+|---|---|---|---|
+| `qev-450m`（默认） | LFM2.5-VL-450M | 文本、图片、视频帧 | 1.00 GB |
+| `qev-230m` | LFM2.5-230M | 仅文本（多媒体会报错拒绝） | 0.53 GB |
+| `qev-0.8b` | Qwen3.5-0.8B | 文本、图片、视频 | 3.48 GB |
+
+LFM2.5 系列模型按 LFM Open License v1.0 分发：年营收达到或超过 1,000 万美元的实体不获商用许可。
 
 ## 判断
 
@@ -62,16 +72,16 @@ qev serve [--port 8008] [--host 127.0.0.1] [--decision-weights bf16]
 
 ## Apple Silicon 上的速度
 
-`--decision-weights`（或 `$QEV_DECISION_WEIGHTS`）决定 MLX 运行时如何计算决策。原生生成始终使用未经改动的底模。
+`--decision-weights`（或 `$QEV_DECISION_WEIGHTS`）决定 MLX 运行时如何计算决策。原生生成始终使用未经改动的底模。默认模型 `qev-450m`（bfloat16 底模）在 M4 上：
 
-| 模式 | 决策路径 | M4 上每步贪吃蛇决策 | 内存 |
+| 模式 | 决策路径 | M4 上每步贪吃蛇决策 | MLX 峰值内存 |
 |---|---|---|---|
-| `adapter` | float32 底模，LoRA 单独计算（经过验证的参考路径） | 219 ms | 3.22 GB |
-| `merged` | float32 底模加一份合并后的 float32 决策权重 | 185 ms | 5.07 GB |
-| `merged-bf16` | float32 底模加一份合并后的 bfloat16 决策权重 | 171 ms | 4.15 GB |
-| `bf16` | 整个模型 bfloat16，决策权重合并 | 149 ms | 2.54 GB |
+| `adapter` | LoRA 单独计算（经过验证的参考路径） | 98 ms | 1.78 GiB |
+| `merged` | 另存一份合并后的 float32 决策权重 | 96 ms | 2.94 GiB |
+| `merged-bf16` | 另存一份合并后的 bfloat16 决策权重 | 70 ms | 1.91 GiB |
+| `bf16` | 整个模型 bfloat16，决策权重合并 | 71 ms | 1.86 GiB |
 
-在 1,380 道开发题上，四种模式准确率都是 87.9%（贪吃蛇 98.4%，通用 81.9%）；相对 `adapter`，`merged-bf16` 改变了 5 个决策，`bf16` 改变了 7 个，净准确率不变（[结果](results/decision_weights.json)）。`bf16` 模式下原生生成也使用 bfloat16，生成文本可能在几个 token 之后与 float32 不同。命令行默认使用 `adapter`，Homebrew 服务使用 `bf16`。
+在 1,380 道开发题上，四种模式准确率都是 86.2%（贪吃蛇 98.8%，通用 79.1%），且与 PyTorch 参考只差同样的 2 个决策（[结果](results/qev-450m_decision_weights.json)）。命令行默认使用 `adapter`，Homebrew 服务使用 `bf16`。纯文本的 `qev-230m` 在 `bf16` 下一步贪吃蛇决策 43 ms、峰值 1.18 GiB（[结果](results/qev-230m_decision_weights.json)）；此前 `qev-0.8b` 的测量（float32 底模，149–219 ms，最高 5.07 GB）保留在 [decision_weights.json](results/decision_weights.json)。
 
 ## 其他命令
 

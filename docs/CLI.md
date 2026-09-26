@@ -9,13 +9,23 @@
 ```bash
 brew tap loadchange/qev https://github.com/loadchange/qev
 brew install loadchange/qev/qev
-qev pull            # download and verify the default model (3.5 GB) into ~/.qev
+qev pull            # download and verify the default model (1.0 GB) into ~/.qev
 qev doctor          # check the chip, MLX/Metal, model files and a local server
 ```
 
 Requirements: Apple Silicon, macOS 14 or newer. Homebrew may ask you to trust the tap first (`brew trust loadchange/qev`). From a source checkout, `uv sync --python 3.12 --extra mlx` and `uv run qev …` work the same way.
 
-`qev pull --from DIR [--link]` imports a checkpoint you already downloaded (for example with `hf download twainsk/qev-0.8b-mlx`) after checking every runtime file against the release manifest shipped with qev.
+`qev pull --from DIR [--link]` imports a checkpoint you already downloaded (for example with `hf download twainsk/qev-450m-mlx`) after checking every runtime file against the release manifest shipped with qev.
+
+Registry models (select with `QEV_MODEL`, `--model`, or `qev pull NAME`):
+
+| Name | Foundation | Decides on | Download |
+|---|---|---|---|
+| `qev-450m` (default) | LFM2.5-VL-450M | text, images, video frames | 1.00 GB |
+| `qev-230m` | LFM2.5-230M | text only (media is rejected) | 0.53 GB |
+| `qev-0.8b` | Qwen3.5-0.8B | text, images, video | 3.48 GB |
+
+The LFM2.5 models are distributed under the LFM Open License v1.0: commercial use by an entity with annual revenue of USD 10 million or more is not licensed.
 
 ## Decisions
 
@@ -62,16 +72,16 @@ It serves `POST /v1/systemone`, `POST /v1/chat/completions`, `GET /v1/models`, `
 
 ## Speed on Apple Silicon
 
-`--decision-weights` (or `$QEV_DECISION_WEIGHTS`) chooses how the MLX runtime computes decisions. Native generation always uses the unchanged foundation.
+`--decision-weights` (or `$QEV_DECISION_WEIGHTS`) chooses how the MLX runtime computes decisions. Native generation always uses the unchanged foundation. For the default `qev-450m` (bfloat16 foundation) on an M4:
 
-| Mode | Decision path | Snake decision, M4 | Memory |
+| Mode | Decision path | Snake decision, M4 | Peak MLX memory |
 |---|---|---|---|
-| `adapter` | float32 foundation, LoRA computed separately (validated reference) | 219 ms | 3.22 GB |
-| `merged` | float32 foundation plus a merged float32 decision copy | 185 ms | 5.07 GB |
-| `merged-bf16` | float32 foundation plus a merged bfloat16 decision copy | 171 ms | 4.15 GB |
-| `bf16` | whole model in bfloat16, merged decision weights | 149 ms | 2.54 GB |
+| `adapter` | LoRA computed separately (validated reference) | 98 ms | 1.78 GiB |
+| `merged` | plus a merged float32 decision copy | 96 ms | 2.94 GiB |
+| `merged-bf16` | plus a merged bfloat16 decision copy | 70 ms | 1.91 GiB |
+| `bf16` | whole model in bfloat16, merged decision weights | 71 ms | 1.86 GiB |
 
-On the 1,380 development questions all four modes scored 87.9% (Snake 98.4%, general 81.9%); `merged-bf16` changed 5 decisions and `bf16` changed 7 relative to `adapter`, with no net accuracy change ([results](results/decision_weights.json)). In `bf16` native generation also runs in bfloat16, so generated text can diverge from float32 after a few tokens. The command-line default is `adapter`; the Homebrew service uses `bf16`.
+On the 1,380 development questions every mode scored 86.2% (Snake 98.8%, general 79.1%) and differed from the PyTorch reference by the same 2 decisions ([results](results/qev-450m_decision_weights.json)). The command-line default is `adapter`; the Homebrew service uses `bf16`. The text-only `qev-230m` answers a Snake decision in 43 ms at 1.18 GiB in `bf16` ([results](results/qev-230m_decision_weights.json)); the previous `qev-0.8b` measurements (float32 foundation, 149–219 ms, up to 5.07 GB) remain in [decision_weights.json](results/decision_weights.json).
 
 ## Other commands
 

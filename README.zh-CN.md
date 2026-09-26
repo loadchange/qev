@@ -2,7 +2,7 @@
 
 [English](README.md) | **简体中文**
 
-以完整 **Qwen3.5-0.8B 多模态模型**为基座的结构化决策模型，提供 Jev / TypeSafe 风格接口和 Apple Silicon MLX 运行时。
+以完整且未改动的多模态底模为基座的结构化决策模型——默认 **LFM2.5-VL-450M**，同时发布 Qwen3.5-0.8B 和纯文本 LFM2.5-230M——提供 Jev / TypeSafe 风格接口和 Apple Silicon MLX 运行时。
 
 Qev 增加独立的语言 LoRA 决策适配器与候选指针头，保留原始视觉编码器、语言模型、图像/视频处理器和生成头。普通对话关闭决策适配器，使用原始基座；结构化决策开启适配器，用候选概率直接构造 JSON，不靠生成文本再解析。
 
@@ -36,6 +36,8 @@ uv run qev serve --model models/qev-snake-0.8b-mlx --port 8008
 
 | 下载仓库 | 内容 | 适用环境 |
 | --- | --- | --- |
+| [twainsk/qev-450m-mlx](https://huggingface.co/twainsk/qev-450m-mlx) | **v0.4.0 默认。** 约 1.00 GB，未改动的 LFM2.5-VL-450M 底模（文本+图像）、决策 adapter 与指针头 | Apple Silicon / MLX |
+| [twainsk/qev-230m-mlx](https://huggingface.co/twainsk/qev-230m-mlx) | 约 0.53 GB，未改动的纯文本 LFM2.5-230M 底模、决策 adapter 与指针头 | Apple Silicon / MLX |
 | [twainsk/qev-0.8b](https://huggingface.co/twainsk/qev-0.8b) | 约 85 MB，LoRA、指针头与处理器；首次运行另外下载固定版本 Qwen3.5 基座 | PyTorch / NVIDIA |
 | [twainsk/qev-0.8b-mlx](https://huggingface.co/twainsk/qev-0.8b-mlx) | 约 3.48 GB，完整 FP32 多模态基座、适配器与指针头 | Apple Silicon / MLX |
 

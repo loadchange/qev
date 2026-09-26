@@ -1,0 +1,90 @@
+{
+  "format": "qev-hub-release-v1",
+  "version": "0.4.0",
+  "repo_id": "twainsk/qev-230m-mlx",
+  "runtime": "mlx",
+  "runtime_source_commit": "47fc15f419d49cca8728d3742cb35cc7b984f82d",
+  "files": {
+    "LICENSE": {
+      "size": 10574,
+      "sha256": "30adf9d6478191fb87f2424f63ba0728598335aaf99cd2848ef17e8e545fe94b"
+    },
+    "NOTICE": {
+      "size": 505,
+      "sha256": "2c7212f9e64a80a9188e1ae0abc15776c50846510236e04efea9efcfb954ecfe"
+    },
+    "README.md": {
+      "size": 4611,
+      "sha256": "3d614f4dc75c6c44715caeaa9530fdff3184bb2a9711de90369069e9c3d1d9d8"
+    },
+    "README.zh-CN.md": {
+      "size": 4387,
+      "sha256": "74e5e088aecdbf2b17b4dcc4befea876e4b8909c9fcbcfd5edf9517eb7551c94"
+    },
+    "backbone/LICENSE": {
+      "size": 10574,
+      "sha256": "30adf9d6478191fb87f2424f63ba0728598335aaf99cd2848ef17e8e545fe94b"
+    },
+    "backbone/chat_template.jinja": {
+      "size": 4762,
+      "sha256": "c5b67247c9f736f6c40eaa91ae1ef27dc67f5b041eedaadb97a1bea5030fb0ff"
+    },
+    "backbone/config.json": {
+      "size": 1568,
+      "sha256": "f7d0bcc454b7a30fa471b1e7b9e359e11fb25b56f5b4ffd59bb18248e3c2ea3d"
+    },
+    "backbone/generation_config.json": {
+      "size": 303,
+      "sha256": "4f88574c47c3215f7f952e1f520d1df7387422dde0345655228fb7b3fde6858c"
+    },
+    "backbone/model.safetensors": {
+      "size": 459401112,
+      "sha256": "f630da86651136c9aee893b04b7542007e90fdd718355358e57e7ecc31517cfd"
+    },
+    "backbone/tokenizer.json": {
+      "size": 4733389,
+      "sha256": "df1d8d5ec5d091b460562ffd545e4a5e91d17d4a0db7ebe733be34ed374377bd"
+    },
+    "backbone/tokenizer_config.json": {
+      "size": 489,
+      "sha256": "75c287923e252b08b0a0f1c367bbe557ab23a681d0b71c5a34e0932ddbe2f5ee"
+    },
+    "decision_adapters.safetensors": {
+      "size": 62148448,
+      "sha256": "9f40ead0fb5ff6db0e7d60f9ff56f404776dc118e1454946854e31abd77e8f78"
+    },
+    "pointer.safetensors": {
+      "size": 2097320,
+      "sha256": "34e28ced1dd53204fd8b95be45832289f9613c68875a0855f42a00646de19d2e"
+    },
+    "qev_config.json": {
+      "size": 815,
+      "sha256": "20adb596217bfaec813012585a088a326eec428acf6479c8ae50225f68051ff5"
+    },
+    "reports/decision_weights.json": {
+      "size": 25489,
+      "sha256": "e6e4c86b37380dd955c734b93fae83a48186fef8bb6ed74449d7894b06fd553e"
+    },
+    "reports/evaluation.json": {
+      "size": 15713,
+      "sha256": "ae290adb77db03d847e751b0733fac82ec6b9f63bc2eaaef356fa14194cb06b1"
+    },
+    "reports/mlx_parity.json": {
+      "size": 12897,
+      "sha256": "f53b0d11745d4cf1eba8b38d464e747253b34ef0b179e843e5d26e1c0a2c2e89"
+    },
+    "reports/order_probe.json": {
+      "size": 2159,
+      "sha256": "df848699431fd7e2404b486a373bbd2963f7c7bad5cf30585e35b22096a4eba8"
+    },
+    "reports/paired_tests.json": {
+      "size": 1903,
+      "sha256": "4dad6ff2e4613be3e2951bc45cd878e1636ec48fb29dde42241d8da369c888c3"
+    },
+    "reports/provenance.json": {
+      "size": 3651,
+      "sha256": "03eb8a3c6ae0d026d755713709403f33f116641c38d212a8d8f1ac9c510ce6cd"
+    }
+  },
+  "scope": "Runtime files and evaluation summaries; raw training records are not included."
+}

@@ -1,0 +1,98 @@
+{
+  "format": "qev-hub-release-v1",
+  "version": "0.4.0",
+  "repo_id": "twainsk/qev-450m-mlx",
+  "runtime": "mlx",
+  "runtime_source_commit": "47fc15f419d49cca8728d3742cb35cc7b984f82d",
+  "files": {
+    "LICENSE": {
+      "size": 10574,
+      "sha256": "4d28ca14dedc0b3d0fcc2b3339f0e79931faa33874f3d24f522183a8fc70068c"
+    },
+    "NOTICE": {
+      "size": 508,
+      "sha256": "d27f2691b1a225e85077c2d626d25969e9e02d8392cfa879b414dc07d35561cc"
+    },
+    "README.md": {
+      "size": 5733,
+      "sha256": "4931c5914e905bf547b75a95b3ebc75c2facd049007dfaa397ba728a8fc26379"
+    },
+    "README.zh-CN.md": {
+      "size": 5394,
+      "sha256": "924b8a2e35335d10cff3046458e99fcc2be005d4713d2e686de0b157575345e0"
+    },
+    "backbone/LICENSE": {
+      "size": 10574,
+      "sha256": "4d28ca14dedc0b3d0fcc2b3339f0e79931faa33874f3d24f522183a8fc70068c"
+    },
+    "backbone/chat_template.jinja": {
+      "size": 3836,
+      "sha256": "309e586e2eda3d7f2db1e2a045bfb07f4c83798b23f7ac587954426302d508e9"
+    },
+    "backbone/config.json": {
+      "size": 2373,
+      "sha256": "ab0de32d57b83b8b0cbb4526e096cf1e8adc1d8b6a09cb55df38597866eae53f"
+    },
+    "backbone/generation_config.json": {
+      "size": 136,
+      "sha256": "40d17f9ec64c97e8fd5400540960b6a9761ed6d6acc0b1ab6a6656055e4755b3"
+    },
+    "backbone/model.safetensors": {
+      "size": 897484568,
+      "sha256": "2f6deb5dd43707de5cfe3c59470d3bccf4c3112a810a74570499f4728d412eea"
+    },
+    "backbone/processor_config.json": {
+      "size": 828,
+      "sha256": "622b75b531b3f49b1cdf4f90626c34e5ffb4f8bba2b8637807af0462398ae718"
+    },
+    "backbone/tokenizer.json": {
+      "size": 4733040,
+      "sha256": "f3910942aa907c48b0cc20ec426ee38bfa8dcda8feecf035ced981918cb30f14"
+    },
+    "backbone/tokenizer_config.json": {
+      "size": 829,
+      "sha256": "aed83606e95db808fc4d5312bf117605360e770bfef5a6028c348c3981ce143a"
+    },
+    "decision_adapters.safetensors": {
+      "size": 95967520,
+      "sha256": "d8fe288414e9c6de06e44625592c1915a6c3e38b6ceb8cd9957e024c4ea6ad52"
+    },
+    "pointer.safetensors": {
+      "size": 2097320,
+      "sha256": "bccabbabc93e25cb56605861ad9b830b7c183e65e298489ad800ed2e3ce5b5b3"
+    },
+    "qev_config.json": {
+      "size": 844,
+      "sha256": "a481228f9b3a3a3cac842fcd30c5538705a001ee941454a1817481e6565dbf57"
+    },
+    "reports/aokvqa_probe.json": {
+      "size": 881,
+      "sha256": "f501c56a9bd349c1c1572a11722180014835d7118501f2a5acd994a09313244a"
+    },
+    "reports/decision_weights.json": {
+      "size": 26151,
+      "sha256": "9a69b33d3938aba753f6d69ccc943b322a0fa24c87d6e9fb30abafc6eca0a52a"
+    },
+    "reports/evaluation.json": {
+      "size": 15895,
+      "sha256": "4243d7d7dd0bc4f839e2fcb0473966d1f064532aad54ee7ca2fa10a0bf5c4117"
+    },
+    "reports/mlx_parity.json": {
+      "size": 13247,
+      "sha256": "89c182a53b928826a2a55acae7a174d279a25122521362287ffca5e4a33dba3e"
+    },
+    "reports/order_probe.json": {
+      "size": 1989,
+      "sha256": "0544469f37fb08cd96ef277ed82c1877beee1167b351802240814d6fbbbfb3fc"
+    },
+    "reports/paired_tests.json": {
+      "size": 1903,
+      "sha256": "4dad6ff2e4613be3e2951bc45cd878e1636ec48fb29dde42241d8da369c888c3"
+    },
+    "reports/provenance.json": {
+      "size": 3651,
+      "sha256": "d42a62a0d2ef35250d9062de029cfb373fc81873e5eeba488204b1644fffef72"
+    }
+  },
+  "scope": "Runtime files and evaluation summaries; raw training records are not included."
+}
