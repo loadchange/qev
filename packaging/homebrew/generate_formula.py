@@ -23,7 +23,7 @@ HERE = Path(__file__).resolve().parent
 NO_DEPS = {"mlx-vlm": "0.7.1"}  # model code only; its audio/OpenCV/server extras stay out
 MACOS = (14, 0)
 TEMPLATE = '''class Qev < Formula
-  desc "Typed decisions and multimodal chat from a local Qwen3.5 model on Apple Silicon"
+  desc "Typed decisions and multimodal chat from local models on Apple Silicon"
   homepage "https://github.com/loadchange/qev"
   url "{url}"
   sha256 "{sha256}"
