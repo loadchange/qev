@@ -8,7 +8,7 @@ class Qev < Formula
 
   bottle do
     root_url "https://github.com/loadchange/qev/releases/download/v0.4.0"
-    sha256 cellar: "any", arm64_sonoma: "1b787e60adc59c7d4e62d7de37176703f14eebc59f280b4cb21d6c34d8424848"
+    sha256 cellar: :any, arm64_sonoma: "1b787e60adc59c7d4e62d7de37176703f14eebc59f280b4cb21d6c34d8424848"
   end
 
 

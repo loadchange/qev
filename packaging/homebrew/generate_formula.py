@@ -127,10 +127,12 @@ def bottle_block(path):
         return ""
     document = next(iter(json.loads(Path(path).read_text()).values()))["bottle"]
     lines = ["", "  bottle do", f'    root_url "{document["root_url"]}"']
+    # `brew bottle --json` writes the :any / :any_skip_relocation symbols
+    # without their leading colon; only real cellar paths stay strings.
+    cellar = document["cellar"].lstrip(":")
+    cellar = f":{cellar}" if cellar in ("any", "any_skip_relocation") else f'"{document["cellar"]}"'
     for tag, entry in sorted(document["tags"].items()):
-        lines.append(f'    sha256 cellar: :{document["cellar"].lstrip(":")}, {tag}: "{entry["sha256"]}"'
-                     if document["cellar"].startswith(":")
-                     else f'    sha256 cellar: "{document["cellar"]}", {tag}: "{entry["sha256"]}"')
+        lines.append(f'    sha256 cellar: {cellar}, {tag}: "{entry["sha256"]}"')
     return "\n".join([*lines, "  end", ""]) + "\n"
 
 
