@@ -21,6 +21,10 @@ tags:
 
 # Qev-0.8B — PyTorch 决策适配器
 
+> [!NOTE]
+> **自 Qev v0.4.0 起，默认模型改为 [twainsk/qev-450m-mlx](https://huggingface.co/twainsk/qev-450m-mlx)**（LFM2.5-VL-450M：下载 1.0 GB，Mac 决策快 2.1 倍，零样本图片准确率持平，通用文本 −2.8 个百分点），并同时提供纯文本的 [twainsk/qev-230m-mlx](https://huggingface.co/twainsk/qev-230m-mlx)。本 Qwen3.5 检查点继续发布、可用 `qev pull qev-0.8b` 安装；它仍是准确率最高、选项顺序最稳健的 Qev 模型，也是唯一接受视频决策输入的模型。
+
+
 本仓库发布 **Qev v0.3.0 贪吃蛇专项续训 checkpoint**：它从早期 Qev 决策适配器出发，使用贪吃蛇监督数据和原通用决策任务回放继续训练。本地训练名称为 `qev-snake-0.8b`，API 模型别名仍为 `qev-0.8b`。这里提供的是新版 checkpoint，而非最初的 v0.2 权重。
 
 Qev 在完整的 [Qwen3.5-0.8B](https://huggingface.co/Qwen/Qwen3.5-0.8B) 多模态基座上增加语言 LoRA 适配器和候选指针头，对给定答案选项评分，并通过 Jev / TypeSafe 风格 API 返回类型化决策。原生文字、图片和采样视频生成会关闭决策适配器，使用冻结基座。

@@ -21,6 +21,10 @@ tags:
 
 # Qev-0.8B — PyTorch decision adapter
 
+> [!NOTE]
+> **Since Qev v0.4.0 the default model is [twainsk/qev-450m-mlx](https://huggingface.co/twainsk/qev-450m-mlx)** (LFM2.5-VL-450M: 1.0 GB download, 2.1× faster Mac decisions, equal zero-shot image accuracy, general text −2.8 pt), with a text-only [twainsk/qev-230m-mlx](https://huggingface.co/twainsk/qev-230m-mlx) beside it. This Qwen3.5 checkpoint stays published and installable (`qev pull qev-0.8b`); it remains the most accurate and most option-order-robust Qev model and the only one taking video decision input.
+
+
 This repository publishes the **Qev v0.3.0 Snake continuation checkpoint**, trained from the earlier Qev decision adapter with Snake supervision and replay of the original general decision tasks. Its local training name is `qev-snake-0.8b`; `qev-0.8b` remains the API model alias. This is the newer checkpoint, not the original v0.2 weights.
 
 Qev adds a language LoRA adapter and a candidate pointer head to the complete [Qwen3.5-0.8B](https://huggingface.co/Qwen/Qwen3.5-0.8B) multimodal foundation. It scores supplied answer options and returns typed decisions through a Jev / TypeSafe-style API. Native text, image and sampled-video generation disables the decision adapter and uses the frozen foundation.

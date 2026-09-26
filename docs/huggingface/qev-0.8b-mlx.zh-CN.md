@@ -22,6 +22,10 @@ tags:
 
 # Qev-0.8B-MLX — 完整多模态 FP32 checkpoint
 
+> [!NOTE]
+> **自 Qev v0.4.0 起，默认模型改为 [twainsk/qev-450m-mlx](https://huggingface.co/twainsk/qev-450m-mlx)**（LFM2.5-VL-450M：下载 1.0 GB，Mac 决策快 2.1 倍，零样本图片准确率持平，通用文本 −2.8 个百分点），并同时提供纯文本的 [twainsk/qev-230m-mlx](https://huggingface.co/twainsk/qev-230m-mlx)。本 Qwen3.5 检查点继续发布、可用 `qev pull qev-0.8b` 安装；它仍是准确率最高、选项顺序最稳健的 Qev 模型，也是唯一接受视频决策输入的模型。
+
+
 本仓库发布 **面向 Apple Silicon 的 Qev v0.3.0 贪吃蛇专项续训 checkpoint**。它包含完整转换的 Qwen3.5-0.8B 基座、独立决策 LoRA 权重、候选指针头和文字/图片/视频预处理资源。本地训练/导出名称为 `qev-snake-0.8b-mlx`，API 模型别名仍为 `qev-0.8b`。这里提供的是较新的续训 checkpoint，而非最初的 v0.2 权重。
 
 Qev 通过 Jev / TypeSafe 风格 API 对给定答案选项评分。决策推理启用 LoRA 适配器；原生文字、图片和采样视频生成关闭适配器，使用未改动的基座。这是**完整 FP32 导出**，不是 4-bit 模型，也不是仅含适配器的下载。对应的 PyTorch 适配器 checkpoint 为 [twainsk/qev-0.8b](https://huggingface.co/twainsk/qev-0.8b)。

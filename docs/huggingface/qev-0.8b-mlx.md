@@ -22,6 +22,10 @@ tags:
 
 # Qev-0.8B-MLX — full multimodal FP32 checkpoint
 
+> [!NOTE]
+> **Since Qev v0.4.0 the default model is [twainsk/qev-450m-mlx](https://huggingface.co/twainsk/qev-450m-mlx)** (LFM2.5-VL-450M: 1.0 GB download, 2.1× faster Mac decisions, equal zero-shot image accuracy, general text −2.8 pt), with a text-only [twainsk/qev-230m-mlx](https://huggingface.co/twainsk/qev-230m-mlx) beside it. This Qwen3.5 checkpoint stays published and installable (`qev pull qev-0.8b`); it remains the most accurate and most option-order-robust Qev model and the only one taking video decision input.
+
+
 This repository publishes the **Qev v0.3.0 Snake continuation checkpoint for Apple Silicon**. It contains the complete converted Qwen3.5-0.8B foundation, separate decision LoRA weights, a candidate pointer head and text/image/video preprocessing assets. Its local training/export name is `qev-snake-0.8b-mlx`; `qev-0.8b` remains the API model alias. This is the newer continuation checkpoint, not the original v0.2 weights.
 
 Qev scores supplied answer options through a Jev / TypeSafe-style API. Decision inference enables the LoRA adapter; native text, image and sampled-video generation disables it and uses the unchanged foundation. This is a **full FP32 export**, not a 4-bit model and not an adapter-only download. The corresponding PyTorch adapter checkpoint is [twainsk/qev-0.8b](https://huggingface.co/twainsk/qev-0.8b).
